@@ -1,0 +1,9 @@
+.idea
+.settings
+.project
+target
+test-output
+.classpath
+*.iml
+*~
+config.properties
