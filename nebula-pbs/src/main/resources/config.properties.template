@@ -1,0 +1,5 @@
+#specify DB connection details
+jdbc.driver=org.postgresql.Driver
+jdbc.url=jdbc:postgresql://
+jdbc.user=
+jdbc.password=
