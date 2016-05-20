@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd"
+        >
+
+    <context:component-scan base-package="cz.cesnet"/>
+    <context:annotation-config/>
+    <tx:annotation-driven/>
+
+
+    <bean id="pbsConnector" class="cz.cesnet.meta.pbs.PbsConnectorJNI"/>
+
+    <!--
+    pozor, JSON neposila informace o ulohach !
+    <bean id="pbsConnector" class="cz.cesnet.meta.pbs.PbsConnectorJson" scope="singleton">
+    </bean>
+    -->
+
+    <bean id="servers" class="java.util.ArrayList">
+        <constructor-arg>
+            <list value-type="cz.cesnet.meta.pbs.PbsServerConfig">
+                <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
+                    <property name="host" value="arien.ics.muni.cz"/>
+                    <property name="main" value="true"/>
+                    <property name="by_queue" value="false"/>
+                    <property name="fairshares">
+                        <list>
+                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
+                                <constructor-arg name="tree" value="default" />
+                                <constructor-arg name="metrics" value="fairshare.default" />
+                                <constructor-arg name="id" value="arien" />
+                            </bean>
+                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
+                                <constructor-arg name="tree" value="ncbr" />
+                                <constructor-arg name="metrics" value="fairshare.ncbr" />
+                                <constructor-arg name="id" value="arien.ncbr" />
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
+                    <property name="host" value="wagap.cerit-sc.cz"/>
+                    <property name="main" value="false"/>
+                    <property name="by_queue" value="false"/>
+                    <property name="planbased" value="true"/>
+                    <property name="fairshares">
+                        <list>
+                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
+                                <constructor-arg name="tree" value="default" />
+                                <constructor-arg name="metrics" value="fairshare.default" />
+                                <constructor-arg name="id" value="wagap" />
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+
+
+    <bean id="pbsCache" class="cz.cesnet.meta.pbscache.PbsCacheImpl">
+        <property name="pbsServers" ref="servers"/>
+        <property name="loadRunTimeInMilliseconds" value="6000"/>
+        <property name="moreMappings">
+            <map key-type="java.lang.String" value-type="java.util.List">
+                <entry key="ungu.cerit-sc.cz">
+                    <list value-type="java.lang.String">
+                        <value>ungu1.cerit-sc.cz</value>
+                        <value>ungu2.cerit-sc.cz</value>
+                    </list>
+                </entry>
+                <entry key="urga.cerit-sc.cz">
+                    <list value-type="java.lang.String">
+                        <value>urga1.cerit-sc.cz</value>
+                        <value>urga2.cerit-sc.cz</value>
+                    </list>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+
+    <bean id="pbsky" class="cz.cesnet.meta.pbs.PbskyImpl">
+        <property name="pbsConnector" ref="pbsConnector"/>
+        <property name="pbsServers" ref="servers"/>
+        <property name="pbsCache" ref="pbsCache"/>
+        <property name="loadRunTimeInMilliseconds" value="10000"/>
+    </bean>
+
+    <bean id="perun" class="cz.cesnet.meta.perun.impl.PerunJsonImpl">
+        <constructor-arg>
+            <list value-type="java.lang.String">
+                <value>/etc/pbsmon/pbsmon_machines.json</value>
+            </list>
+        </constructor-arg>
+        <constructor-arg>
+            <list value-type="java.lang.String">
+                <value>/etc/pbsmon/pbsmon_users.json</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="accounting" class="cz.cesnet.meta.acct.AccountingImpl">
+        <property name="dataSource" ref="dataSourceAcct"/>
+    </bean>
+
+    <bean id="dataSourceAcct" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="/jdbc/acctDb"/>
+        <property name="resourceRef" value="true"/>
+    </bean>
+
+    <bean id="cloud" class="cz.cesnet.meta.cloud.CloudImpl" >
+        <property name="dataMaxAgeInMilliseconds" value="300000"/>
+        <property name="loadRunTimeInMilliseconds" value="15000"/>
+    </bean>
+
+    <bean id="diskArrays" class="cz.cesnet.meta.storages.StoragesDiskArrayMotdImpl">
+        <property name="file" value="/home/makub/motd.storage"/>
+        <property name="dataMaxAgeInMilliseconds" value="300000"/>
+    </bean>
+
+    <bean id="hsms" class="cz.cesnet.meta.storages.StoragesHsmImpl" >
+        <property name="url" value="https://accounting.du.cesnet.cz/du/du_motd_info.txt"/>
+        <property name="cerit4File" value="/home/makub/brno4-cerit-hsm.txt" />
+        <property name="dataMaxAgeInMilliseconds" value="3600000"/>
+    </bean>
+
+</beans>

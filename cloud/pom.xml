@@ -1,0 +1,48 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cz.metacentrum</groupId>
+        <artifactId>accounting-parent</artifactId>
+        <version>3.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>cloud</artifactId>
+    <packaging>jar</packaging>
+
+    <name>shared lib for reading OpenNebula State</name>
+    <description>Načítání stavu cloudu z JSON souborů generovaných OpenNebulou</description>
+    <inceptionYear>2013</inceptionYear>
+    <organization>
+        <name>CESNET</name>
+        <url>http://www.cesnet.cz</url>
+    </organization>
+    <developers>
+        <developer>
+            <name>Martin Kuba</name>
+            <email>makub@ics.muni.cz</email>
+            <url>http://www.muni.cz/people/3988</url>
+            <organization>Masaryk University</organization>
+            <organizationUrl>http://www.muni.cz</organizationUrl>
+        </developer>
+    </developers>
+
+    <dependencies>
+        <!-- slf4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <!-- Jackson JSON processor -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <!-- Spring REST template -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

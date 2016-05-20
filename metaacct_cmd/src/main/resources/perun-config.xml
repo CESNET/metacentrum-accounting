@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="perun" class="cz.cesnet.meta.acct.hw.perun.PerunHwJsonImpl">
+        <property name="perunJson" ref="perunJson"/>
+    </bean>
+
+    <bean id="perunJson" class="cz.cesnet.meta.perun.impl.PerunJsonImpl">
+        <constructor-arg>
+            <list value-type="java.lang.String">
+                <value>/etc/pbsmon/pbsmon_machines.json</value>
+            </list>
+        </constructor-arg>
+        <constructor-arg>
+            <list value-type="java.lang.String">
+                <value>/etc/pbsmon/pbsmon_users.json</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+</beans>

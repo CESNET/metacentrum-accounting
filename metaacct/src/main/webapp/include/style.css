@@ -1,0 +1,134 @@
+@CHARSET "UTF-8";
+
+
+input.error {
+    background-color: yellow;
+    color: red;
+}
+
+a {
+	background-repeat: no-repeat;
+}
+	
+TABLE.data {
+	border-width: 1px;
+	border-color: navy;
+	border-style: dotted;	
+	width: 100%;
+}
+TD.data {
+	padding: 2px;
+	margin: 5px;
+	text-align: center;
+	border-top-width: 1px;
+	border-top-style: dotted;
+	
+}
+
+#main {
+	text-align: center;
+	margin: auto;
+	position: relative;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.inner_table tr th {
+	font-size: 95%;
+	font-weight: bold;
+}
+.second {
+	background-color: #ffde33;
+}
+.conflict {
+	background-color: red;
+}
+
+th.sorted {
+	background-color: orange;
+}
+
+th a,th a:visited {
+	color: black;
+}
+
+
+
+th a:hover {
+	text-decoration: underline;
+	color: black;
+}
+
+th.sorted a,th.sortable a {
+	background-position: right;
+	display: block;
+	width: 100%;
+}
+
+th.sortable a {
+	background-image: url(images/arrow_off.png);
+}
+
+th.order1 a {
+	background-image: url(images/arrow_down.png);
+}
+
+th.order2 a {
+	background-image: url(images/arrow_up.png);
+}
+
+#page form h3 {
+  padding-top: 4px;
+  padding-left: 10px;
+  padding-bottom: 4px;
+  font-weight: bold;
+  margin-top: 0pt;
+  margin-right: 0pt;
+  margin-bottom: 0pt;
+  margin-left: 0pt;
+  background-color: orange;
+}
+
+#page {
+} 
+  
+
+#page form div.filtr {
+	margin: 10px 0;	
+}
+
+#page form div.filtr table  {
+	width: 100%;
+}
+
+#page form .filtr table td.polozka {
+	width: auto;
+	text-align: left;
+}
+
+#page form .filtr h3 {
+	cursor: pointer;
+	_cursor: hand;	
+}
+
+div.filtr-akce {
+	width: 150px;
+	float: right;
+	font-weight: bold;
+	text-align: center;
+	padding: 0px 0 0 0;	
+}
+
+#page form table td.akce {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    background-color: orange;
+}
+
+#page form table td.polozka {
+    width: 40%;
+    text-align: right;
+}

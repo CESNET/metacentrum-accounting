@@ -30,10 +30,10 @@ public class SpringConfig {
     @Bean
     public DataSource dataSource() {
         BasicDataSource bds = new BasicDataSource();
-        bds.setDriverClassName(env.getProperty("jdbc.driver"));
-        bds.setUrl(env.getProperty("jdbc.url"));
-        bds.setUsername(env.getProperty("jdbc.user"));
-        bds.setPassword(env.getProperty("jdbc.password"));
+        bds.setDriverClassName("org.postgresql.Driver");
+        bds.setUrl(env.getProperty("postgresql.url"));
+        bds.setUsername(env.getProperty("postgresql.user"));
+        bds.setPassword(env.getProperty("postgresql.password"));
         return bds;
     }
 

@@ -1,0 +1,37 @@
+<configuration>
+    <contextName>metaacct</contextName>
+    <if condition='isDefined("catalina.base")'>
+        <then>
+            <appender name="APP" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>${catalina.base}/logs/${CONTEXT_NAME}.log</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <fileNamePattern>${catalina.base}/logs/${CONTEXT_NAME}.log.%d{yyyy-MM-dd}</fileNamePattern>
+                </rollingPolicy>
+                <encoder>
+                    <!-- http://logback.qos.ch/manual/layouts.html#conversionWord -->
+                    <pattern>%d %-5level %logger{15} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </then>
+        <else>
+            <appender name="APP" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                    <pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </else>
+    </if>
+
+    <root level="info">
+        <appender-ref ref="APP"/>
+    </root>
+
+    <logger name="net.sourceforge.stripes.util.ResolverUtil" level="warn"/>
+    <logger name="net.sourceforge.stripes" level="info"/>
+    <logger name="org.springframework" level="warn"/>
+    <logger name="org.springframework.web.context.ContextLoader" level="info"/>
+
+    <logger name="cz" level="info"/>
+    <logger name="cz.cesnet.meta.accounting.server.service.PbsRecordManagerImpl" level="info"/>
+
+</configuration>

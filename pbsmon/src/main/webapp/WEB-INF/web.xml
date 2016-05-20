@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+         version="2.4">
+
+    <!-- Spring -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/spring-context.xml</param-value>
+    </context-param>
+    
+    <!-- JSTL fmt: tags will use Stripes resources-->
+    <context-param>
+        <param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+        <param-value>cz.cesnet.meta.perun.impl.Texty</param-value>
+    </context-param>
+
+    <!-- Stripes -->
+    <filter>
+        <display-name>Stripes Filter</display-name>
+        <filter-name>StripesFilter</filter-name>
+        <filter-class>net.sourceforge.stripes.controller.StripesFilter</filter-class>
+        <!-- see http://www.stripesframework.org/display/stripes/Configuration+Reference -->
+        <init-param>
+            <param-name>ActionResolver.Packages</param-name>
+            <param-value>cz.cesnet.meta.stripes</param-value>
+        </init-param>
+        <init-param>
+            <param-name>Extension.Packages</param-name>
+            <param-value>cz.cesnet.meta.stripes</param-value>
+        </init-param>
+        <init-param>
+            <param-name>LocalePicker.Locales</param-name>
+            <param-value>cs:utf-8,en:utf-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>Interceptor.Classes</param-name>
+            <param-value>net.sourceforge.stripes.integration.spring.SpringInterceptor</param-value>
+        </init-param>
+    </filter>
+    
+    <filter-mapping>
+        <filter-name>StripesFilter</filter-name>
+        <url-pattern>*.jsp</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>StripesFilter</filter-name>
+        <servlet-name>StripesDispatcher</servlet-name>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <filter>
+      <description>Dynamically maps URLs to ActionBeans.</description>
+      <display-name>Stripes Dynamic Mapping Filter</display-name>
+      <filter-name>DynamicMappingFilter</filter-name>
+      <filter-class>net.sourceforge.stripes.controller.DynamicMappingFilter</filter-class>
+    </filter>
+    <filter-mapping>
+      <filter-name>DynamicMappingFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+      <dispatcher>REQUEST</dispatcher>
+      <dispatcher>FORWARD</dispatcher>
+      <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
+    <servlet>
+        <servlet-name>StripesDispatcher</servlet-name>
+        <servlet-class>net.sourceforge.stripes.controller.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>StripesDispatcher</servlet-name>
+        <url-pattern>*.action</url-pattern>
+    </servlet-mapping>
+
+    <!-- db -->
+    <resource-ref>
+        <res-ref-name>jdbc/acctDb</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+
+</web-app>

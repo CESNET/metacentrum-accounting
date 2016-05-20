@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context crossContext="true">
+
+ <ResourceLink name="jdbc/acctDb" global="jdbc/acctDb" type="javax.sql.DataSource" />
+
+ <Parameter name="menuName" value="state" override="true"/>
+
+</Context>

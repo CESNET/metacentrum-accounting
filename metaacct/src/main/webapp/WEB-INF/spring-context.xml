@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:tx="http://www.springframework.org/schema/tx"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd"
+        >
+
+  <context:component-scan base-package="cz.cesnet.meta.accounting" />
+  <context:annotation-config />
+  <tx:annotation-driven />
+  
+  <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName" value="/jdbc/acctDb" />
+    <property name="resourceRef" value="true" />
+  </bean>
+
+  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource" />
+  </bean>
+  
+  <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+    <property name="transactionManager" ref="transactionManager" />
+  </bean>
+  
+  <bean id="messages" class="cz.cesnet.meta.accounting.server.util.LocalizationHelper">
+    <property name="basename" value="StripesResources"/>
+  </bean>
+
+    <bean id="dbUtilsManager" class="cz.cesnet.meta.accounting.server.service.DbUtilsManagerImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="pbsServerManager" class="cz.cesnet.meta.accounting.server.service.PbsServerManagerImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="pbsRecordManager" class="cz.cesnet.meta.accounting.server.service.PbsRecordManagerImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="appManager" class="cz.cesnet.meta.accounting.server.service.AppManagerImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="chartStatsManager" class="cz.cesnet.meta.accounting.server.service.ChartStatsManagerImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="hostManager" class="cz.cesnet.meta.accounting.server.service.HostManagerImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="kernelRecordManager" class="cz.cesnet.meta.accounting.server.service.KernelRecordManagerNoopImpl">
+        <!--<property name="dataSource" ref="dataSource"/>-->
+    </bean>
+
+    <bean id="outageManager" class="cz.cesnet.meta.accounting.server.service.OutageManagerImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="receiveLogManager" class="cz.cesnet.meta.accounting.server.service.ReceiveLogManagerImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="receivePbsManager" class="cz.cesnet.meta.accounting.server.service.ReceivePbsManagerImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="userManager" class="cz.cesnet.meta.accounting.server.service.UserManagerImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+</beans>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd"
+    version="2.0">
+    <description>A tag library that defines my custom functions.</description>
+    <tlib-version>1.0</tlib-version>
+    <short-name>FunctionTagLibrary</short-name>
+    <uri>/FunctionLibrary</uri>
+
+  <function>
+    <name>formatMilisecondsToHhMmSs</name>
+    <function-class>cz.cesnet.meta.accounting.web.util.JspFunctions</function-class>
+    <function-signature>java.lang.String formatMilisecondsToHhMmSs(java.lang.Long)</function-signature>    
+  </function>
+  <function>
+    <name>formatHundredthsToHhMmSs</name>
+    <function-class>cz.cesnet.meta.accounting.web.util.JspFunctions</function-class>
+    <function-signature>java.lang.String formatHundredthsToHhMmSs(java.lang.Long)</function-signature>    
+  </function>
+  
+  <function>
+    <name>secondsToDate</name>
+    <function-class>cz.cesnet.meta.accounting.web.util.JspFunctions</function-class>
+    <function-signature>java.util.Date secondsToDate(java.lang.Long)</function-signature>    
+  </function>
+
+  <function>
+    <!-- lze nahradit JSTL fn:length() -->
+    <name>getSize</name>
+    <function-class>cz.cesnet.meta.accounting.web.util.JspFunctions</function-class>
+    <function-signature>java.lang.Integer getSize(java.util.Collection)</function-signature>
+  </function>
+  
+</taglib>

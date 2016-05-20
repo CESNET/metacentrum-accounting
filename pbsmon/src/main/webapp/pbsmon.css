@@ -1,0 +1,209 @@
+ h2 { clear: both; }
+ td.stroj a:link,td.node a:link,table.nodes a:link,table.job a:link,table.queue a:link,table.prop2node a:link,table.node2prop a:link,table.users a:link { color: black; }
+ td.stroj a:visited,td.node a:visited,table.nodes a:visited,table.job a:visited,table.queue a:visited, table.prop2node a:visited, table.node2prop a:visited,table.users a:visited { color: black; }
+ td.node a:hover,td.stroj a:hover { color: #ff6600; }
+
+ table.node td,table.node th { border-width: 1px; border-style: outset; text-align: center; }
+ table.nodeInfo td,table.nodeInfo th { border-width: 1px; border-style: outset; text-align: left; }
+ table.nodeList th { background: #ffffff; }
+ table.nodeList { background: #f0f0f0; }
+ table.states td { border-width: 1px; border-style: outset; text-align: center; }
+ td.state { border-width: 1px; border-style: outset; text-align: center; font-weight: bold; font-size: small; }
+
+ table.nodes td { border-width: 1px; border-style: outset; text-align: center; width: 9.5em; }
+ table.nodes td.spacer { border-width: 0; height: 5px; }
+ table.nodes td a { width: 100%; font-weight: bold; font-size: small; display: inline-block; }
+ table.nodes td a:hover { background-color: #f0f0f0;}
+ table.nodes td.partialy-free a { position: relative; z-index: 10; vertical-align: middle; display: inline-block; }
+ table.nodes td.partialy-free div.usedbox { background-color: #6060FF; left:0;bottom:0; position:absolute; width: 100%; z-index: 1;}
+ table.nodes td.partialy-free div.usedwrapper { position: relative; height: 100%; width: 100%; } /*needed for firefox,cannot position table cells*/
+ table.nodes td.node.partialy-free { border-color: #6060F0; border-top-color: #6EED6E; }
+
+ table.node td a:link { color: gold; }
+
+
+ .free          { background-color: #00d000; border-color: #00d000; color: black;}
+ .partialy-free { background-color: #6EED6E; border-color: #6EED6E; color: black; }
+ .occupied-would-preempt { background-color: #00f000; border-color: #00f000; color: black;}
+ .cloud         { background-color: #AFC1CD; border-color: #AFC1CD; color: black; }
+ .cloud_warning { color: #AFC1CD; }
+ .nebulapbshost    { background-color: #e0d8a1; border-color: #e0d8a1; color: #7c7427; }
+
+ /* icon of cloud */
+ table.nodes td.opennebulausable a { background: url('/pbsmon2/img/cloud.png') top right no-repeat; }
+
+ .job-busy,.reserved,.test,.job-sharing,.job-exclusive, .job-full { background-color: #6060FF; border-color: #6060FF;}
+ .job-busy         {  color: black;}
+ .reserved,.reserved a:link, .reserved a:visited, table.nodes td.reserved a:link, table.nodes td.reserved a:visited {  color: blue;}
+ .test             {  color: #0000E0;}
+ .job-sharing      {  color: #0000D0;}
+ .job-exclusive, .job-full {  color: #0000A0;}
+
+
+ .maintenance, .maintenance-busy, .down, .offline, .state-unknown { background-color: #c0c0c0; border-color: #c0c0c0;}
+ .maintenance, .maintenance a:link,.maintenance a:visited {  color: black; }
+ .maintenance-busy,.maintenance-busy a:link,.maintenance-busy a:visited, table.nodes td.maintenance-busy a:link, table.nodes td.maintenance-busy a:visited, table.mapping td.maintenance-busy a:link, table.mapping td.maintenance-busy a:visited  { color: #995C00; }
+ .down             { color: #e00000;}
+ .offline          { color: #f0f000;}
+ .state-unknown    { color: orange;}
+
+ .occupied,.running-priority,.running,.running-preemptible,.preempted { background-color: #6060FF; border-color: #6060FF; color: black;}
+ 
+ td.total { background: #f0f0f0; border-color: #f0f0f0; font-weight: bold; font-size: small;}
+
+ table.server th { 
+ 	background-color: #5368A6; 
+	border-color: #5368A6;
+	border-style: outset;
+	border-width: 1px;
+ 	}
+ table.server td { 
+	text-align: center;
+ 	background-color: #8B96B9; 
+	border-color: #8B96B9;
+	border-style: outset;
+	border-width: 1px;
+	}
+ table.job th { background: #dbc198; }
+ table.job td { background: #eddfc9; }
+ table.job td.u { color: #bf0055; }
+ table.job td.R { background: #00f0f0; }
+ table.job td.Q { background: #c0c0c0; }
+ 
+ table.queue th { background: #ffff66; }
+ table.queue td { background: #ffffcc; text-align: center;}
+
+ table.queue tr.denied th { background: #e0e0e0; }
+ table.queue tr.denied td { background: #e0e0e0; }
+ table.queue tr.nonexec th { background: #e0e0e0; }
+ table.queue tr.nonexec td { background: #e0e0e0; }
+ table.queue tr.bezna td  { background-color: #EAFFCC; }
+
+
+ table.attributes td { background: #e0e0e0; }
+ table.prop2node th { background: #c0c0c0; }
+ table.prop2node td { background: #e0e0e0; }
+ table.node2prop th { background: #c0c0c0; }
+ table.node2prop td { background: #e0e0e0; }
+ table.users th { background: #dbc198; }
+ table.users td { background: #eddfc9; }
+
+ p.hyperthreading,p.maintenance,p.comment,p.killedjob,p.jobwarning {
+     margin: 10px; border: 1px solid red; padding: 10px;
+     background-color: azure; color: black; font-weight: bold;
+ }
+ p.killedjob,p.jobwarning { color: red; display: table-cell; }
+ table.job td.memexceeded { background-color: #FF6060; }
+ table.job td.wasting { background-color: #FF6060; }
+
+ div.personlink { width: 35em; border: 1px solid #80C9FF; padding: 10px; background-color: #BFE4FF; text-align: center;}
+
+table.zakladni { border-collapse: collapse; margin: 10px; }
+table.zakladni th, table.zakladni td {  border: solid 1px black; padding: 4px; }
+
+ /*z forrestu*/
+.warning1 {
+    clear: right;
+    border: 1px solid #990000;
+    margin: 1em 3em;
+}
+
+.warning1 .label1 {
+    background-color: #cc0000;
+    color: white;
+    font-weight: bold;
+    padding: 5px 10px;
+}
+
+.warning1 .content1 {
+    background-color: #fff0f0;
+    color: black;
+    line-height: 120%;
+    font-size: 90%;
+    padding: 5px 10px;
+}
+
+ .warning2 {
+    clear: right;
+    border: 1px solid orange;
+    margin: 1em 3em;
+ }
+
+.warning2 .label2 {
+    background-color: #F5B800;
+    color: white;
+    font-weight: bold;
+    padding: 5px 10px;
+
+}
+
+.warning2 .content2 {
+    background-color: #FFDB70;
+    color: black;
+    line-height: 120%;
+    font-size: 90%;
+    padding: 5px 10px;
+
+}
+
+ .warning3 {
+    clear: right;
+    border: 1px solid #009900;
+    margin: 1em 3em;
+ }
+
+.warning3 .label3 {
+    background-color: #00D600;
+    color: white;
+    font-weight: bold;
+    padding: 5px 10px;
+
+}
+ 
+.warning3 .content3 {
+    background-color: #94FF70;
+    color: black;
+    line-height: 120%;
+    font-size: 90%;
+    padding: 5px 10px;
+
+}
+ /* zelena -seda -cerna
+.free          { background-color: #00d000; border-color: #00d000; color: black;}
+ .partialy-free { background-color: #6EED6E; border-color: #6EED6E; color: black; }
+
+
+ .job-busy { background-color: #c0c0c0; border-color: #c0c0c0; color: black;}
+ .reserved { background-color: #c0c0c0; border-color: #c0c0c0; color: blue;}
+ .test { background-color: #c0c0c0; border-color: #c0c0c0; color: #0000E0;}
+ .job-sharing { background-color: #c0c0c0; border-color: #c0c0c0; color: #0000D0;}
+ .job-exclusive { background-color: #c0c0c0; border-color: #c0c0c0; color: #0000A0;}
+
+ .maintenance { background-color: #101010; border-color: #101010; color: gold; }
+ .maintenance-busy { background-color: #101010; border-color: #101010; color: #995C00; }
+ .down          { background-color: #101010; border-color: #101010; color: #e00000;}
+ .offline       { background-color: #101010; border-color: #101010; color: #f0f000;}
+ .state-unknown { background-color: #101010; border-color: #101010; color: #c0c0c0;}
+
+
+ td.maintenance a:link,td.maintenance a:visited { color: gold; }
+ td.reserved a:link,td.reserved a:visited { color: blue; }
+ */
+
+ /*  puvodni
+ .free          { background-color: #00d000; border-color: #00d000; color: black;}
+ .partialy-free { background-color: #6EED6E; border-color: #6EED6E; color: black; }
+ .job-busy { background-color: #6060FF; border-color: #6060FF; color: black;}
+ .reserved { background-color: blue; border-color: blue; color: gold;}
+ .test { background-color: #3931C5; border-color: #3931C5; color: black;}
+ .job-sharing { background-color: #00d0d0; border-color: #00d0d0; color: black;}
+ .job-exclusive { background-color: #00b0b0; border-color: #00b0b0; color: black;}
+ .maintenance { background-color: #101010; border-color: #101010; color: gold; }
+ .maintenance-busy { background-color: #995C00; border-color: #995C00; color: gold; }
+ .down          { background-color: #e00000; border-color: #e00000; color: black;}
+ .offline       { background-color: #f0f000; border-color: #f0f000; color: black;}
+ .state-unknown { background-color: #c0c0c0; border-color: #c0c0c0; color: black;}
+ .occupied,.running-priority,.running,.running-preemptible,.preempted { background-color: #00e0e0; border-color: #00e0e0; color: black;}
+ .occupied-would-preempt { background-color: #00d000; border-color: #00d000; color: black;}
+ .booting,.occupied-booting { background-color: #d0d0d0; border-color: #d0d0d0; color: black;}
+  */

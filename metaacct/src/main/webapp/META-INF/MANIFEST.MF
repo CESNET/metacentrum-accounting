@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Class-Path: log4j-1.2.12.jar 
+ commons-logging-1.1.jar 
+ stripes-1.4.2.jar 
+ cos-05Nov2002.jar 
+ logkit-1.0.1.jar 
+ avalon-framework-4.1.3.jar
+

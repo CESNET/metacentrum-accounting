@@ -7,3 +7,5 @@ test-output
 *.iml
 *~
 config.properties
+dependency-reduced-pom.xml
+deploy.sh

@@ -1,0 +1,55 @@
+<configuration>
+    <contextName>pbsmon2</contextName>
+
+    <if condition='isDefined("catalina.base")'>
+        <then>
+            <appender name="APP" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>${catalina.base}/logs/${CONTEXT_NAME}.log</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <fileNamePattern>${catalina.base}/logs/${CONTEXT_NAME}.log.%d{yyyy-MM-dd}</fileNamePattern>
+                </rollingPolicy>
+                <encoder>
+                    <!-- http://logback.qos.ch/manual/layouts.html#conversionWord -->
+                    <pattern>%d %-5level %logger{15} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </then>
+        <else>
+            <appender name="APP" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                    <pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </else>
+    </if>
+
+    <root level="debug">
+        <appender-ref ref="APP"/>
+    </root>
+
+    <logger name="org.apache.log4j.xml" level="info"/>
+    <logger name="net.sourceforge.stripes.util.ResolverUtil" level="warn"/>
+    <logger name="net.sourceforge.stripes" level="info"/>
+    <logger name="org.springframework" level="warn"/>
+    <logger name="org.springframework.web.context.ContextLoader" level="info"/>
+    <logger name="cz" level="info"/>
+    <logger name="cz.cesnet.meta.perun.api.FyzickeStroje" level="info"/>
+    <logger name="cz.cesnet.meta.perun.impl" level="info"/>
+    <logger name="cz.cesnet.meta.perun.impl.PerunResourceBundle" level="info"/>
+    <logger name="cz.cesnet.meta.perun.impl.Texty" level="info"/>
+    <logger name="cz.cesnet.meta.pbs" level="info"/>
+    <logger name="cz.cesnet.meta.stripes.PersonActionBean" level="info"/>
+    <logger name="cz.cesnet.meta.perun.api.FyzickeStroje" level="info"/>
+    <logger name="cz.cesnet.meta.perun.impl.PerunJsonImpl" level="info"/>
+    <logger name="cz.cesnet.meta.pbsmon.RozhodovacStavuStroju" level="info"/>
+    <logger name="cz.cesnet.meta.cloud.CloudPhysicalHost" level="error"/>
+    <logger name="cz.cesnet.meta.cloud.CloudImpl" level="info"/>
+    <logger name="cz.cesnet.meta.cloud.CloudLoader" level="info"/>
+    <logger name="cz.cesnet.meta.pbs.PbskyImpl" level="info"/>
+    <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl" level="info"/>
+    <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl.gpu" level="info"/>
+    <logger name="cz.cesnet.meta.pbs.Queue" level="info"/>
+    <logger name="cz.cesnet.meta.stripes.QueuesActionBean" level="info"/>
+    <logger name="cz.cesnet.meta.storages.StoragesHsmImpl" level="info"/>
+
+</configuration>

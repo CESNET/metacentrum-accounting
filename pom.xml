@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cz.metacentrum</groupId>
+    <artifactId>accounting-parent</artifactId>
+    <packaging>pom</packaging>
+    <version>3.0-SNAPSHOT</version>
+    <name>MetaCentrum Accounting Parent Project</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <!-- defines compatible versions of many libraries -->
+    <!-- see http://docs.spring.io/platform/docs/current/reference/htmlsingle/#getting-started-using-spring-io-platform-maven -->
+    <parent>
+        <groupId>io.spring.platform</groupId>
+        <artifactId>platform-bom</artifactId>
+        <version>2.0.5.RELEASE</version>
+        <relativePath/>
+    </parent>
+
+    <!-- specifies versions not defined by the Spring platform-bom -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>9.4.1208</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>8</source>
+                        <target>8</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <modules>
+        <module>cloud</module><!-- API for MetaCentrum OpenNebula State -->
+        <module>perun_machines</module><!-- API for reading JSON data about physical machines from Perun -->
+        <module>pbsmon</module><!-- PBSMon - web app showing the state of MetaCentrum -->
+        <module>metaacct</module><!-- Accounting server for MetaCentrum -->
+        <module>metaacct_cmd</module><!-- Command Line Tools for MetaCentrum Accounting -->
+        <module>cerit-stats</module><!-- Availability a Reliability statistics for CERIT-SC -->
+        <module>nebula-pbs</module><!-- Import tool for correction for Torque machines in CERIT-SC's OpenNebula -->
+    </modules>
+</project>

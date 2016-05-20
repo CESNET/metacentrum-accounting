@@ -1,0 +1,122 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cz.metacentrum</groupId>
+        <artifactId>accounting-parent</artifactId>
+        <version>3.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>pbsmon</artifactId>
+    <packaging>war</packaging>
+
+    <name>PBSMon - web app showing the state of MetaCentrum</name>
+    <description>Zobrazování stavu strojů v MetaCentru</description>
+    <inceptionYear>2009</inceptionYear>
+    <organization>
+        <name>CESNET</name>
+        <url>http://www.cesnet.cz</url>
+    </organization>
+    <developers>
+        <developer>
+            <name>Martin Kuba</name>
+            <email>makub@ics.muni.cz</email>
+            <url>http://www.muni.cz/people/3988</url>
+            <organization>Masaryk University</organization>
+            <organizationUrl>http://www.muni.cz</organizationUrl>
+        </developer>
+    </developers>
+
+    <dependencies>
+        <!-- Rozhrani k Perunovi, spolecne s accountingem -->
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>perun_machines</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <!-- Rozhrani k cloudu, spolecne s accountingem -->
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>cloud</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <!-- DBCP pool -->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-dbcp</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- servlet, JSP, JSTL -->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-servlet-api</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jsp-api</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.taglibs</groupId>
+            <artifactId>taglibs-standard-spec</artifactId>
+            <version>${taglibs-standard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.taglibs</groupId>
+            <artifactId>taglibs-standard-impl</artifactId>
+            <version>${taglibs-standard.version}</version>
+        </dependency>
+        <!-- stripes -->
+        <dependency>
+            <groupId>net.sourceforge.stripes</groupId>
+            <artifactId>stripes</artifactId>
+            <version>1.5.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>servlets.com</groupId>
+            <artifactId>cos</artifactId>
+            <version>05Nov2002</version>
+        </dependency>
+        <!-- must provide logging implementation, this is a runnable project -->
+        <!-- see viz http://docs.spring.io/platform/docs/current/reference/htmlsingle/#getting-started-logging -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+        </dependency>
+        <!-- spring -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <defaultGoal>package</defaultGoal>
+        <!-- war name-->
+        <finalName>pbsmon2</finalName>
+    </build>
+
+
+</project>
