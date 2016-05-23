@@ -26,6 +26,6 @@
     <logger name="cz.cesnet.meta.acct.hw.stats.StatsImpl.time" level="info"/>
     <logger name="cz.cesnet.meta.acct.hw.stats.StatsImpl.sql" level="info"/>
     <logger name="cz.cesnet.meta.acct.hw.stats.StatsImpl.exe" level="info"/>
-    <logger name="cz.cesnet.meta.acct.hw.stats.StatsImpl.hw" level="debug"/>
+    <logger name="cz.cesnet.meta.acct.hw.stats.StatsImpl.hw" level="info"/>
 
 </configuration>

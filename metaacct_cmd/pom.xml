@@ -12,6 +12,11 @@
     <packaging>jar</packaging>
     <name>Command Line Tools for MetaCentrum Accounting</name>
 
+    <properties>
+        <!-- for shade plugin as configured in spring-boot -->
+        <start-class>cz.cesnet.meta.acct.hw.Statistics</start-class>
+    </properties>
+
     <dependencies>
         <!-- Rozhrani k Perunovi spolecne s accountingem -->
         <dependency>
@@ -56,6 +61,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <!-- Main-Class defined as property ${start-class} -->
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
             </plugin>
         </plugins>
     </build>

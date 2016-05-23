@@ -10,7 +10,6 @@ import java.util.Calendar;
  * Created by IntelliJ IDEA.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: Stats.java,v 1.2 2009/12/11 17:37:58 makub Exp $
  */
 public interface Stats {
 

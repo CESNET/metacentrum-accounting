@@ -12,11 +12,10 @@ import java.util.*;
 
 
 /**
- * Hlavní program pro výpočet statistik. Bere data z accountingové datatbáze, a pro zadané datumy
+ * Hlavní program pro výpočet statistik. Bere data z accountingové databáze, a pro zadané datumy
  * spočítá statistiky pro všechny clustery. Výsledky ukládá do tabulky workload.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: Statistics.java,v 1.5 2011/06/27 08:53:19 makub Exp $
  */
 public class Statistics {
 
@@ -26,10 +25,9 @@ public class Statistics {
         Stats stats = new ClassPathXmlApplicationContext("spring-context.xml").getBean("stats", Stats.class);
         long startTime = System.currentTimeMillis();
 
-//        generateStats(stats, absoluteDate(2014,1,27), absoluteDate(2014,1,27));
-        generateStats(stats, absoluteDate(2015,11,1), absoluteDate(2015,11,1));
-//        generateStats(stats, relativeDate(-1), relativeDate(-1));
-//        generateStats(stats, relativeDate(-31), relativeDate(-31));
+//        generateStats(stats, absoluteDate(2016,4,20), absoluteDate(2016,4,22));
+        generateStats(stats, relativeDate(-1), relativeDate(-1));
+        generateStats(stats, relativeDate(-31), relativeDate(-31));
         long endTime = System.currentTimeMillis();
         System.out.println();
         long duration = (endTime - startTime) / 60000;
@@ -40,8 +38,8 @@ public class Statistics {
         PrintStream out = System.out;
         out.println();
         out.println("computing MetaCentrum VO statistics for " + CZECH_DATE.format(start.getTime()) + " - " +CZECH_DATE.format(end.getTime()));
-//        for (String cluster : stats.getClusters(start, end)) {
-        for(String cluster : Arrays.asList("hda.cerit-sc.cz")) {
+        for (String cluster : stats.getClusters(start, end)) {
+//        for(String cluster : Arrays.asList("hda.cerit-sc.cz")) {
             out.println();
             out.println(cluster);
             out.println();

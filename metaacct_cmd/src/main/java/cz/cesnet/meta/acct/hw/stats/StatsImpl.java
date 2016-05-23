@@ -15,7 +15,6 @@ import java.util.*;
  * Created by IntelliJ IDEA.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: StatsImpl.java,v 1.3 2009/12/11 17:37:58 makub Exp $
  */
 
 @SuppressWarnings("deprecation")
@@ -32,8 +31,8 @@ public class StatsImpl implements Stats {
             rs.getString(1),
             rs.getString(2),
             rs.getInt("cpu_number"),
-            new Timestamp(rs.getLong("start_time") * 1000l),
-            new Timestamp(rs.getLong("end_time") * 1000l)
+            new Timestamp(rs.getLong("start_time") * 1000L),
+            new Timestamp(rs.getLong("end_time") * 1000L)
     );
     private JdbcTemplate jdbc;
 
@@ -269,7 +268,7 @@ public class StatsImpl implements Stats {
         //pro kazdou ulohu je v acct_hosts_logs tolik radku, kolik pouzila procesoru
         //berou se jen procesory patrici do clusteru
         logSQL.debug("jobs non-exclusive time");
-        long jobsNonexclusiveTime = jdbc.queryForObject(
+        long jobsNonexclusiveTime = queryForLong(jdbc.queryForObject(
                 "SELECT sum(least(j.end_time,?)- greatest(j.start_time,?)) " +
                         "FROM acct_host h, acct_pbs_record j, acct_hosts_logs l,physical_resources pr," +
                         "physical_hosts_resources_rel phrr,physical_hosts ph,physical_virtual_rel fvr " +
@@ -286,12 +285,12 @@ public class StatsImpl implements Stats {
                 c.getNextDayAsLinuxTime(), c.getDateAsLinuxTime(),
                 c.getCluster(),
                 c.getDate(), c.getDate()
-        );
+        ));
         //pri pouziti #excl se zaberou vsechny procesory, musime dohledat kolik jich bylo
         //ale zapocitat kazdy stroj jen jednou, proto je tam distinct
         logSQL.debug("jobs exclusive time");
-        long jobsExclusiveTime = jdbc.queryForObject(
-                "SELECT sum( (end_time-start_time)*cpu ) FROM (" +
+
+        String sql =  "SELECT sum( (end_time-start_time)*cpu ) FROM (" +
                         "SELECT DISTINCT" +
                         "     j.acct_id_string,j.req_nodes," +
                         "     least(j.end_time,?) AS end_time," +
@@ -308,21 +307,21 @@ public class StatsImpl implements Stats {
                         "  AND ph.id=fvr.ph_id AND fvr.acct_host_id=h.acct_host_id" +
                         "  AND ph.id=phcpu.ph_id AND phcpu.start_time<? AND ?<phcpu.end_time" +
                         "  AND j.req_nodes ~ '#excl'" +
-                        ") AS t1",
+                        ") AS t1";
+        long jobsExclusiveTime = queryForLong(jdbc.queryForObject(sql,
                 Long.class,
                 c.getNextDayAsLinuxTime(), c.getDateAsLinuxTime(),
                 c.getNextDayAsLinuxTime(), c.getDateAsLinuxTime(),
                 c.getCluster(),
                 c.getDate(), c.getDate(),
                 c.getDate(), c.getDate()
-        );
-
+        ));
         if (logExe.isDebugEnabled()) {
             logExe.debug("jobsNonexclusiveTime={}", jobsNonexclusiveTime);
             logExe.debug("jobsExclusiveTime={}", jobsExclusiveTime);
         }
         logSQL.debug("started jobs non-exclusive time");
-        long startedNonexclusiveJobsTime = jdbc.queryForObject(
+        long startedNonexclusiveJobsTime = queryForLong(jdbc.queryForObject(
                 "SELECT sum(? - greatest(j.start_time,?)) " +
                         "FROM acct_host h, acct_pbs_record_started j, acct_hosts_logs_started l,physical_resources pr," +
                         "physical_hosts_resources_rel phrr,physical_hosts ph,physical_virtual_rel fvr " +
@@ -338,9 +337,9 @@ public class StatsImpl implements Stats {
                 c.getNextDayAsLinuxTime(),
                 c.getCluster(),
                 c.getDate(), c.getDate()
-        );
+        ));
         logSQL.debug("started jobs exclusive time");
-        long startedExclusiveJobsTime = jdbc.queryForObject(
+        long startedExclusiveJobsTime = queryForLong(jdbc.queryForObject(
                 "SELECT sum( (?-start_time)*cpu ) FROM (" +
                         "SELECT DISTINCT" +
                         "     j.acct_id_string,j.req_nodes," +
@@ -363,7 +362,7 @@ public class StatsImpl implements Stats {
                 c.getCluster(),
                 c.getDate(), c.getDate(),
                 c.getDate(), c.getDate()
-        );
+        ));
 
         if (startedExclusiveJobsTime > 0 || startedNonexclusiveJobsTime > 0) {
             if (logExe.isDebugEnabled()) {
@@ -373,8 +372,6 @@ public class StatsImpl implements Stats {
         }
         if (c.getAllCpuTime() < (jobsNonexclusiveTime + jobsExclusiveTime + startedExclusiveJobsTime + startedNonexclusiveJobsTime)) {
             System.out.println("Pozor pro den " + c.getDate() + " je vice propocitano nez dostupno:");
-
-
             System.out.println("jobsNonexclusiveTime / jobsExclusiveTime: " + jobsNonexclusiveTime + " / " + jobsExclusiveTime);
             System.out.println("startedNonexclusiveJobsTime / startedExclusiveJobsTime: " + startedNonexclusiveJobsTime + " / " + startedExclusiveJobsTime);
             if (logExe.isDebugEnabled()) {
@@ -758,17 +755,25 @@ public class StatsImpl implements Stats {
 
     private void countCpus(ClusterAtDay c) {
         logSQL.debug("count CPUs");
-        c.setCpuCount(jdbc.queryForObject(
+        c.setCpuCount(queryForInt(jdbc.queryForObject(
                 "SELECT sum(phcpu.cpu) FROM physical_resources pr,physical_hosts_resources_rel phrr,physical_hosts ph,physical_hosts_cpu phcpu "
                         + "WHERE pr.name=? AND pr.id=phrr.ph_resources_id AND phrr.ph_hosts_id=ph.id AND "
                         + "phrr.start_time<=? AND ?<phrr.end_time AND ph.id=phcpu.ph_id AND "
                         + "phcpu.start_time<=? AND ?<phcpu.end_time",
                 Integer.class,
-                c.getCluster(), c.getDate(), c.getDate(), c.getDate(), c.getDate()));
+                c.getCluster(), c.getDate(), c.getDate(), c.getDate(), c.getDate())));
     }
 
     private boolean isHostNameDom0(String name, PhysicalMachineRecord pmr) {
         return name.equals(pmr.getName());
         //return name.contains("nympha-xen.zcu.cz") || !name.contains("nympha.zcu.cz") && !name.contains("-");
+    }
+
+    private static int queryForInt(Integer i) {
+        return i == null ? 0 : i;
+    }
+
+    private static long queryForLong(Long l) {
+        return l == null ? 0 : l;
     }
 }
