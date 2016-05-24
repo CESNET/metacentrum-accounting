@@ -170,6 +170,12 @@ public class AccountingImpl implements Accounting {
                 " WHERE ah.acct_host_id NOT IN (SELECT fvr.acct_host_id FROM physical_virtual_rel fvr)" +
                 " AND ph.name=ah.hostname";
         jdbc.update(virt2phys);
+        //pak stroje s pridanym .priv. ve jmene
+        jdbc.update("INSERT INTO physical_virtual_rel(acct_host_id,ph_id) " +
+                "SELECT ah.acct_host_id,ph.id FROM acct_host ah,physical_hosts ph " +
+                "WHERE ah.acct_host_id NOT IN (SELECT fvr.acct_host_id FROM physical_virtual_rel fvr) " +
+                "AND substr(ah.hostname,0,strpos(ah.hostname,'.'))||'.priv'||substr(ah.hostname,strpos(ah.hostname,'.'))=ph.name "
+                );
         //pak vyrobit neexistujici fyzicke
         jdbc.update("INSERT INTO physical_hosts (name) " +
                 "SELECT ah.hostname FROM acct_host ah " +
