@@ -7,3 +7,6 @@ Database connections are configured:
 * nebula_pbs - src/main/resources/config.properties
 * pbsmon - reference to Tomcat resource /jdbc/acctDb (defined in $CATALINA_BASE/conf/server.xml, makub@segin )
 * perun_machines - no DB used
+
+Further connections:
+* resource statistics: segin:/var/www/metavo/resourcestats/pripojeni.php
