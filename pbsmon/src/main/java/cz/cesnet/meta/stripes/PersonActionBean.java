@@ -63,6 +63,7 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
     List<Queue> queues;
     List<Queue> offerQueues;
     List<String> props;
+    Map<String,Set<String>> resourceValues;
 
 
     PbsAccess pbsAccess;
@@ -110,7 +111,9 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
             //vsechny pristupne fronty
             queues = new ArrayList<>(40);
             //priprav mapovani nazvu fronty na pristupne uzly
+            //a seznam resources
             q2n = new HashMap<>();
+            resourceValues = new HashMap<>();
             for (String qname : pbsAccess.getQueues()) {
                 queues.add(pbsky.getQueueByName(qname));
                 //TODO v CERIT-SC nemuze fronta bez required vlastnosti na uzel, kde uz je fronta s required vlastnosti, class PBS
@@ -118,6 +121,20 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
                 //TODO muselo by se to přepsat důkladněji
                 List<Node> nodes = pbsAccess.getQueueToHostsMap().get(qname).stream().map(nodeName -> pbsky.getNodeByName(nodeName)).collect(Collectors.toList());
                 q2n.put(qname, nodes);
+                //resources
+                for(Node node : nodes) {
+                    Map<String, String> nodeResources = node.getResources();
+                    for (String r : nodeResources.keySet()) {
+                        Set<String> values = resourceValues.get(r);
+                        if(values==null) {
+                            values = new TreeSet<>();
+                            resourceValues.put(r,values);
+                        }
+                        if (!r.equals("mem") && !r.equals("vmem") && !r.startsWith("scratch")) {
+                            values.add(nodeResources.get(r));
+                        }
+                    }
+                }
             }
             //sort
             Collections.sort(queues, (q1, q2) -> {
@@ -183,6 +200,22 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
     int ws = 0;
     Queue queue;
     Queue finalQueue;
+    int gpu;
+    String cluster="";
+    String city="";
+    String room="";
+    String home="";
+    String infiniband="";
+    /*
+     resources:
+     gpu = [2, 4]
+     cluster = [doom, minos, manegrot, ajax, luna, bofur, losgar, zubat, quark, upol128, haldir, mudrc, lex, loslab, ramdal, mandos, gram, ida, eru, hildor, tarkil, krux, konos, perian, alfrid]
+     city = [ostrava, praha, plzen, budejovice, olomouc, brno]
+     home = [ostrava1, plzen1, brno3-cerit, brno2, praha1, budejovice1, olomouc1]
+     room = [fzu1, ntis, ics2, jcu-umbr1, ics1, ics3, zcu-ul011, ncbr1, zcu-ui419, ostrava1, ncbr, cesnet, uk1, upol128, cvut]
+     infiniband = [elixir, mandos, ncbr, minos, tarkil, alfrid, manegrot, hildor, luna, bofur, brno]
+     */
+
 
     private long walltimeSecs() {
         return 7L * 24L * 3600L * ww + 24L * 3600L * wd + 3600L * wh + 60L * wm + ws;
@@ -260,6 +293,14 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
                 if (scratchtype.equals("shared") && !nodeScratch.getHasNetwork()) continue;
                 if (scratchtype.equals("-") && !nodeScratch.hasAnySizeKiB(scratchKB)) continue;
             }
+            //musi mit GPU
+            if(gpu>0 && node.getNoOfGPUInt()<gpu) continue;
+            //musi mit pozadovane resources
+            if(cluster!=null && !cluster.isEmpty() && !cluster.equals(node.getResource("cluster"))) continue;
+            if(city!=null && !city.isEmpty() && !city.equals(node.getResource("city"))) continue;
+            if(room!=null && !room.isEmpty() && !room.equals(node.getResource("room"))) continue;
+            if(home!=null && !home.isEmpty() && !home.equals(node.getResource("home"))) continue;
+            if(infiniband!=null && !infiniband.isEmpty() && !infiniband.equals(node.getResource("infiniband"))) continue;
 
             //kdy se to dostalo az sem, je potencialne vhodny
             potencialni.add(node);
@@ -278,6 +319,8 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
                 if (scratchtype.equals("shared") && !nodeScratch.hasNetworkFreeKiB(scratchKB)) continue;
                 if (scratchtype.equals("-")&& nodeScratch.getAnyFreeKiB() < scratchKB) continue;
             }
+            //musi mit dost gpu
+            if(gpu>0 && node.getNoOfFreeGPUInt()<gpu) continue;
             //kdyz se to dostalo az, je i ted volny
             tedVolne.add(node);
         }
@@ -454,6 +497,58 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
 
     public void setWs(int ws) {
         this.ws = ws;
+    }
+
+    public String getInfiniband() {
+        return infiniband;
+    }
+
+    public void setInfiniband(String infiniband) {
+        this.infiniband = infiniband;
+    }
+
+    public String getHome() {
+        return home;
+    }
+
+    public void setHome(String home) {
+        this.home = home;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(String cluster) {
+        this.cluster = cluster;
+    }
+
+    public int getGpu() {
+        return gpu;
+    }
+
+    public void setGpu(int gpu) {
+        this.gpu = gpu;
+    }
+
+    public String getRoom() {
+        return room;
+    }
+
+    public void setRoom(String room) {
+        this.room = room;
+    }
+
+    public Map<String, Set<String>> getResourceValues() {
+        return resourceValues;
     }
 
     static private final HashSet<String> OMIT_PROPERTIES = new HashSet<String>() {{

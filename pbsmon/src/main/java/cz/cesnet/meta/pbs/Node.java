@@ -36,6 +36,7 @@ public class Node extends PbsInfoObject {
     final static Logger log = LoggerFactory.getLogger(Node.class);
     //helpers
     private static final Pattern whole = Pattern.compile("^([A-Za-z]+)(\\d*)-*([0-9a-z]*)");
+    public static final String RESOURCES_TOTAL = "resources_total.";
     private String shortName;
     private String state;
     private String pbsState;
@@ -288,6 +289,10 @@ public class Node extends PbsInfoObject {
     public int getNoOfUsedGPUInt() {
         String n = getNoOfUsedGPU();
         return n == null ? 0 : Integer.parseInt(n);
+    }
+
+    public int getNoOfFreeGPUInt() {
+        return getNoOfGPUInt() - getNoOfUsedGPUInt();
     }
 
     public String getNoOfHTCores() {
@@ -689,5 +694,23 @@ public class Node extends PbsInfoObject {
             }
         }
         return  null;
+    }
+
+    /**
+     * Returns attributes that sterted with resources_total, but without the prefix.
+     * @return map fo attributes with attribute names without the prefix
+     */
+    public Map<String,String> getResources() {
+        Map<String,String> map = new HashMap<>();
+        for(Map.Entry<String,String> e : getAttributes().entrySet()) {
+            if(e.getKey().startsWith(RESOURCES_TOTAL)) {
+                map.put(e.getKey().substring(RESOURCES_TOTAL.length()),e.getValue());
+            }
+        }
+        return map;
+    }
+
+    public String getResource(String name) {
+        return attrs.get(RESOURCES_TOTAL+name);
     }
 }

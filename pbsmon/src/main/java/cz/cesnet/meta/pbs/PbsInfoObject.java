@@ -30,7 +30,7 @@ public class PbsInfoObject {
     //používán JNI
     public PbsInfoObject(String name) {
         this.name = name;
-        this.attrs = new TreeMap<String, String>();
+        this.attrs = new TreeMap<>();
     }
 
     public void setName(String name) {

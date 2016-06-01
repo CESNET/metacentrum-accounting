@@ -52,20 +52,30 @@
                         <s:select name="wh"><c:forEach begin="0" end="24" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>h
                         <s:select name="wm"><c:forEach begin="0" end="59" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>m
                         <s:select name="ws"><c:forEach begin="0" end="59" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>s
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-q <s:select name="fronta"><s:option value="default"> </s:option><s:option value="default@wagap.cerit-sc.cz">@wagap.cerit-sc.cz</s:option>
+            \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-q <s:select name="fronta"><s:option value="default"> </s:option><s:option value="default@wagap.cerit-sc.cz">@wagap.cerit-sc.cz</s:option>
                 <c:forEach items="${actionBean.offerQueues}" var="q"><s:option value="${q.name}">${q.name}</s:option></c:forEach></s:select>
-            \<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l mem=<s:text style="text-align: right;" name="mem" size="5"/><s:select name="memu"><s:option value="mb">mb</s:option><s:option value="gb">gb</s:option></s:select>
-            -l scratch=<s:text style="text-align: right;" name="scratch" size="5"/><s:select name="scratchu"><s:option value="mb">mb</s:option><s:option value="gb">gb</s:option></s:select>
+            \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l mem=<s:text style="text-align: right;" name="mem" size="5"/><s:select name="memu"><s:option value="mb">mb</s:option><s:option value="gb">gb</s:option></s:select>
+            \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l scratch=<s:text style="text-align: right;" name="scratch" size="5"/><s:select name="scratchu"><s:option value="mb">mb</s:option><s:option value="gb">gb</s:option></s:select>
             :<s:select name="scratchtype"><s:option value="-"> </s:option><s:option value="ssd">ssd</s:option><s:option value="shared">shared</s:option><s:option value="local">local</s:option><s:option value="first">first</s:option></s:select>
-            \<br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l nodes=<s:select name="nodes"><c:forEach begin="1" end="99" var="i"><s:option value="${i}" >${i}</s:option></c:forEach></s:select>
+            \<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l nodes=<s:select name="nodes"><c:forEach begin="1" end="99" var="i"><s:option value="${i}" >${i}</s:option></c:forEach></s:select>
             :ppn=<s:select name="ppn"><c:forEach begin="1" end="384" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>
             <s:select name="prop1"><s:option value=""/><c:forEach items="${actionBean.props}" var="p"><s:option value="${p}">:${p}</s:option></c:forEach></s:select>
             <s:select name="prop2"><s:option value=""/><c:forEach items="${actionBean.props}" var="p"><s:option value="${p}">:${p}</s:option></c:forEach></s:select>
             <s:select name="prop3"><s:option value=""/><c:forEach items="${actionBean.props}" var="p"><s:option value="${p}">:${p}</s:option></c:forEach></s:select>
-            uloha.sh    
-        </strong>  <br> <br>
+            \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l gpu=<s:select name="gpu"><s:option value="0"/><c:forEach begin="1" end="4" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>
+            \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l cluster=<s:select name="cluster"><s:option value=""/><c:forEach items="${actionBean.resourceValues.cluster}" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>
+            \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l city=<s:select name="city"><s:option value=""/><c:forEach items="${actionBean.resourceValues.city}" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>
+            \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l room=<s:select name="room"><s:option value=""/><c:forEach items="${actionBean.resourceValues.room}" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>
+            \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l home=<s:select name="home"><s:option value=""/><c:forEach items="${actionBean.resourceValues.home}" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>
+            \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l infiniband=<s:select name="infiniband"><s:option value=""/><c:forEach items="${actionBean.resourceValues.infiniband}" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>
+            \<br> uloha.sh
+        </strong>  <br>
+        <%--
+         <c:forEach items="${actionBean.resourceValues}" var="rv">
+             <c:out value="${rv.key}" /> = <c:out value="${rv.value}"/>
+         </c:forEach>
+        --%>
+        <br>
         <f:message key="person_vyznam"/> <a href="https://wiki.metacentrum.cz/wiki/Pl%C3%A1novac%C3%AD_syst%C3%A9m_-_detailn%C3%AD_popis#Vlastnosti_stroj.C5.AF"><f:message key="person_vlastnosti_stroju"/></a>.
         <br><br>
         <input type="submit" name="sestavovac" value="<f:message key="person_nalezt"/>"/>
@@ -80,11 +90,16 @@
             <c:when test="${actionBean.fronta=='default@wagap.cerit-sc.cz'}"> -q @wagap.cerit-sc.cz </c:when>
             <c:when test="${actionBean.fronta=='default'}"> </c:when>
         </c:choose>
-        
-        
         -l mem=${actionBean.mem}${actionBean.memu}
         -l scratch=${actionBean.scratch}${actionBean.scratchu}<c:if test="${actionBean.scratchtype!='-'}">:${actionBean.scratchtype}</c:if>
         -l nodes=${actionBean.nodes}:ppn=${actionBean.ppn}<c:if test="${! empty actionBean.prop1}">:${actionBean.prop1}</c:if><c:if test="${! empty actionBean.prop2}">:${actionBean.prop2}</c:if><c:if test="${! empty actionBean.prop3}">:${actionBean.prop3}</c:if>
+        <c:if test="${actionBean.gpu>0}">-l gpu=${actionBean.gpu}</c:if>
+        <c:if test="${! empty actionBean.cluster}"   >-l cluster=${actionBean.cluster}</c:if>
+        <c:if test="${! empty actionBean.city}"      >-l city=${actionBean.city}</c:if>
+        <c:if test="${! empty actionBean.room}"      >-l room=${actionBean.room}</c:if>
+        <c:if test="${! empty actionBean.home}"      >-l home=${actionBean.home}</c:if>
+        <c:if test="${! empty actionBean.infiniband}">-l infiniband=${actionBean.infiniband}</c:if>
+
         <c:choose>
             <c:when test="${fn:length(actionBean.potencialni)<actionBean.nodes}">
                 <div class="warning1">
