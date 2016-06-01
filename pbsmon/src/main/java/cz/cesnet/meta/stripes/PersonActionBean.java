@@ -19,6 +19,7 @@ import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Akce pro personalizaci pohledu na PBS.
@@ -26,6 +27,7 @@ import java.util.*;
  * @author Martin Kuba makub@ics.muni.cz
  * @version $Id: PersonActionBean.java,v 1.17 2014/10/17 12:33:03 makub Exp $
  */
+@SuppressWarnings("unused") //methods are accessed by Stripes through reflection
 @UrlBinding("/person")
 public class PersonActionBean extends BaseActionBean implements ValidationErrorHandler {
 
@@ -111,10 +113,10 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
             q2n = new HashMap<>();
             for (String qname : pbsAccess.getQueues()) {
                 queues.add(pbsky.getQueueByName(qname));
-                List<Node> nodes = new ArrayList<Node>();
-                for (String nodeName : pbsAccess.getQueueToHostsMap().get(qname)) {
-                    nodes.add(pbsky.getNodeByName(nodeName));
-                }
+                //TODO v CERIT-SC nemuze fronta bez required vlastnosti na uzel, kde uz je fronta s required vlastnosti, class PBS
+                //TODO tohle se čte z Ruby serveru, který to zjištuje podle členství ve skupinách a ACL dané fronty
+                //TODO muselo by se to přepsat důkladněji
+                List<Node> nodes = pbsAccess.getQueueToHostsMap().get(qname).stream().map(nodeName -> pbsky.getNodeByName(nodeName)).collect(Collectors.toList());
                 q2n.put(qname, nodes);
             }
             //sort
@@ -171,8 +173,8 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
     long scratch = 400;
     String scratchu = "mb";
     String scratchtype = "-";
-    String prop1 = "x86_64";
-    String prop2 = "linux";
+    String prop1 = "";
+    String prop2 = "";
     String prop3 = "";
     int ww = 0;
     int wd = 1;
@@ -183,7 +185,7 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
     Queue finalQueue;
 
     private long walltimeSecs() {
-        return 7l * 24l * 3600l * ww + 24l * 3600l * wd + 3600l * wh + 60l * wm + ws;
+        return 7L * 24L * 3600L * ww + 24L * 3600L * wd + 3600L * wh + 60L * wm + ws;
     }
 
     public Resolution sestavovac() throws UnsupportedEncodingException {
@@ -223,6 +225,7 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
             }
             finalQueue = queue;
         }
+        log.debug("finalQueue={}",finalQueue);
         nodesList = q2n.get(finalQueue.getName());
         potencialni = new ArrayList<>(nodesList.size());
         tedVolne = new ArrayList<>(nodesList.size());
@@ -232,7 +235,12 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
         if (prop2 != null && prop2.trim().length() > 0) props.add(prop2);
         if (prop3 != null && prop3.trim().length() > 0) props.add(prop3);
 
+        if(log.isDebugEnabled()) {
+            log.debug("nodesList="+nodesList.stream().map(Node::getShortName).collect(Collectors.joining(",")));
+        }
         NODES: for (Node node : nodesList) {
+            String nodeShortName = node.getShortName();
+            log.debug("deciding node {}", nodeShortName);
             //musi mit dost procesoru
             if (node.getNoOfCPUInt() < ppn) continue;
             //musi mit dost pameti
@@ -242,6 +250,8 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
             for(String prop : props) {
                 if(!node.hasProperty(prop)) continue NODES;
             }
+            //musi povolovat ulohy dane delky pres min_ a max_
+            if(!node.allowsWalltime(walltimeSecs)) continue;
             //musi mit vhodny typ scratche
             Scratch nodeScratch = node.getScratch();
             if (scratchKB > 0) {
@@ -250,6 +260,7 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
                 if (scratchtype.equals("shared") && !nodeScratch.getHasNetwork()) continue;
                 if (scratchtype.equals("-") && !nodeScratch.hasAnySizeKiB(scratchKB)) continue;
             }
+
             //kdy se to dostalo az sem, je potencialne vhodny
             potencialni.add(node);
             //ted zkontrolujeme, zda ma ted dost volnych prostredku
@@ -282,15 +293,6 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
         log.info("SestavovacQsub vysledek: " + vysledek);
         vyber = true;
         return new ForwardResolution("/nodes/personal.jsp");
-    }
-
-    private static String getNodesShortNames(List<Node> nodes) {
-        StringBuilder sb = new StringBuilder("[");
-        for (Node node : nodes) {
-            sb.append(node.getShortName()).append(",");
-        }
-        sb.append("]");
-        return sb.toString();
     }
 
     public Queue getQueue() {
@@ -454,7 +456,7 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
         this.ws = ws;
     }
 
-    static private final HashSet<String> vynechatProps = new HashSet<String>() {{
+    static private final HashSet<String> OMIT_PROPERTIES = new HashSet<String>() {{
         add("globus");
         add("pa177");
         add("jcu");
@@ -468,18 +470,19 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
 
     public List<String> getProps() {
         if (props == null) {
-            HashSet<String> propSet = new HashSet<String>(50);
+            HashSet<String> propSet = new HashSet<>(50);
             for (Node node : pbsky.getAllNodes()) {
                 propSet.addAll(Arrays.asList(node.getProperties()));
             }
             Iterator<String> iterator = propSet.iterator();
             while (iterator.hasNext()) {
                 String prop = iterator.next();
-                if (prop.startsWith("q_") || vynechatProps.contains(prop)) {
+                //omit properties not intended for users
+                if (prop.startsWith("q_") || prop.startsWith("max_") || prop.startsWith("min_") || OMIT_PROPERTIES.contains(prop)) {
                     iterator.remove();
                 }
             }
-            props = new ArrayList<String>(propSet);
+            props = new ArrayList<>(propSet);
             Collections.sort(props);
         }
         return props;

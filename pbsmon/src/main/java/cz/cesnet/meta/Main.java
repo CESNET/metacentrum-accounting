@@ -1,6 +1,8 @@
 package cz.cesnet.meta;
 
-import cz.cesnet.meta.cloud.*;
+import cz.cesnet.meta.cloud.CloudImpl;
+import cz.cesnet.meta.cloud.CloudPhysicalHost;
+import cz.cesnet.meta.cloud.HostsDocument;
 import cz.cesnet.meta.pbs.*;
 import cz.cesnet.meta.pbscache.PbsCache;
 import cz.cesnet.meta.pbscache.PbsCacheImpl;
@@ -18,7 +20,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -32,8 +37,10 @@ import java.util.regex.Pattern;
 public class Main {
     final static Logger log = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) {
-        Perun perun = new PerunJsonImpl(Arrays.asList("/etc/pbsmon/pbsmon_machines.json"),Collections.emptyList());
+
+
+    public static void main10(String[] args) {
+        Perun perun = new PerunJsonImpl(Arrays.asList("/etc/pbsmon/pbsmon_machines.json"), Collections.emptyList());
         VypocetniZdroj bofurA = perun.getVypocetniZdrojByName("bofur.ics.muni.cz");
         VypocetniZdroj bofurB = najdiZdroj(perun, "bofur.ics.muni.cz");
         System.out.println("bofurA = " + bofurA.getStroje());
@@ -41,10 +48,10 @@ public class Main {
 
     }
 
-    private static VypocetniZdroj najdiZdroj(Perun perun,String jmeno) {
+    private static VypocetniZdroj najdiZdroj(Perun perun, String jmeno) {
         for (VypocetniCentrum centrum : perun.getFyzickeStroje().getCentra()) {
             for (VypocetniZdroj zdroj : centrum.getZdroje()) {
-                if(zdroj.getId().equals(jmeno)) {
+                if (zdroj.getId().equals(jmeno)) {
                     return zdroj;
                 }
             }
@@ -54,26 +61,27 @@ public class Main {
 
     public static void main9(String[] args) {
         MessageFormat mf = new MessageFormat("Začátek odstávky je naplánován na {0,time,d.M.yyyy HH:mm:ss}");
-        System.out.println(mf.format(new Object[] { new Date()}));
+        System.out.println(mf.format(new Object[]{new Date()}));
     }
+
     public static void main8(String[] args) {
-        for(String s : new String[]{ "0mb", "2gb" , "2200mb","1024tb", "7815829540kb","543905024kb","57076422mb","4097mb",
-                "4096mb","4095mb","4612mb","8193mb","8192mb","8191mb","8705mb","16385mb","6154397092kb"}) {
+        for (String s : new String[]{"0mb", "2gb", "2200mb", "1024tb", "7815829540kb", "543905024kb", "57076422mb", "4097mb",
+                "4096mb", "4095mb", "4612mb", "8193mb", "8192mb", "8191mb", "8705mb", "16385mb", "6154397092kb"}) {
 //        Random random = new Random();
 //        String[] units = new String[] { "mb", "gb", "tb"};
 //        for(int i =0; i<10; i++) {
 //            String s = random.nextInt(3000) + units[random.nextInt(units.length)];
             long bytes = PbsUtils.parsePbsBytes(s);
-            System.out.printf("%15s -> %10s  %s%n",s,PbsUtils.formatInPbsUnits(bytes),PbsUtils.formatInHumanUnits(bytes));
+            System.out.printf("%15s -> %10s  %s%n", s, PbsUtils.formatInPbsUnits(bytes), PbsUtils.formatInHumanUnits(bytes));
         }
     }
 
     public static void main7(String[] args) {
         Pattern p = Pattern.compile("^host=([^:]+):.*:scratch_type=(\\w+):scratch_volume=([0-9]+[kmgp]b)");
-        for(String s : Arrays.asList("host=luna43.fzu.cz:ppn=1:mem=409600KB:vmem=137438953472KB:scratch_type=local:scratch_volume=1024mb",
+        for (String s : Arrays.asList("host=luna43.fzu.cz:ppn=1:mem=409600KB:vmem=137438953472KB:scratch_type=local:scratch_volume=1024mb",
                 "host=ramdal.ics.muni.cz:ppn=1:mem=409600KB:vmem=137438953472KB:scratch_type=shared:scratch_volume=1024mb")) {
             Matcher m = p.matcher(s);
-            if(m.find()) {
+            if (m.find()) {
                 String hostname = m.group(1);
                 String type = m.group(2);
                 String volume = m.group(3);
@@ -126,20 +134,20 @@ public class Main {
         @Override
         public void run() {
             try {
-            long start = System.currentTimeMillis();
-            while (System.currentTimeMillis() < start + 90000l) {
-                log.info("loading");
-                cloud.getPhysicalHosts();
-                int refreshTime = cloud.getRefreshTime();
-                log.info("got them, refresh in {}s", refreshTime);
-                try {
-                    Thread.sleep(5000l);
-                } catch (InterruptedException e) {
-                    log.error("", e);
+                long start = System.currentTimeMillis();
+                while (System.currentTimeMillis() < start + 90000l) {
+                    log.info("loading");
+                    cloud.getPhysicalHosts();
+                    int refreshTime = cloud.getRefreshTime();
+                    log.info("got them, refresh in {}s", refreshTime);
+                    try {
+                        Thread.sleep(5000l);
+                    } catch (InterruptedException e) {
+                        log.error("", e);
+                    }
                 }
-            }
             } catch (Throwable t) {
-                log.error("in run",t);
+                log.error("in run", t);
             }
         }
     }

@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
  * @author Martin Kuba makub@ics.muni.cz
  * @version $Id: Node.java,v 1.50 2015/08/26 11:24:27 makub Exp $
  */
+@SuppressWarnings("unused")
 public class Node extends PbsInfoObject {
     public static final String STATE_FREE = "free";
     public static final String STATE_PARTIALY_FREE = "partialy-free";
@@ -45,7 +46,7 @@ public class Node extends PbsInfoObject {
     private String clusterName;
     private int numInCluster;
     private int virtNum;
-    private List<Queue> queues = new ArrayList<Queue>();
+    private List<Queue> queues = new ArrayList<>();
     private List<OutageRecord> outages;
     private Scratch scratch;
     private Map<String, String> status;
@@ -453,7 +454,7 @@ public class Node extends PbsInfoObject {
         if (this.jobsIds == null) {
             String jobsatr = attrs.get("jobs");
             String[] jobsIds = jobsatr != null ? jobsatr.split(", *") : new String[0];
-            HashMap<String, Integer> cpuCounts = new HashMap<String, Integer>();
+            HashMap<String, Integer> cpuCounts = new HashMap<>();
             for (int i = 0; i < jobsIds.length; i++) {
                 jobsIds[i] = PbsUtils.substringAfter(jobsIds[i], '/');
                 PbsUtils.updateCount(cpuCounts, jobsIds[i], 1);
@@ -509,14 +510,14 @@ public class Node extends PbsInfoObject {
     }
 
     public Date getLastJobEndTime() {
-        long maxend = 0l;
+        long maxend = 0L;
         for (Job job : getJobs()) {
             Date timeExpectedEnd = job.getTimeExpectedEnd();
             if (timeExpectedEnd != null && timeExpectedEnd.getTime() > maxend) {
                 maxend = timeExpectedEnd.getTime();
             }
         }
-        return (maxend == 0l) ? null : new Date(maxend);
+        return (maxend == 0L) ? null : new Date(maxend);
     }
 
     private Date availableBefore;
@@ -593,8 +594,8 @@ public class Node extends PbsInfoObject {
         if (scratch == null) scratch = new Scratch();
         scratch.setSsdSize(getStatus("scratch_ssd"));
         scratch.setLocalSize(getStatus("scratch_local"));
-        long allocatedSsd = 0l;
-        long allocatedLocal = 0l;
+        long allocatedSsd = 0L;
+        long allocatedLocal = 0L;
         for (Job.ReservedScratch reservedScratch : this.getReservedScratches()) {
             switch (reservedScratch.getType()) {
                 case "ssd":
@@ -649,5 +650,44 @@ public class Node extends PbsInfoObject {
 
     public Map<String, String> getGpuJobMap() {
         return gpuJobMap;
+    }
+
+    Pattern p = Pattern.compile("max_(.)+");
+
+    public boolean allowsWalltime(long walltimeSecs) {
+        String[] properties = getProperties();
+        String max = findPrefixedProperty("max_");
+        if(max!=null) {
+            long maxSeconds = PbsUtils.parseWalltime(max);
+            if(walltimeSecs>maxSeconds) return false;
+        }
+        String min = findPrefixedProperty("min_");
+        if(min!=null) {
+            long minSeconds = PbsUtils.parseWalltime(min);
+            if(walltimeSecs<minSeconds) return false;
+        }
+        return true;
+    }
+
+    public String getMaxWalltime() {
+        return findPrefixedProperty("max_");
+    }
+
+    public String getMinWalltime() {
+        return findPrefixedProperty("min_");
+    }
+
+    /**
+     * Searches node properties and returns the first that start with given prefix, with the prefix truncated.
+     * @param prefix characters for beginning of the string
+     * @return null or value of property without prefix
+     */
+    private String findPrefixedProperty(String prefix) {
+        for (String prop : properties) {
+            if (prop.startsWith(prefix)) {
+                return prop.substring(prefix.length());
+            }
+        }
+        return  null;
     }
 }

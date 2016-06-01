@@ -19,7 +19,7 @@ import java.util.List;
 public class PbsmonUtils {
 
     /**
-     * Získá senzam PBS uzlů pro fyzický stroj.
+     * Získá seznam PBS uzlů pro fyzický stroj.
      * @param perunMachine - informace z Peruna
      * @param pbsky - informace z Torque
      * @param pbsCache - informace z pbs_cache

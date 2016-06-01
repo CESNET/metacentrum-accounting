@@ -3,6 +3,8 @@ package cz.cesnet.meta.pbs;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,7 +51,7 @@ public class PbsUtils {
     }
 
     //velikost
-    static final long KIBI = 1024l;
+    static final long KIBI = 1024L;
     static final long MEBI = KIBI * KIBI;
     static final long GIBI = MEBI * KIBI;
     static final long TEBI = GIBI * KIBI;
@@ -58,7 +60,7 @@ public class PbsUtils {
     static final long KILO = 1000;
     static final long MEGA = KILO * KILO;
     static final long GIGA = MEGA * KILO;
-    static final long ROUND_LIMIT = 16l*KIBI;
+    static final long ROUND_LIMIT = 16L*KIBI;
 
     /**
      * Převádí velikost paměti ve formátu PBS na počet bajtů.
@@ -178,5 +180,37 @@ public class PbsUtils {
         if (count == null) count = 0;
         count += inc;
         map.put(key, count);
+    }
+
+    /**
+     * Parses walltime specified with w for week, d for days, h for hours, m for minutes, s for seconds
+     * @param walltime walltime
+     * @return number of seconds
+     */
+    public static long parseWalltime(String walltime) {
+        Pattern p = Pattern.compile("(\\d+)([wdhms])");
+        Matcher m = p.matcher(walltime);
+        long seconds = 0L;
+        while (m.find()) {
+            int num = Integer.parseInt(m.group(1));
+            switch (m.group(2)) {
+                case "w":
+                    seconds += num * (7L * 24L * 3600L);
+                    break;
+                case "d":
+                    seconds += num * (24L * 3600L);
+                    break;
+                case "h":
+                    seconds += num * (3600L);
+                    break;
+                case "m":
+                    seconds += num * (60L);
+                    break;
+                case "s":
+                    seconds += num;
+                    break;
+            }
+        }
+        return seconds;
     }
 }

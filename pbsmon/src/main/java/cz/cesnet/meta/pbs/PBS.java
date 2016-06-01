@@ -309,8 +309,9 @@ public class PBS implements TimeStamped {
     private static Map<String, List<Node>> makeQueuesToNodeMap(List<Queue> queues, List<Node> nodes) {
         Map<String, List<Node>> queuesToNodesMap = new HashMap<String, List<Node>>((int) (queues.size() * 1.5));
         for (Queue q : queues) {
-            List<Node> nodeList = new ArrayList<Node>();
+            List<Node> nodeList = new ArrayList<>();
             String queueName = q.getName();
+            //non-execution queues have no nodes
             if (!q.isExecutionQueue()) {
                 queuesToNodesMap.put(queueName, nodeList);
                 continue;

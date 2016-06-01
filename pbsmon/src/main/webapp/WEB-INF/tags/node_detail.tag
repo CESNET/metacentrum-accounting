@@ -231,6 +231,17 @@
             value="${node.pbs.server.shortName}"/></s:link>:
         <t:queues queues="${node.queues}"/>
 
+        <c:if test="${! empty node.maxWalltime}">
+            <div class="walltimelimit">
+                <f:message key="node_detail_max_walltime"><f:param value="${node.maxWalltime}"/></f:message>
+            </div>
+        </c:if>
+        <c:if test="${! empty node.minWalltime}">
+            <div class="walltimelimit">
+                <f:message key="node_detail_min_walltime"><f:param value="${node.minWalltime}"/></f:message>
+            </div>
+        </c:if>
+
         <br>
         <table class="attributes">
             <c:forEach items="${node.attributes}" var="met">
