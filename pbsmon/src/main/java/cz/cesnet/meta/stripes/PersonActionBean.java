@@ -115,11 +115,10 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
             q2n = new HashMap<>();
             resourceValues = new HashMap<>();
             for (String qname : pbsAccess.getQueues()) {
-                queues.add(pbsky.getQueueByName(qname));
-                //TODO v CERIT-SC nemuze fronta bez required vlastnosti na uzel, kde uz je fronta s required vlastnosti, class PBS
-                //TODO tohle se čte z Ruby serveru, který to zjištuje podle členství ve skupinách a ACL dané fronty
-                //TODO muselo by se to přepsat důkladněji
-                List<Node> nodes = pbsAccess.getQueueToHostsMap().get(qname).stream().map(nodeName -> pbsky.getNodeByName(nodeName)).collect(Collectors.toList());
+                Queue q = pbsky.getQueueByName(qname);
+                queues.add(q);
+                //budeme předpokládat, že uživatel může na všechny uzly fronty, do které může
+                List<Node> nodes = q.getPbs().getQueueToNodesMap().get(q.getName());
                 q2n.put(qname, nodes);
                 //resources
                 for(Node node : nodes) {
