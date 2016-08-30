@@ -1,12 +1,14 @@
 package cz.cesnet.meta.pbs;
 
 /**
- * Specializace PbsInfoObject na server.
+ * Class representing data about a PBS server.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: PbsServer.java,v 1.7 2013/11/15 10:05:35 makub Exp $
  */
 public class PbsServer extends PbsInfoObject {
+
+    //used attribute names
+    private static final String ATTRIBUTE_PBS_VERSION = "pbs_version";
 
     private PbsServerConfig serverConfig;
 
@@ -18,7 +20,7 @@ public class PbsServer extends PbsInfoObject {
     }
 
     public String getVersion() {
-        return attrs.get("pbs_version");
+        return attrs.get(ATTRIBUTE_PBS_VERSION);
     }
 
     /**

@@ -11,11 +11,38 @@ import java.util.regex.Pattern;
  * Holds information about a job.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: Job.java,v 1.38 2014/12/10 15:42:37 makub Exp $
  */
 public class Job extends PbsInfoObject {
 
     final static Logger log = LoggerFactory.getLogger(Job.class);
+
+    //used attribute names
+    public static final String ATTRIBUTE_TIME_CREATED = "ctime";
+    public static final String ATTRIBUTE_TIME_ELIGIBLE = "etime";
+    public static final String ATTRIBUTE_TIME_MODIFIED = "mtime";
+    public static final String ATTRIBUTE_TIME_STARTED = "start_time";
+    public static final String ATTRIBUTE_TIME_COMPLETED = "comp_time";
+    public static final String ATTRIBUTE_PLANNED_START = "planned_start";
+    public static final String ATTRIBUTE_PLANNED_NODES = "planned_nodes";
+    public static final String ATTRIBUTE_USED_GPUS = "resc_req_total.gpu";
+    public static final String ATTRIBUTE_USED_CPUS = "resc_req_total.procs";
+    public static final String ATTRIBUTE_USED_MEMORY = "resources_used.mem";
+    public static final String ATTRIBUTE_USED_CPUTIME = "resources_used.cput";
+    public static final String ATTRIBUTE_USED_WALLTIME = "resources_used.walltime";
+    public static final String ATTRIBUTE_RESERVED_MEMORY = "resc_req_total.mem";
+    public static final String ATTRIBUTE_NODE_COUNT = "Resource_List.nodect";
+    public static final String ATTRIBUTE_NODES = "Resource_List.nodes";
+    public static final String ATTRIBUTE_VARIABLE_LIST = "Variable_List";
+    public static final String ATTRIBUTE_JOB_OWNER = "Job_Owner";
+    public static final String ATTRIBUTE_JOB_NAME = "Job_Name";
+    public static final String ATTRIBUTE_WALLTIME_REMAINING = "Walltime.Remaining";
+    public static final String ATTRIBUTE_JOB_STATE = "job_state";
+    public static final String ATTRIBUTE_QUEUE = "queue";
+    public static final String ATTRIBUTE_COMMENT = "comment";
+    public static final String ATTRIBUTE_EXEC_HOST = "exec_host";
+    public static final String ATTRIBUTE_SCHEDULED_NODES_SPECS = "sched_nodespec";
+    public static final String ATTRIBUTE_EXECUTION_TIME = "Execution_Time";
+    public static final String ATTRIBUTE_EXIT_STATUS = "exit_status";
 
     public static final Comparator<Job> PLANNED_START_JOB_COMPARATOR = (j1, j2) -> {
         Date t1 = j1.getPlannedStart();
@@ -50,6 +77,7 @@ public class Job extends PbsInfoObject {
         //stejny fairshare,porovnat joby
         return j1.getId().compareTo(j2.getId());
     };
+
 
     public Job() {
     }
@@ -92,23 +120,24 @@ public class Job extends PbsInfoObject {
         queue = null;
     }
 
+
     /**
      * Defines order of attributes.
      */
     static String[] orderedAttributeNames = new String[]{
-            "submit_args", "comment", "Job_Name", "Job_Owner", "job_state", "queue", "server",
-            "exec_host", "Output_Path", "Error_Path", "Join_Path",
-            "ctime", "qtime", "etime", "planned_start", "mtime", "stime", "start_time", "comp_time", "Walltime.Remaining",
-            "planned_nodes",
-            "resc_req_total.nodect", "resc_req_total.procs", "resc_req_total.gpu",
-            "resc_req_total.mem", "resc_req_total.vmem", "resc_req_total.walltime",
+            "submit_args", ATTRIBUTE_COMMENT, ATTRIBUTE_JOB_NAME, ATTRIBUTE_JOB_OWNER, ATTRIBUTE_JOB_STATE, ATTRIBUTE_QUEUE,
+            ATTRIBUTE_EXEC_HOST, "Output_Path", "Error_Path", "Join_Path",
+            ATTRIBUTE_TIME_CREATED, "qtime", ATTRIBUTE_TIME_ELIGIBLE, ATTRIBUTE_PLANNED_START, ATTRIBUTE_TIME_MODIFIED, "stime", ATTRIBUTE_TIME_STARTED, ATTRIBUTE_TIME_COMPLETED, ATTRIBUTE_WALLTIME_REMAINING,
+            ATTRIBUTE_PLANNED_NODES,
+            "resc_req_total.nodect", ATTRIBUTE_USED_CPUS, ATTRIBUTE_USED_GPUS,
+            ATTRIBUTE_RESERVED_MEMORY, "resc_req_total.vmem", "resc_req_total.walltime",
             "resc_req_total.scratch", "resc_req_total.scratch_volume",
-            "Resource_List.ncpus", "Resource_List.neednodes", "Resource_List.nodect", "Resource_List.nodes", "Resource_List.gpu",
+            "Resource_List.ncpus", "Resource_List.neednodes", ATTRIBUTE_NODE_COUNT, ATTRIBUTE_NODES, "Resource_List.gpu",
             "Resource_List.mem", "Resource_List.vmem", "Resource_List.walltime", "Resource_List.scratch",
-            "Resource_List.ansys", "Resource_List.matlab", "Resource_List.processed_nodes", "sched_nodespec",
-            "resources_used.cpupercent", "resources_used.cput", "resources_used.ncpus", "resources_used.mem",
-            "resources_used.vmem", "resources_used.walltime", "resources_used.fairshare",
-            "Keep_Files", "Mail_Points", "Priority", "Rerunable", "Variable_List", "Checkpoint", "Hold_Types",
+            "Resource_List.ansys", "Resource_List.matlab", "Resource_List.processed_nodes", ATTRIBUTE_SCHEDULED_NODES_SPECS,
+            "resources_used.cpupercent", ATTRIBUTE_USED_CPUTIME, "resources_used.ncpus", ATTRIBUTE_USED_MEMORY,
+            "resources_used.vmem", ATTRIBUTE_USED_WALLTIME, "resources_used.fairshare",
+            "Keep_Files", "Mail_Points", "Priority", "Rerunable", ATTRIBUTE_VARIABLE_LIST, "Checkpoint", "Hold_Types",
             "server", "depend", "session_id"
     };
 
@@ -169,21 +198,21 @@ public class Job extends PbsInfoObject {
     public Date getTimeCreated() {
         //  ctime The time that the job was created.
         if (ctime == null) {
-            ctime = PbsUtils.getJavaTime(attrs.get("ctime"));
+            ctime = PbsUtils.getJavaTime(attrs.get(ATTRIBUTE_TIME_CREATED));
         }
         return ctime;
     }
 
     public Date getTimeStarted() {
         if (start_time == null) {
-            start_time = PbsUtils.getJavaTime(attrs.get("start_time"));
+            start_time = PbsUtils.getJavaTime(attrs.get(ATTRIBUTE_TIME_STARTED));
         }
         return start_time;
     }
 
     public Date getTimeCompleted() {
         if (comp_time == null) {
-            comp_time = PbsUtils.getJavaTime(attrs.get("comp_time"));
+            comp_time = PbsUtils.getJavaTime(attrs.get(ATTRIBUTE_TIME_COMPLETED));
         }
         return comp_time;
     }
@@ -191,13 +220,13 @@ public class Job extends PbsInfoObject {
 
     public Date getPlannedStart() {
         if (planned_start == null) {
-            planned_start = PbsUtils.getJavaTime(attrs.get("planned_start"));
+            planned_start = PbsUtils.getJavaTime(attrs.get(ATTRIBUTE_PLANNED_START));
         }
         return planned_start;
     }
 
     public String getPlannedNodes() {
-        return attrs.get("planned_nodes");
+        return attrs.get(ATTRIBUTE_PLANNED_NODES);
     }
 
     private String[] nodeNames;
@@ -231,7 +260,7 @@ public class Job extends PbsInfoObject {
         //  state while residing in an execution queue.
         if (etime == null) {
             //ulohy ve stavu H nemaji etime
-            String es = attrs.get("etime");
+            String es = attrs.get(ATTRIBUTE_TIME_ELIGIBLE);
             if (es != null) {
                 etime = PbsUtils.getJavaTime(es);
             }
@@ -242,7 +271,7 @@ public class Job extends PbsInfoObject {
     public Date getTimeModified() {
         // mtime The time that the job was last modified, changed state, or changed locations.
         if (mtime == null) {
-            mtime = PbsUtils.getJavaTime(attrs.get("mtime"));
+            mtime = PbsUtils.getJavaTime(attrs.get(ATTRIBUTE_TIME_MODIFIED));
         }
         return mtime;
     }
@@ -250,13 +279,13 @@ public class Job extends PbsInfoObject {
     public Date getExecutionTime() {
         // executionTime - job waits in state W until that time instant
         if (executionTime == null) {
-            executionTime = PbsUtils.getJavaTime(attrs.get("Execution_Time"));
+            executionTime = PbsUtils.getJavaTime(attrs.get(ATTRIBUTE_EXECUTION_TIME));
         }
         return executionTime;
     }
 
     public String getUsedGPU() {
-        return attrs.get("resc_req_total.gpu");
+        return attrs.get(ATTRIBUTE_USED_GPUS);
     }
 
     public int getNoOfUsedGPU() {
@@ -274,7 +303,7 @@ public class Job extends PbsInfoObject {
 
     public int getNoOfUsedCPU() {
         if (noOfUsedCPU == -1) {
-            String ncpu = attrs.get("resc_req_total.procs");
+            String ncpu = attrs.get(ATTRIBUTE_USED_CPUS);
             if (ncpu == null) {
                 this.noOfUsedCPU = 0;
             } else {
@@ -290,7 +319,7 @@ public class Job extends PbsInfoObject {
 
     public long getUsedMemoryNum() {
         if (usedMemory == -1) {
-            usedMemory = PbsUtils.parsePbsBytes(attrs.get("resources_used.mem"));
+            usedMemory = PbsUtils.parsePbsBytes(attrs.get(ATTRIBUTE_USED_MEMORY));
         }
         return usedMemory;
     }
@@ -302,7 +331,7 @@ public class Job extends PbsInfoObject {
 
     public long getReservedMemoryTotalNum() {
         if (reservedMemoryTotal == -1) {
-            reservedMemoryTotal = PbsUtils.parsePbsBytes(attrs.get("resc_req_total.mem"));
+            reservedMemoryTotal = PbsUtils.parsePbsBytes(attrs.get(ATTRIBUTE_RESERVED_MEMORY));
         }
         return reservedMemoryTotal;
     }
@@ -316,7 +345,7 @@ public class Job extends PbsInfoObject {
     }
 
     public Integer getExitStatus() {
-        String s = attrs.get("exit_status");
+        String s = attrs.get(ATTRIBUTE_EXIT_STATUS);
         if (s != null) return new Integer(s);
         return null;
     }
@@ -362,7 +391,7 @@ public class Job extends PbsInfoObject {
     @SuppressWarnings("UnusedDeclaration")
     public int getNodeCount() {
         if (nodeCount == -1) {
-            String nct = attrs.get("Resource_List.nodect");
+            String nct = attrs.get(ATTRIBUTE_NODE_COUNT);
             if (nct != null) {
                 nodeCount = Integer.parseInt(nct);
             } else {
@@ -373,7 +402,7 @@ public class Job extends PbsInfoObject {
     }
 
     public String getResourceNodes() {
-        return attrs.get("Resource_List.nodes");
+        return attrs.get(ATTRIBUTE_NODES);
     }
 
     /**
@@ -383,16 +412,16 @@ public class Job extends PbsInfoObject {
      */
     public String getSubmitDir() {
         if (submitDir == null) {
-            String vl = attrs.get("Variable_List");
+            String vl = attrs.get(ATTRIBUTE_VARIABLE_LIST);
             if (vl != null) {
-                int poz = vl.indexOf("PBS_O_WORKDIR=");
-                if (poz != -1) {
-                    String konec = vl.substring(poz + "PBS_O_WORKDIR=".length());
-                    int carka = konec.indexOf(',');
-                    if (carka == -1) {
-                        submitDir = konec;
+                int position = vl.indexOf("PBS_O_WORKDIR=");
+                if (position != -1) {
+                    String end = vl.substring(position + "PBS_O_WORKDIR=".length());
+                    int comma = end.indexOf(',');
+                    if (comma == -1) {
+                        submitDir = end;
                     } else {
-                        submitDir = konec.substring(0, carka);
+                        submitDir = end.substring(0, comma);
                     }
                 }
             }
@@ -402,7 +431,7 @@ public class Job extends PbsInfoObject {
 
     public String getWorkDir() {
         if (workDir == null) {
-            String vl = attrs.get("Variable_List");
+            String vl = attrs.get(ATTRIBUTE_VARIABLE_LIST);
             if (vl != null) {
                 int poz = vl.indexOf("PBS_O_INITDIR=");
                 if (poz != -1) {
@@ -423,14 +452,14 @@ public class Job extends PbsInfoObject {
 
     public String getUser() {
         if (user == null) {
-            String owner = attrs.get("Job_Owner");
+            String owner = attrs.get(ATTRIBUTE_JOB_OWNER);
             this.user = owner.substring(0, owner.indexOf('@'));
         }
         return user;
     }
 
     public String getJobName() {
-        return attrs.get("Job_Name");
+        return attrs.get(ATTRIBUTE_JOB_NAME);
     }
 
     /**
@@ -439,16 +468,17 @@ public class Job extends PbsInfoObject {
      * @return null or string "hours:minutes:seconds"
      */
     public String getCPUTimeUsed() {
-        String s = attrs.get("resources_used.cput");
+        String s = attrs.get(ATTRIBUTE_USED_CPUTIME);
         return s == null ? "" : s;
     }
 
     /**
      * Report jobs using less than 3/4 of allocated CPUs.
-     * Only for running or completed jobs, which run mor ethan 5 minutes.
+     * Only for running or completed jobs, which run more than 5 minutes.
      *
      * @return true for jobs wasting CPUs
      */
+    @SuppressWarnings("SimplifiableIfStatement")
     public boolean isUnderusingCPUs() {
         String state = getState();
         if (!("R".equals(state) || "C".equals(state))) return false;
@@ -482,12 +512,12 @@ public class Job extends PbsInfoObject {
      * @return null or string "hours:minutes:seconds"
      */
     public String getWallTimeUsed() {
-        String s = attrs.get("resources_used.walltime");
+        String s = attrs.get(ATTRIBUTE_USED_WALLTIME);
         return s == null ? "" : s;
     }
 
     public Long getWalltimeRemaining() {
-        String s = attrs.get("Walltime.Remaining");
+        String s = attrs.get(ATTRIBUTE_WALLTIME_REMAINING);
         if (s == null) return null;
         try {
             return Long.parseLong(s) * 1000;
@@ -550,11 +580,11 @@ public class Job extends PbsInfoObject {
     }
 
     public String getState() {
-        return attrs.get("job_state");
+        return attrs.get(ATTRIBUTE_JOB_STATE);
     }
 
     public Queue getQueue() {
-        if (queue == null) queue = getPbs().getQueues().get(attrs.get("queue"));
+        if (queue == null) queue = getPbs().getQueues().get(attrs.get(ATTRIBUTE_QUEUE));
         return queue;
     }
 
@@ -563,7 +593,7 @@ public class Job extends PbsInfoObject {
     }
 
     public String getComment() {
-        return attrs.get("comment");
+        return attrs.get(ATTRIBUTE_COMMENT);
     }
 
     /**
@@ -573,7 +603,7 @@ public class Job extends PbsInfoObject {
      */
     public String getExecHostFirst() {
         if (execHostFirst == null) {
-            String hosts = attrs.get("exec_host");
+            String hosts = attrs.get(ATTRIBUTE_EXEC_HOST);
             if (hosts != null) {
                 String sh[] = hosts.split("\\+");
                 execHostFirst = sh[0];
@@ -601,7 +631,7 @@ public class Job extends PbsInfoObject {
      */
     public String[] getExecHostMore() {
         if (execHostMore == null) {
-            String hosts = attrs.get("exec_host");
+            String hosts = attrs.get(ATTRIBUTE_EXEC_HOST);
             if (hosts != null) {
                 String sh[] = hosts.split("\\+");
                 if (sh.length > 1) {
@@ -622,7 +652,7 @@ public class Job extends PbsInfoObject {
     // sched_nodespec	host=gram9.zcu.cz:ppn=2:mem=716800KB:vmem=137438953472KB:gpu=2:cl_gram:scratch_type=ssd:scratch_volume=400mb:scratch_ssd=400mb+host=doom7.metacentrum.cz:ppn=1:mem=614400KB:vmem=137438953472KB:gpu=1:cl_doom:scratch_type=ssd:scratch_volume=400mb:scratch_ssd=400mb
     public List<NodeSpec> getScheduledNodeSpecs() {
         if (nodeSpecs == null) {
-            String sched_nodespec = attrs.get("sched_nodespec");
+            String sched_nodespec = attrs.get(ATTRIBUTE_SCHEDULED_NODES_SPECS);
             if (sched_nodespec == null) return null;
             nodeSpecs = new ArrayList<>();
             for (String spec : sched_nodespec.split("\\+")) {
@@ -720,7 +750,7 @@ public class Job extends PbsInfoObject {
     static Pattern scratchRegex = Pattern.compile("^host=([^:]+):.*:scratch_type=(\\w+):scratch_volume=([0-9]+[kmgp]b)");
 
     public String getScratchType() {
-        String sched_nodespec = attrs.get("sched_nodespec");
+        String sched_nodespec = attrs.get(ATTRIBUTE_SCHEDULED_NODES_SPECS);
         if (sched_nodespec == null) return null;
         Matcher m = pst.matcher(sched_nodespec);
         return m.find() ? m.group(1) : null;
@@ -745,7 +775,7 @@ public class Job extends PbsInfoObject {
         if (nodeName2reservedScratchMap == null) {
             synchronized (this) {
                 nodeName2reservedScratchMap = new HashMap<>();
-                String sched_nodespec = attrs.get("sched_nodespec");
+                String sched_nodespec = attrs.get(ATTRIBUTE_SCHEDULED_NODES_SPECS);
                 if (sched_nodespec == null) return null;
                 for (String hostString : sched_nodespec.split("\\+")) {
                     Matcher m = scratchRegex.matcher(hostString);
@@ -762,7 +792,7 @@ public class Job extends PbsInfoObject {
     }
 
     public boolean isPlanned() {
-        return attrs.get("planned_start") != null;
+        return attrs.get(ATTRIBUTE_PLANNED_START) != null;
     }
 
 

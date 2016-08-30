@@ -10,13 +10,41 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by IntelliJ IDEA.
+ * Class representing computing node as reported by a PBS server.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: Node.java,v 1.50 2015/08/26 11:24:27 makub Exp $
  */
 @SuppressWarnings("unused")
 public class Node extends PbsInfoObject {
+
+    final static Logger log = LoggerFactory.getLogger(Node.class);
+
+    //used attribute names
+    public static final String ATTRIBUTE_PREFIX_RESOURCES_TOTAL = "resources_total.";
+    public static final String ATTRIBUTE_STATE = "state";
+    public static final String ATTRIBUTE_EXCLUSIVELY_ASSIGNED = "exclusively_assigned";
+    public static final String ATTRIBUTE_NODE_TYPE = "ntype";
+    public static final String ATTRIBUTE_RESOURCES_AVAILABLE_ARCH = "resources_available.arch";
+    public static final String ATTRIBUTE_COMMENT = "comment";
+    public static final String ATTRIBUTE_NOTE = "note";
+    public static final String ATTRIBUTE_NUMBER_OF_PROCESSORS = "np";
+    public static final String ATTRIBUTE_RESOURCES_TOTAL_GPU = "resources_total.gpu";
+    public static final String ATTRIBUTE_RESOURCES_USED_GPU = "resources_used.gpu";
+    public static final String ATTRIBUTE_NUMBER_OF_HT_CORES = "pcpus";
+    public static final String ATTRIBUTE_NUMBER_OF_FREE_CPUS = "npfree";
+    public static final String ATTRIBUTE_NUMBER_OF_USED_CPUS = "resources_assigned.ncpus";
+    public static final String ATTRIBUTE_TOTAL_MEMORY_TORQUE = "resources_total.mem";
+    public static final String ATTRIBUTE_TOTAL_MEMORY_PBSPRO = "resources_available.mem";
+    public static final String ATTRIBUTE_USED_MEMORY_TORQUE = "resources_used.mem";
+    public static final String ATTRIBUTE_USED_MEMORY_PBSPRO = "resources_assigned.mem";
+    public static final String ATTRIBUTE_QUEUE = "queue";
+    public static final String ATTRIBUTE_JOBS = "jobs";
+    public static final String ATTRIBUTE_AVAILABLE_BEFORE = "available_before";
+    public static final String ATTRIBUTE_AVAILABLE_AFTER = "available_after";
+    public static final String ATTRIBUTE_PROPERTIES = "properties";
+    public static final String ATTRIBUTE_STATUS = "status";
+
+    //node states
     public static final String STATE_FREE = "free";
     public static final String STATE_PARTIALY_FREE = "partialy-free";
     public static final String STATE_OCCUPIED_WOULD_PREEMPT = "occupied-would-preempt";
@@ -33,10 +61,9 @@ public class Node extends PbsInfoObject {
     public static final String STATE_CLOUD = "cloud";
     public static final String STATE_RUNNING_CLUSTER = "running-cluster";
     public static final String STATE_JOB_FULL = "job-full"; //pseudo state for all used CPUs or all used memory
-    final static Logger log = LoggerFactory.getLogger(Node.class);
-    //helpers
+
     private static final Pattern whole = Pattern.compile("^([A-Za-z]+)(\\d*)-*([0-9a-z]*)");
-    public static final String RESOURCES_TOTAL = "resources_total.";
+
     private String shortName;
     private String state;
     private String pbsState;
@@ -170,7 +197,7 @@ public class Node extends PbsInfoObject {
      */
     public String getPbsState() {
         if (this.pbsState == null) {
-            this.pbsState = PbsUtils.substringBefore(attrs.get("state"), ',');
+            this.pbsState = PbsUtils.substringBefore(attrs.get(ATTRIBUTE_STATE), ',');
 
             if (this.pbsState.equals(STATE_FREE)) {
                 if (getNoOfUsedCPUInt() >= getNoOfCPUInt()) {
@@ -181,7 +208,7 @@ public class Node extends PbsInfoObject {
                     this.pbsState = STATE_PARTIALY_FREE;
                 }
             }
-            if ("True".equals(attrs.get("exclusively_assigned"))) {
+            if ("True".equals(attrs.get(ATTRIBUTE_EXCLUSIVELY_ASSIGNED))) {
                 this.pbsState = STATE_JOB_EXCLUSIVE;
             }
         }
@@ -228,7 +255,7 @@ public class Node extends PbsInfoObject {
 
     public String getNtype() {
         //cluster, cloud, virtual
-        return attrs.get("ntype");
+        return attrs.get(ATTRIBUTE_NODE_TYPE);
     }
 
     /**
@@ -248,20 +275,20 @@ public class Node extends PbsInfoObject {
         if (pbs.isTorque()) {
             return getStatus("uname");
         } else {
-            return attrs.get("resources_available.arch");
+            return attrs.get(ATTRIBUTE_RESOURCES_AVAILABLE_ARCH);
         }
     }
 
     public String getComment() {
-        String comment = attrs.get("comment");
+        String comment = attrs.get(ATTRIBUTE_COMMENT);
         if (comment == null) {
-            comment = attrs.get("note");
+            comment = attrs.get(ATTRIBUTE_NOTE);
         }
         return comment;
     }
 
     public String getNoOfCPU() {
-        return attrs.get("np");
+        return attrs.get(ATTRIBUTE_NUMBER_OF_PROCESSORS);
     }
 
     public int getNoOfCPUInt() {
@@ -270,7 +297,7 @@ public class Node extends PbsInfoObject {
     }
 
     public String getNoOfGPU() {
-        return attrs.get("resources_total.gpu");
+        return attrs.get(ATTRIBUTE_RESOURCES_TOTAL_GPU);
     }
 
     public int getNoOfGPUInt() {
@@ -283,7 +310,7 @@ public class Node extends PbsInfoObject {
     }
 
     public String getNoOfUsedGPU() {
-        return attrs.get("resources_used.gpu");
+        return attrs.get(ATTRIBUTE_RESOURCES_USED_GPU);
     }
 
     public int getNoOfUsedGPUInt() {
@@ -299,7 +326,7 @@ public class Node extends PbsInfoObject {
         if (pbs.isTorque()) {
             return getStatus("ncpus");
         } else {
-            return attrs.get("pcpus");
+            return attrs.get(ATTRIBUTE_NUMBER_OF_HT_CORES);
         }
     }
 
@@ -319,14 +346,14 @@ public class Node extends PbsInfoObject {
     }
 
     public String getNoOfFreeCPU() {
-        return attrs.get("npfree");
+        return attrs.get(ATTRIBUTE_NUMBER_OF_FREE_CPUS);
     }
 
     public String getNoOfUsedCPU() {
         if (pbs.isTorque()) {
             return Integer.toString(getNoOfUsedCPUInt());
         } else {
-            return attrs.get("resources_assigned.ncpus");
+            return attrs.get(ATTRIBUTE_NUMBER_OF_USED_CPUS);
         }
     }
 
@@ -370,9 +397,9 @@ public class Node extends PbsInfoObject {
     public long getTotalMemoryInt() {
         String mem;
         if (pbs.isTorque()) {
-            mem = attrs.get("resources_total.mem");
+            mem = attrs.get(ATTRIBUTE_TOTAL_MEMORY_TORQUE);
         } else {
-            mem = attrs.get("resources_available.mem");
+            mem = attrs.get(ATTRIBUTE_TOTAL_MEMORY_PBSPRO);
         }
         return PbsUtils.parsePbsBytes(mem);
     }
@@ -387,9 +414,9 @@ public class Node extends PbsInfoObject {
 
     public long getUsedMemoryInt() {
         if (pbs.isTorque()) {
-            return PbsUtils.parsePbsBytes(attrs.get("resources_used.mem"));
+            return PbsUtils.parsePbsBytes(attrs.get(ATTRIBUTE_USED_MEMORY_TORQUE));
         } else {
-            return PbsUtils.parsePbsBytes(attrs.get("resources_assigned.mem"));
+            return PbsUtils.parsePbsBytes(attrs.get(ATTRIBUTE_USED_MEMORY_PBSPRO));
         }
     }
 
@@ -398,7 +425,7 @@ public class Node extends PbsInfoObject {
     }
 
     public boolean isExclusivelyAssigned() {
-        return Boolean.parseBoolean(attrs.get("exclusively_assigned"));
+        return Boolean.parseBoolean(attrs.get(ATTRIBUTE_EXCLUSIVELY_ASSIGNED));
     }
 
     public long getFreeMemoryInt() {
@@ -441,13 +468,13 @@ public class Node extends PbsInfoObject {
      * @return queue name
      */
     public String getRequiredQueue() {
-        String rq = attrs.get("queue");
+        String rq = attrs.get(ATTRIBUTE_QUEUE);
         if (rq != null) rq = rq + getPbs().getSuffix();
         return rq;
     }
 
     private String getRequiredQueueShort() {
-        return attrs.get("queue");
+        return attrs.get(ATTRIBUTE_QUEUE);
     }
 
     /**
@@ -457,7 +484,7 @@ public class Node extends PbsInfoObject {
      */
     public String[] getJobIds() {
         if (this.jobsIds == null) {
-            String jobsatr = attrs.get("jobs");
+            String jobsatr = attrs.get(ATTRIBUTE_JOBS);
             String[] jobsIds = jobsatr != null ? jobsatr.split(", *") : new String[0];
             HashMap<String, Integer> cpuCounts = new HashMap<>();
             for (int i = 0; i < jobsIds.length; i++) {
@@ -530,7 +557,7 @@ public class Node extends PbsInfoObject {
     public Date getAvailableBefore() {
         // available_before - začátek plánované odstávky
         if (availableBefore == null) {
-            String available_before = attrs.get("available_before");
+            String available_before = attrs.get(ATTRIBUTE_AVAILABLE_BEFORE);
             if (available_before == null || "0".equals(available_before)) return null;
             availableBefore = PbsUtils.getJavaTime(available_before);
         }
@@ -542,7 +569,7 @@ public class Node extends PbsInfoObject {
     public Date getAvailableAfter() {
         // available_after - konec plánované odstávky
         if (availableAfter == null) {
-            String available_after = attrs.get("available_after");
+            String available_after = attrs.get(ATTRIBUTE_AVAILABLE_AFTER);
             if (available_after == null || "0".equals(available_after)) return null;
             availableAfter = PbsUtils.getJavaTime(available_after);
         }
@@ -554,7 +581,7 @@ public class Node extends PbsInfoObject {
     }
 
     public boolean getHasJobs() {
-        return attrs.get("jobs") != null;
+        return attrs.get(ATTRIBUTE_JOBS) != null;
     }
 
     /**
@@ -564,7 +591,7 @@ public class Node extends PbsInfoObject {
      */
     public String[] getProperties() {
         if (this.properties == null) {
-            String propatr = attrs.get("properties");
+            String propatr = attrs.get(ATTRIBUTE_PROPERTIES);
             this.properties = propatr != null ? propatr.split(",") : new String[0];
         }
         return this.properties;
@@ -628,7 +655,7 @@ public class Node extends PbsInfoObject {
     public String getStatus(String name) {
         if (status == null) {
             status = new HashMap<>();
-            String all = attrs.get("status");
+            String all = attrs.get(ATTRIBUTE_STATUS);
             if (all != null) {
                 for (String s : all.split(", *")) {
                     int pos = s.indexOf('=');
@@ -697,20 +724,20 @@ public class Node extends PbsInfoObject {
     }
 
     /**
-     * Returns attributes that sterted with resources_total, but without the prefix.
+     * Returns attributes that started with resources_total, but without the prefix.
      * @return map fo attributes with attribute names without the prefix
      */
     public Map<String,String> getResources() {
         Map<String,String> map = new HashMap<>();
         for(Map.Entry<String,String> e : getAttributes().entrySet()) {
-            if(e.getKey().startsWith(RESOURCES_TOTAL)) {
-                map.put(e.getKey().substring(RESOURCES_TOTAL.length()),e.getValue());
+            if(e.getKey().startsWith(ATTRIBUTE_PREFIX_RESOURCES_TOTAL)) {
+                map.put(e.getKey().substring(ATTRIBUTE_PREFIX_RESOURCES_TOTAL.length()),e.getValue());
             }
         }
         return map;
     }
 
     public String getResource(String name) {
-        return attrs.get(RESOURCES_TOTAL+name);
+        return attrs.get(ATTRIBUTE_PREFIX_RESOURCES_TOTAL +name);
     }
 }

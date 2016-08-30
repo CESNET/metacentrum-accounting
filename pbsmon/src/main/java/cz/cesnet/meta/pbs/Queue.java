@@ -6,14 +6,33 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
+ * Class representing a queue as reported by a PBS server.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: Queue.java,v 1.13 2014/03/05 14:50:15 makub Exp $
  */
 public class Queue extends PbsInfoObject {
 
     final static Logger log = LoggerFactory.getLogger(Queue.class);
+
+    //used attribute names
+    public static final String ATTRIBUTE_QUEUE_TYPE = "queue_type";
+    public static final String ATTRIBUTE_ROUTE_DESTINATIONS = "route_destinations";
+    public static final String ATTRIBUTE_WALLTIME_MIN = "resources_min.walltime";
+    public static final String ATTRIBUTE_WALLTIME_MAX = "resources_max.walltime";
+    public static final String ATTRIBUTE_PRIORITY = "Priority";
+    public static final String ATTRIBUTE_REQUIRED_PROPERTY = "required_property";
+    public static final String ATTRIBUTE_ACL_USERS = "acl_users";
+    public static final String ATTRIBUTE_ACL_GROUPS = "acl_groups";
+    public static final String ATTRIBUTE_ACL_HOSTS = "acl_hosts";
+    public static final String ATTRIBUTE_ACL_USERS_ENABLED = "acl_user_enable";
+    public static final String ATTRIBUTE_ACL_GROUPS_ENABLED = "acl_group_enable";
+    public static final String ATTRIBUTE_ACL_HOSTS_ENABLED = "acl_host_enable";
+    public static final String ATTRIBUTE_MAX_RUNNING_JOBS = "max_running";
+    public static final String ATTRIBUTE_MAX_USER_RUN = "max_user_run";
+    public static final String ATTRIBUTE_MAX_USER_CPU = "max_user_proc";
+    public static final String ATTRIBUTE_FAIRSHARE_TREE = "fairshare_tree";
+    public static final String ATTRIBUTE_DESCRIPTION_CZECH = "description_cs";
+    public static final String ATTRIBUTE_DESCRIPTION_ENGLISH = "description_en";
 
     public Queue() {
         super();
@@ -60,14 +79,14 @@ public class Queue extends PbsInfoObject {
     }
 
     public boolean isRouting() {
-        return "Route".equals(attrs.get("queue_type"));
+        return "Route".equals(attrs.get(ATTRIBUTE_QUEUE_TYPE));
     }
 
     public List<String> getDestQueueNames() {
-        String route_destinations = attrs.get("route_destinations");
+        String route_destinations = attrs.get(ATTRIBUTE_ROUTE_DESTINATIONS);
         if (route_destinations == null) return Collections.emptyList();
         String[] shortNames = route_destinations.split(",");
-        List<String> dsts = new ArrayList<String>(shortNames.length);
+        List<String> dsts = new ArrayList<>(shortNames.length);
         for (String shortName : shortNames) {
             dsts.add(pbs == null ? shortName : shortName + pbs.getSuffix());
         }
@@ -75,11 +94,11 @@ public class Queue extends PbsInfoObject {
     }
 
     public String getWalltimeMin() {
-        return attrs.get("resources_min.walltime");
+        return attrs.get(ATTRIBUTE_WALLTIME_MIN);
     }
 
     public String getWalltimeMax() {
-        return attrs.get("resources_max.walltime");
+        return attrs.get(ATTRIBUTE_WALLTIME_MAX);
     }
 
     public long getWalltimeMinSeconds() {
@@ -90,7 +109,7 @@ public class Queue extends PbsInfoObject {
             log.error("cannot parsec queue {} mintime {}", getName(), t);
             return 0;
         }
-        return Long.parseLong(sa[0]) * 3600l + Long.parseLong(sa[1]) * 60l + Long.parseLong(sa[2]);
+        return Long.parseLong(sa[0]) * 3600L + Long.parseLong(sa[1]) * 60L + Long.parseLong(sa[2]);
     }
 
     public long getWalltimeMaxSeconds() {
@@ -101,13 +120,13 @@ public class Queue extends PbsInfoObject {
             log.error("cannot parsec queue {} maxtime {}", getName(), t);
             return Long.MAX_VALUE;
         }
-        return Long.parseLong(sa[0]) * 3600l + Long.parseLong(sa[1]) * 60l + Long.parseLong(sa[2]);
+        return Long.parseLong(sa[0]) * 3600L + Long.parseLong(sa[1]) * 60L + Long.parseLong(sa[2]);
     }
 
 
     public int getPriority() {
         if (priority == -1) {
-            String p = attrs.get("Priority");
+            String p = attrs.get(ATTRIBUTE_PRIORITY);
             if (p == null) {
                 this.priority = 0;
             } else {
@@ -123,7 +142,7 @@ public class Queue extends PbsInfoObject {
      * @return value of required_property attribute
      */
     public String getRequiredProperty() {
-        return attrs.get("required_property");
+        return attrs.get(ATTRIBUTE_REQUIRED_PROPERTY);
     }
 
     /**
@@ -168,27 +187,27 @@ public class Queue extends PbsInfoObject {
     }
 
     public String getAclUsers() {
-        return attrs.get("acl_users");
+        return attrs.get(ATTRIBUTE_ACL_USERS);
     }
 
     public String getAclGroups() {
-        return attrs.get("acl_groups");
+        return attrs.get(ATTRIBUTE_ACL_GROUPS);
     }
 
     public String getAclHosts() {
-        return attrs.get("acl_hosts");
+        return attrs.get(ATTRIBUTE_ACL_HOSTS);
     }
 
     public boolean isAclUsersEnabled() {
-        return "True".equals(attrs.get("acl_user_enable"));
+        return "True".equals(attrs.get(ATTRIBUTE_ACL_USERS_ENABLED));
     }
 
     public boolean isAclGroupsEnabled() {
-        return "True".equals(attrs.get("acl_group_enable"));
+        return "True".equals(attrs.get(ATTRIBUTE_ACL_GROUPS_ENABLED));
     }
 
     public boolean isAclHostsEnabled() {
-        return "True".equals(attrs.get("acl_host_enable"));
+        return "True".equals(attrs.get(ATTRIBUTE_ACL_HOSTS_ENABLED));
     }
 
     public String getLockedForKey() {
@@ -211,19 +230,19 @@ public class Queue extends PbsInfoObject {
     }
 
     public String getMaxRunningJobs() {
-        return attrs.get("max_running");
+        return attrs.get(ATTRIBUTE_MAX_RUNNING_JOBS);
     }
 
     public String getMaxUserRun() {
-        return attrs.get("max_user_run");
+        return attrs.get(ATTRIBUTE_MAX_USER_RUN);
     }
 
     public String getMaxUserCPU() {
-        return attrs.get("max_user_proc");
+        return attrs.get(ATTRIBUTE_MAX_USER_CPU);
     }
 
     public String getFairshareTree() {
-        String ft = attrs.get("fairshare_tree");
+        String ft = attrs.get(ATTRIBUTE_FAIRSHARE_TREE);
         return ft != null ? ft : "default";
     }
 
@@ -267,17 +286,17 @@ public class Queue extends PbsInfoObject {
     }
 
     public boolean isExecutionQueue() {
-        return "Execution".equals(attrs.get("queue_type"));
+        return "Execution".equals(attrs.get(ATTRIBUTE_QUEUE_TYPE));
     }
 
 
     private synchronized void prepareDescriptions() {
-        descriptionsMap = new HashMap<Locale, String>();
-        String description_cs = attrs.get("description_cs");
+        descriptionsMap = new HashMap<>();
+        String description_cs = attrs.get(ATTRIBUTE_DESCRIPTION_CZECH);
         if (description_cs != null) {
             descriptionsMap.put(new Locale("cs"), description_cs);
         }
-        String description_en = attrs.get("description_en");
+        String description_en = attrs.get(ATTRIBUTE_DESCRIPTION_ENGLISH);
         if (description_en != null) {
             descriptionsMap.put(new Locale("en"), description_en);
         }
