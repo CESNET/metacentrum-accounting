@@ -6,10 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
+ * Load data from PBS server using its C interface through Java Native Interface.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: PbsConnectorJNI.java,v 1.39 2014/03/05 17:03:53 makub Exp $
  */
 public class PbsConnectorJNI implements PbsConnector {
 
@@ -17,8 +16,11 @@ public class PbsConnectorJNI implements PbsConnector {
 
     static {
         System.loadLibrary("pbsmon2torque");
-        //System.loadLibrary("pbsmon2pro");
+        System.loadLibrary("pbsmon2pro");
     }
+
+    private native void loadInfoTorque();
+    private native void loadInfoPro();
 
     String pbsServer;
     Node[] nodes;
@@ -30,7 +32,14 @@ public class PbsConnectorJNI implements PbsConnector {
     public synchronized PBS loadData(PbsServerConfig pbsServerConfig) {
         pbsServer = pbsServerConfig.getHost();
         log.debug("loadData({})", pbsServer);
-        loadInfoTorque();
+        if(pbsServerConfig.isTorque()) {
+            log.debug("loadInfoTorque({})", pbsServer);
+            loadInfoTorque();
+        } else {
+            log.debug("loadInfoPro({})", pbsServer);
+            loadInfoPro();
+        }
+         
         PBS pbs = new PBS(pbsServerConfig);
         PbsServer server = servers[0];
         server.setServerConfig(pbsServerConfig);
@@ -47,16 +56,13 @@ public class PbsConnectorJNI implements PbsConnector {
         return map;
     }
 
-    //private native void loadInfoPro();
-
-    private native void loadInfoTorque();
 
     public static void main(String[] args) {
         System.out.println("start");
         log.debug("main");
         PbsConnectorJNI p = new PbsConnectorJNI();
-        call(p, new PbsServerConfig("torque.cerit-sc.cz",true,true, true,Collections.<FairshareConfig>emptyList()));
-        //call(p, new PbsServerConfig("arien.ics.muni.cz",true,true));
+        call(p, new PbsServerConfig("arien-pro.ics.muni.cz",false,false, true,Collections.<FairshareConfig>emptyList()));
+        call(p, new PbsServerConfig("arien.ics.muni.cz",false,true,true,Collections.<FairshareConfig>emptyList()));
 
     }
 
@@ -67,9 +73,10 @@ public class PbsConnectorJNI implements PbsConnector {
         pbs.uprav();
         System.out.println();
         System.out.println();
-        System.out.println("pbs.getServer() = " + pbs.getServer());
+        //System.out.println("pbs.getServer() = " + pbs.getServer());
         System.out.println("time " + (end - start));
         System.out.println("pbs.getServer().getShortName() = " + pbs.getServer().getShortName());
+        System.out.println("pbs.getServer().getVersion() = " + pbs.getServer().getVersion());
 
 //        for(Job job: pbs.getJobsById()) {
 //            System.out.println("-------");
@@ -79,11 +86,13 @@ public class PbsConnectorJNI implements PbsConnector {
 //            }
 //
 //        }
-//        for(Queue q : pbs.getQueuesByPriority()) {
-//            System.out.println();
-//            System.out.println("queue = " + q.getOrigToString());
-//            System.out.println("queue.name = " + q.getName());
-//        }
+/*
+        for(Queue q : pbs.getQueuesByPriority()) {
+            System.out.println();
+            System.out.println("queue = " + q.getOrigToString());
+            System.out.println("queue.name = " + q.getName());
+        }
+*/
         System.out.println("-------");
 //        for (Node node : pbs.getNodesByName()) {
 //            if(!node.getName().equals("skirit50-1.ics.muni.cz")) continue;
