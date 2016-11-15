@@ -45,7 +45,11 @@
     <logger name="cz.cesnet.meta.cloud.CloudPhysicalHost" level="error"/>
     <logger name="cz.cesnet.meta.cloud.CloudImpl" level="info"/>
     <logger name="cz.cesnet.meta.cloud.CloudLoader" level="info"/>
+
     <logger name="cz.cesnet.meta.pbs.PbskyImpl" level="info"/>
+    <logger name="cz.cesnet.meta.pbs.PbsConnectorJNI" level="info"/>
+    <logger name="cz.cesnet.meta.pbs" level="info"/>
+
     <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl" level="info"/>
     <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl.gpu" level="info"/>
     <logger name="cz.cesnet.meta.pbs.Queue" level="info"/>
