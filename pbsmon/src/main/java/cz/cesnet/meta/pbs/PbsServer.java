@@ -35,10 +35,6 @@ public class PbsServer extends PbsInfoObject {
         return getHost().split("\\.")[0];
     }
 
-    public boolean isTorque() {
-        return !getVersion().startsWith("PBSPro");
-    }
-
     public void setServerConfig(PbsServerConfig serverConfig) {
         this.serverConfig = serverConfig;
     }

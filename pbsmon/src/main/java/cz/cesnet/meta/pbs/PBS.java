@@ -129,9 +129,6 @@ public class PBS implements TimeStamped {
 
     public void setServer(PbsServer server) {
         this.server = server;
-        if (this.torque != server.isTorque()) {
-            log.error("server " + server.getHost() + " declared as Torque but is " + server.getVersion());
-        }
     }
 
     /**
