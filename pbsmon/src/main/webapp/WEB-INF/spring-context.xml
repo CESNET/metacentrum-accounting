@@ -92,7 +92,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
         <property name="pbsConnector" ref="pbsConnector"/>
         <property name="pbsServers" ref="servers"/>
         <property name="pbsCache" ref="pbsCache"/>
-        <property name="loadRunTimeInMilliseconds" value="10000"/>
+        <property name="loadRunTimeInMilliseconds" value="25000"/>
     </bean>
 
     <bean id="perun" class="cz.cesnet.meta.perun.impl.PerunJsonImpl">
@@ -123,13 +123,13 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
     </bean>
 
     <bean id="diskArrays" class="cz.cesnet.meta.storages.StoragesDiskArrayMotdImpl">
-        <property name="file" value="/home/makub/motd.storage"/>
+        <property name="file" value="/home/pbsmon/motd.storage"/>
         <property name="dataMaxAgeInMilliseconds" value="300000"/>
     </bean>
 
     <bean id="hsms" class="cz.cesnet.meta.storages.StoragesHsmImpl" >
         <property name="url" value="https://accounting.du.cesnet.cz/du/du_motd_info.txt"/>
-        <property name="cerit4File" value="/home/makub/brno4-cerit-hsm.txt" />
+        <property name="cerit4File" value="/home/pbsmon/brno4-cerit-hsm.txt" />
         <property name="dataMaxAgeInMilliseconds" value="3600000"/>
     </bean>
 
