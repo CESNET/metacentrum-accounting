@@ -34,6 +34,8 @@ public interface Pbsky extends TimeStamped {
 
     Node getNodeByName(String nodeName);
 
+    Node getNodeByFQDN(String fqdn);
+
     int getJobsQueuedCount();
 
     JobsInfo getJobsInfo();

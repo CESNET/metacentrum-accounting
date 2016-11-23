@@ -50,6 +50,8 @@ public class PbsUtils {
         return new Date(time);
     }
 
+
+
     //velikost
     static final long KIBI = 1024L;
     static final long MEBI = KIBI * KIBI;
@@ -212,5 +214,16 @@ public class PbsUtils {
             }
         }
         return seconds;
+    }
+
+    /**
+     * Parses time to seconds.
+     * @param time in format hours:minutes:seconds
+     * @return number of seconds
+     */
+    public static Long parseTime(String time) {
+        if(time==null) return null;
+        String[] c = time.split(":");
+        return Long.parseLong(c[0]) * 3600 + Long.parseLong(c[1]) * 60 + Long.parseLong(c[2]);
     }
 }

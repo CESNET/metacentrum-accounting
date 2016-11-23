@@ -62,7 +62,7 @@ public class RozhodovacStavuStroju {
             return;
         }
 
-        Node physNode = pbsky.getNodeByName(jmenoStroje);
+        Node physNode = pbsky.getNodeByFQDN(jmenoStroje);
         //nevirtualizovane stroje v PBS pouziji svuj stav
         if (physNode != null && !physNode.getState().equals(Node.STATE_CLOUD)) {
             String state = physNode.getState();
@@ -92,7 +92,7 @@ public class RozhodovacStavuStroju {
                         stroj.setState(Node.STATE_JOB_BUSY);
                         return;
                     }
-                    Node node = pbsky.getNodeByName(virtName);
+                    Node node = pbsky.getNodeByFQDN(virtName);
                     if (node != null) virtNodes.add(node);
                 }
                 stav = rozhodniStavFyzickehoPodleVirtualnich(stroj, virtNodes);
@@ -119,7 +119,7 @@ public class RozhodovacStavuStroju {
                 //podle značky z OpenNebula je to PBS node
                 if (cloudVM.isPbsNode()) {
                     stroj.setNebulaPbsHost(true);
-                    Node node = pbsky.getNodeByName(cloudVM.getFqdn());
+                    Node node = pbsky.getNodeByFQDN(cloudVM.getFqdn());
                     if (node != null) {
                         //PBSka ho zná
                         stroj.setPbsName(node.getShortName());

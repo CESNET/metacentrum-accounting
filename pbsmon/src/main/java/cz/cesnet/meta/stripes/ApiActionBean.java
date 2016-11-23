@@ -46,7 +46,7 @@ public class ApiActionBean extends BaseActionBean {
         for (Stroj s : vsechnyStroje) {
             String strojName = s.getName();
             //PBs uzel primo na fyzickem - nevirtualizovane nebo Magratea-cloudove
-            Node pbsNode = pbsky.getNodeByName(strojName);
+            Node pbsNode = pbsky.getNodeByFQDN(strojName);
             if (pbsNode != null && pbsNode.isComputingNode() && !pbsNode.isDown()) {
                 pbsNodeNames.add(strojName);
             }
@@ -54,7 +54,7 @@ public class ApiActionBean extends BaseActionBean {
             List<String> virtNames = mapping.getPhysical2virtual().get(strojName);
             if (virtNames != null) {
                 for (String virtName : virtNames) {
-                    Node vn = pbsky.getNodeByName(virtName);
+                    Node vn = pbsky.getNodeByFQDN(virtName);
                     if (vn != null && vn.isComputingNode() && !vn.isDown()) {
                         pbsNodeNames.add(virtName);
                     }

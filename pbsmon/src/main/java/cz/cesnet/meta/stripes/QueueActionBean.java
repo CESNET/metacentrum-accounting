@@ -65,18 +65,18 @@ public class QueueActionBean extends BaseActionBean {
         Set<String> machineNames = new HashSet<String>(nodes.size());
         machines = new ArrayList<Stroj>(nodes.size());
         for (Node node : nodes) {
-            String nodeName = node.getName();
+            String nodeFQDN = node.getFQDN();
             //try Magrathea
-            String machineName = pbsCache.getMapping().getVirtual2physical().get(nodeName);
+            String machineName = pbsCache.getMapping().getVirtual2physical().get(nodeFQDN);
             //try OpenNebula
             if (machineName == null) {
-                CloudPhysicalHost physicalHost = cloud.getVmFqdn2HostMap().get(nodeName);
+                CloudPhysicalHost physicalHost = cloud.getVmFqdn2HostMap().get(nodeFQDN);
                 if (physicalHost != null) {
                     machineName = physicalHost.getHostname();
                 }
             }
             //assume non-virtualised host
-            if (machineName == null) machineName = nodeName;
+            if (machineName == null) machineName = nodeFQDN;
             machineNames.add(machineName);
         }
         cpus = 0;

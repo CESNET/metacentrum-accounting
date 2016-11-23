@@ -2,6 +2,7 @@ package cz.cesnet.meta.cloud;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -133,7 +134,7 @@ public class CloudLoader {
     }
 
     private void loadVirtualHosts() {
-        log.debug("loadVirtualHosts()");
+        log.debug("loadVirtualHosts({})",vmsUrl);
         RestTemplate rt = new RestTemplate();
         List<CloudVirtualHost> virtualHosts1 = rt.getForObject(vmsUrl, VmsDocument.class).getVms();
         List<CloudVirtualHost> activeHosts = new ArrayList<>(virtualHosts1.size());
@@ -148,9 +149,13 @@ public class CloudLoader {
     }
 
     private void loadPhysicalHosts() {
-        log.debug("loadPhysicalHosts()");
+        log.debug("loadPhysicalHosts({})",hostsUrl);
         //read physical hosts
-        RestTemplate rt = new RestTemplate();
-        this.physicalHosts = rt.getForObject(hostsUrl, HostsDocument.class).getHosts();
+        try {
+            RestTemplate rt = new RestTemplate();
+            this.physicalHosts = rt.getForObject(hostsUrl, HostsDocument.class).getHosts();
+        } catch (RestClientException ex) {
+            log.error("cannot load physical hosts from "+hostsUrl,ex);
+        }
     }
 }

@@ -117,7 +117,7 @@ public class NodesActionBean extends BaseActionBean {
         fyzicke = new ArrayList<>(vsechnyStroje.size());
         //mapa z hostname PBS uzlu na PBS uzel
         nodeMap = new HashMap<>(vsechnyStroje.size());
-        //mapovani z jmen virtualnich na jmena fyzickych a naopak
+        //mapovani z jmen virtualnich stroju na jmena fyzickych stroju a naopak
         mapping = makeUnifiedMapping(this.pbsCache, this.cloud);
         //mapa VM z cloudu
         List<CloudVirtualHost> virtualHosts = cloud.getVirtualHosts();
@@ -129,7 +129,7 @@ public class NodesActionBean extends BaseActionBean {
         for (Stroj s : vsechnyStroje) {
             String strojName = s.getName();
             //PBs uzel primo na fyzickem - nevirtualizovane nebo Magratea-cloudove
-            Node pbsNode = pbsky.getNodeByName(strojName);
+            Node pbsNode = pbsky.getNodeByFQDN(strojName);
             if (pbsNode != null) nodeMap.put(strojName, pbsNode);
             // pro vsechny fyzicke vytahat virtualni s PBS uzly
             if (!s.isVirtual()) {
@@ -137,7 +137,7 @@ public class NodesActionBean extends BaseActionBean {
                 List<String> virtNames = mapping.getPhysical2virtual().get(s.getName());
                 if (virtNames != null) {
                     for (String virtName : virtNames) {
-                        Node vn = pbsky.getNodeByName(virtName);
+                        Node vn = pbsky.getNodeByFQDN(virtName);
                         if (vn != null) {
                             nodeMap.put(vn.getName(), vn);
                         }

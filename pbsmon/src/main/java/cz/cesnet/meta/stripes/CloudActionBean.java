@@ -52,7 +52,7 @@ public class CloudActionBean extends BaseActionBean {
         //assign PBSnodes
         for (List<CloudVirtualHost> hostVMs : vms.values()) {
             for (CloudVirtualHost vm : hostVMs) {
-                vm.setNode(pbsky.getNodeByName(vm.getName()));
+                vm.setNode(pbsky.getNodeByFQDN(vm.getName()));
             }
         }
 

@@ -83,7 +83,7 @@ public class StatsActionBean extends BaseActionBean {
                         //shromazdit vsechny nody z PBSky
                         String jmenoStroje = stroj.getName();
                         List<Node> nodes = new ArrayList<Node>(2);
-                        Node physNode = pbsky.getNodeByName(jmenoStroje);
+                        Node physNode = pbsky.getNodeByFQDN(jmenoStroje);
                         if (physNode != null) nodes.add(physNode);
                         List<String> virtNames = mapping.getPhysical2virtual().get(jmenoStroje);
                         if (virtNames != null) {
@@ -92,7 +92,7 @@ public class StatsActionBean extends BaseActionBean {
                                     strojCpuUsed = strojCpuTotal;
                                     continue;
                                 }
-                                Node virtNode = pbsky.getNodeByName(virtName);
+                                Node virtNode = pbsky.getNodeByFQDN(virtName);
                                 if (virtNode != null) nodes.add(virtNode);
                             }
                         }

@@ -38,9 +38,15 @@
     <logger name="cz.cesnet.meta.perun.impl.PerunResourceBundle" level="info"/>
     <logger name="cz.cesnet.meta.perun.impl.Texty" level="info"/>
     <logger name="cz.cesnet.meta.pbs" level="info"/>
+
     <logger name="cz.cesnet.meta.stripes.PersonActionBean" level="info"/>
-    <logger name="cz.cesnet.meta.perun.api.FyzickeStroje" level="info"/>
+
+    <logger name="cz.cesnet.meta.stripes.NodeActionBean" level="debug"/>
     <logger name="cz.cesnet.meta.perun.impl.PerunJsonImpl" level="info"/>
+
+    <logger name="cz.cesnet.meta.perun.api.FyzickeStroje" level="info"/>
+
+
     <logger name="cz.cesnet.meta.pbsmon.RozhodovacStavuStroju" level="info"/>
     <logger name="cz.cesnet.meta.cloud.CloudPhysicalHost" level="error"/>
     <logger name="cz.cesnet.meta.cloud.CloudImpl" level="info"/>

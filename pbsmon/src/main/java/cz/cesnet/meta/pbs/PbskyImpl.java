@@ -252,6 +252,15 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     }
 
     @Override
+    public Node getNodeByFQDN(String fqdn) {
+        for (PBS pbs : getPbsky()) {
+            Node node = pbs.getFqdnToNodeMap().get(fqdn);
+            if (node != null) return node;
+        }
+        return null;
+    }
+
+    @Override
     public int getJobsQueuedCount() {
         int total = 0;
         for (PBS pbs : getPbsky()) {

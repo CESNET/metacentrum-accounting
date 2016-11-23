@@ -39,6 +39,7 @@ public class PBS implements TimeStamped {
     private List<Job> jobsById;
     private Map<String, List<Node>> queueToNodesMap;
     private Map<String, List<Job>> queueToJobsMap;
+    private Map<String,Node> fqdnToNodeMap;
     private int jobsQueuedCount;
     private Map<String, User> usersMap;
     private String suffix;
@@ -72,6 +73,9 @@ public class PBS implements TimeStamped {
             }
             queueToNodesMap.clear();
             queueToNodesMap = null;
+
+            fqdnToNodeMap.clear();
+            fqdnToNodeMap = null;
 
             for (List<Job> ljobs : queueToJobsMap.values()) {
                 ljobs.clear();
@@ -182,6 +186,10 @@ public class PBS implements TimeStamped {
         return queueToJobsMap;
     }
 
+    public Map<String, Node> getFqdnToNodeMap() {
+        return fqdnToNodeMap;
+    }
+
     public int getJobsQueuedCount() {
         return jobsQueuedCount;
     }
@@ -202,6 +210,7 @@ public class PBS implements TimeStamped {
      * Provede úpravy po prostém načtení dat.
      */
     public void uprav() {
+
         //ukazatele nahoru
         for (Queue queue : queues.values()) {
             queue.setPbs(this);
@@ -209,8 +218,11 @@ public class PBS implements TimeStamped {
         for (Job job : jobs.values()) {
             job.setPbs(this);
         }
+
+        fqdnToNodeMap = new HashMap<>(nodes.size());
         for (Node node : nodes.values()) {
             node.setPbs(this);
+            fqdnToNodeMap.put(node.getFQDN(),node);
         }
         //suffix
         suffix = mainServer ? "" : "@" + server.getHost();

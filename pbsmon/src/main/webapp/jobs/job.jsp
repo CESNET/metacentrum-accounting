@@ -181,8 +181,8 @@
    --%>
 
    <tr><th><f:message key="job_variable_list"/></th>
-       <td colspan="9"><c:forEach items="${fn:split(job.attributes['Variable_List'],',')}" var="vl">
-           ${fn: substring(vl,0,75)}<br>
+       <td colspan="9"><c:forEach items="${job.variables}" var="vl">
+           ${vl.key}=<c:out value="${fn:substring(vl.value,0,75)}"/><br>
        </c:forEach>
      </td></tr>
    <c:if test="${! empty job.scheduledNodeSpecs}">
@@ -218,7 +218,7 @@
 
    <table class="attributes">
    <c:forEach var="oat" items="${job.orderedAttributes}">
-    <tr><td>${oat.key}</td><td>${oat.value}</td></tr>
+    <tr><td>${oat.key}</td><td><c:out value="${oat.value}"/></td></tr>
    </c:forEach>
    </table>
 </c:otherwise>

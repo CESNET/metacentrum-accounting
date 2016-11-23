@@ -20,16 +20,25 @@ public class Node extends PbsInfoObject {
     final static Logger log = LoggerFactory.getLogger(Node.class);
 
     //used attribute names
-    public static final String ATTRIBUTE_PREFIX_RESOURCES_TOTAL = "resources_total.";
+    public static final String ATTRIBUTE_PREFIX_RESOURCES_TOTAL_TORQUE = "resources_total.";
+    public static final String ATTRIBUTE_PREFIX_RESOURCES_TOTAL_PBSPRO = "resources_available.";
+
     public static final String ATTRIBUTE_STATE = "state";
     public static final String ATTRIBUTE_EXCLUSIVELY_ASSIGNED = "exclusively_assigned";
     public static final String ATTRIBUTE_NODE_TYPE = "ntype";
     public static final String ATTRIBUTE_RESOURCES_AVAILABLE_ARCH = "resources_available.arch";
     public static final String ATTRIBUTE_COMMENT = "comment";
     public static final String ATTRIBUTE_NOTE = "note";
-    public static final String ATTRIBUTE_NUMBER_OF_PROCESSORS = "np";
-    public static final String ATTRIBUTE_RESOURCES_TOTAL_GPU = "resources_total.gpu";
-    public static final String ATTRIBUTE_RESOURCES_USED_GPU = "resources_used.gpu";
+
+    public static final String ATTRIBUTE_NUMBER_OF_PROCESSORS_TORQUE = "np";
+    public static final String ATTRIBUTE_NUMBER_OF_PROCESSORS_PBSPRO = "resources_available.ncpus";
+
+    public static final String ATTRIBUTE_RESOURCES_TOTAL_GPU_TORQUE = "resources_total.gpu";
+    public static final String ATTRIBUTE_RESOURCES_TOTAL_GPU_PBSPRO = "resources_available.ngpus";
+
+    public static final String ATTRIBUTE_RESOURCES_USED_GPU_TORQUE = "resources_used.gpu";
+    public static final String ATTRIBUTE_RESOURCES_USED_GPU_PBSPRO = "resources_assigned.ngpus";
+
     public static final String ATTRIBUTE_NUMBER_OF_HT_CORES = "pcpus";
     public static final String ATTRIBUTE_NUMBER_OF_FREE_CPUS = "npfree";
     public static final String ATTRIBUTE_NUMBER_OF_USED_CPUS = "resources_assigned.ncpus";
@@ -146,6 +155,14 @@ public class Node extends PbsInfoObject {
         } else {
             //neco divnyho
             throw new RuntimeException("name " + shortName + " is non-parseable");
+        }
+    }
+
+    public String getFQDN() {
+        if(pbs!=null && !pbs.isTorque()) {
+            return attrs.get("Mom");
+        } else {
+            return name;
         }
     }
 
@@ -288,7 +305,7 @@ public class Node extends PbsInfoObject {
     }
 
     public String getNoOfCPU() {
-        return attrs.get(ATTRIBUTE_NUMBER_OF_PROCESSORS);
+        return attrs.get(pbs.isTorque()?ATTRIBUTE_NUMBER_OF_PROCESSORS_TORQUE : ATTRIBUTE_NUMBER_OF_PROCESSORS_PBSPRO);
     }
 
     public int getNoOfCPUInt() {
@@ -297,7 +314,7 @@ public class Node extends PbsInfoObject {
     }
 
     public String getNoOfGPU() {
-        return attrs.get(ATTRIBUTE_RESOURCES_TOTAL_GPU);
+        return attrs.get(pbs.isTorque()?ATTRIBUTE_RESOURCES_TOTAL_GPU_TORQUE : ATTRIBUTE_RESOURCES_TOTAL_GPU_PBSPRO);
     }
 
     public int getNoOfGPUInt() {
@@ -310,7 +327,7 @@ public class Node extends PbsInfoObject {
     }
 
     public String getNoOfUsedGPU() {
-        return attrs.get(ATTRIBUTE_RESOURCES_USED_GPU);
+        return attrs.get(pbs.isTorque()?ATTRIBUTE_RESOURCES_USED_GPU_TORQUE:ATTRIBUTE_RESOURCES_USED_GPU_PBSPRO);
     }
 
     public int getNoOfUsedGPUInt() {
@@ -346,7 +363,11 @@ public class Node extends PbsInfoObject {
     }
 
     public String getNoOfFreeCPU() {
-        return attrs.get(ATTRIBUTE_NUMBER_OF_FREE_CPUS);
+        if(pbs.isTorque()) {
+            return attrs.get(ATTRIBUTE_NUMBER_OF_FREE_CPUS);
+        } else {
+            return Integer.toString(getNoOfCPUInt() - getNoOfUsedCPUInt());
+        }
     }
 
     public String getNoOfUsedCPU() {
@@ -488,7 +509,8 @@ public class Node extends PbsInfoObject {
             String[] jobsIds = jobsatr != null ? jobsatr.split(", *") : new String[0];
             HashMap<String, Integer> cpuCounts = new HashMap<>();
             for (int i = 0; i < jobsIds.length; i++) {
-                jobsIds[i] = PbsUtils.substringAfter(jobsIds[i], '/');
+                jobsIds[i] = pbs.isTorque() ?
+                        PbsUtils.substringAfter(jobsIds[i], '/') : PbsUtils.substringBefore(jobsIds[i], '/');
                 PbsUtils.updateCount(cpuCounts, jobsIds[i], 1);
             }
             Set<String> keys = cpuCounts.keySet();
@@ -725,19 +747,21 @@ public class Node extends PbsInfoObject {
 
     /**
      * Returns attributes that started with resources_total, but without the prefix.
-     * @return map fo attributes with attribute names without the prefix
+     * @return map of attributes with attribute names without the prefix
      */
     public Map<String,String> getResources() {
+        String RESOURCE_PREFIX = pbs.isTorque()?ATTRIBUTE_PREFIX_RESOURCES_TOTAL_TORQUE:ATTRIBUTE_PREFIX_RESOURCES_TOTAL_PBSPRO;
         Map<String,String> map = new HashMap<>();
         for(Map.Entry<String,String> e : getAttributes().entrySet()) {
-            if(e.getKey().startsWith(ATTRIBUTE_PREFIX_RESOURCES_TOTAL)) {
-                map.put(e.getKey().substring(ATTRIBUTE_PREFIX_RESOURCES_TOTAL.length()),e.getValue());
+            if(e.getKey().startsWith(RESOURCE_PREFIX)) {
+                map.put(e.getKey().substring(RESOURCE_PREFIX.length()),e.getValue());
             }
         }
         return map;
     }
 
     public String getResource(String name) {
-        return attrs.get(ATTRIBUTE_PREFIX_RESOURCES_TOTAL +name);
+        String RESOURCE_PREFIX = pbs.isTorque()?ATTRIBUTE_PREFIX_RESOURCES_TOTAL_TORQUE:ATTRIBUTE_PREFIX_RESOURCES_TOTAL_PBSPRO;
+        return attrs.get(RESOURCE_PREFIX +name);
     }
 }

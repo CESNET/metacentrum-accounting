@@ -78,9 +78,9 @@ public class PerunUser {
         this.researchGroup = researchGroup;
     }
 
-    public String getLang() {
-        return lang;
-    }
+//    public String getLang() {
+//        return lang;
+//    }
 
     public void setLang(String lang) {
         this.lang = lang;
