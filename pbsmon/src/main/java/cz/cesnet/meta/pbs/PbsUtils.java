@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
  * @author Martin Kuba makub@ics.muni.cz
  * @version $Id: PbsUtils.java,v 1.12 2014/12/10 15:42:37 makub Exp $
  */
+@SuppressWarnings("Duplicates")
 public class PbsUtils {
     public static final String MAINTENANCE = "maintenance";
     public static final String RESERVED = "reserved";
@@ -123,13 +124,13 @@ public class PbsUtils {
             return Long.toString(bytes / MEBI) + "mb";
             //pak zaokrouhlování
         } else if (bytes > PEBI) {
-            return Long.toString((bytes + PEBI / 2l) / PEBI) + "pb";
+            return Long.toString((bytes + PEBI / 2L) / PEBI) + "pb";
         } else if (bytes > TEBI) {
-            return Long.toString((bytes + TEBI / 2l) / TEBI) + "tb";
+            return Long.toString((bytes + TEBI / 2L) / TEBI) + "tb";
         } else if (bytes > GIBI) {
-            return Long.toString((bytes + GIBI / 2l) / GIBI) + "gb";
+            return Long.toString((bytes + GIBI / 2L) / GIBI) + "gb";
         } else if (bytes > MEBI) {
-            return Long.toString((bytes + MEBI / 2l) / MEBI) + "mb";
+            return Long.toString((bytes + MEBI / 2L) / MEBI) + "mb";
         } else {
             return Long.toString(bytes) + "b";
         }

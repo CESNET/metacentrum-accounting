@@ -96,7 +96,11 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
                 }
                 for (Node node : pbs.getNodesByName()) {
                     node.setMagratheaStatus(pbsCache.getMagratheaStateForNode(node));
-                    node.setScratch(pbsCache.getScratchForNode(node));
+                    if(node.getPbs().isTorque()) {
+                        node.setScratch(pbsCache.getScratchForNode(node));
+                    } else {
+                        node.setScratchPBSPro();
+                    }
                     node.setGpuJobMap(pbsCache.getGpuAlloc(node));
                 }
             }

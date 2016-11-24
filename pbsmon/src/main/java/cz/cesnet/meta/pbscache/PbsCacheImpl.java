@@ -278,7 +278,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
         try {
             HttpURLConnection uc = (HttpURLConnection) new URL("http://" + server + ":6666/magrathea").openConnection();
             JSONArray ja = (JSONArray) new JSONParser(uc.getInputStream()).nextValue();
-            long mez = System.currentTimeMillis() - (30 * 60 * 1000l);
+            long mez = System.currentTimeMillis() - (30 * 60 * 1000L);
             for (JSONValue js : ja.getValue()) {
                 JSONObject jo = (JSONObject) js;
                 JSONInteger ji = (JSONInteger) jo.get("timestamp");
@@ -309,6 +309,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
         this.scratchSizes = scratchSizes;
     }
 
+    @SuppressWarnings("Java8ReplaceMapGet")
     private boolean loadScratchSizes(PbsServerConfig serverConfig, Map<String, Scratch> scratchSizes, ScratchType type) {
         String server = serverConfig.getHost();
         log.trace("loadScratchSizes({},{})", server, type);
@@ -318,7 +319,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
         }
         try {
             RestTemplate rt = new RestTemplate();
-            long mez = System.currentTimeMillis() - (4 * 60 * 60 * 1000l);
+            long mez = System.currentTimeMillis() - (4 * 60 * 60 * 1000L);
             for (JsonNode jn : rt.getForObject("http://" + server + ":6666/pbs_cache/scratch_" + type, JsonNode.class)) {
                 if (type == ScratchType.pool || jn.path("timestamp").asLong() * 1000 > mez) {
                     String nodename = jn.path("key").asText();
@@ -334,7 +335,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
                     } else if (type == ScratchType.pool) {
                         Long size = pools.get(jn.path("value").asText());
                         if (size != null) {
-                            scratch.setNetworkFreeKiB(size);
+                            scratch.setSharedFreeKiB(size);
                         }
                     }
                 }
@@ -359,7 +360,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
         try {
             log.trace("loadNetworkScratchSizes({})", serverConfig.getHost());
             RestTemplate rt = new RestTemplate();
-            long mez = System.currentTimeMillis() - (4 * 60 * 60 * 1000l);
+            long mez = System.currentTimeMillis() - (4 * 60 * 60 * 1000L);
             JsonNode rootNode = rt.getForObject("http://" + serverConfig.getHost() + ":6666/pbs_cache/dynamic_resources", JsonNode.class);
             for (JsonNode jn : rootNode) {
                 if (jn.path("timestamp").asLong() * 1000 > mez) {

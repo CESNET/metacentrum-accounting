@@ -665,6 +665,16 @@ public class Node extends PbsInfoObject {
         this.scratch = scratch;
     }
 
+    public void setScratchPBSPro() {
+        scratch = new Scratch();
+        scratch.setSsdSize(attrs.get("resources_available.scratch_ssd"));
+        scratch.setSsdReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_ssd")));
+        scratch.setLocalSize(attrs.get("resources_available.scratch_local"));
+        scratch.setLocalReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_local")));
+        scratch.setSharedSize(attrs.get("resources_available.scratch_shared"));
+        scratch.setSharedReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_shared")));
+    }
+
     public List<Job.ReservedResources> getReservedScratches() {
         List<Job.ReservedResources> list = new ArrayList<>();
         for (Job job : this.getJobs()) {
@@ -764,4 +774,6 @@ public class Node extends PbsInfoObject {
         String RESOURCE_PREFIX = pbs.isTorque()?ATTRIBUTE_PREFIX_RESOURCES_TOTAL_TORQUE:ATTRIBUTE_PREFIX_RESOURCES_TOTAL_PBSPRO;
         return attrs.get(RESOURCE_PREFIX +name);
     }
+
+
 }

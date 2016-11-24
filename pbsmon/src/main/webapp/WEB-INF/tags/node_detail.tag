@@ -32,10 +32,6 @@
                 <td colspan="2" class="${node.state}"><c:out value="${node.pbsState}"/></td>
             </tr>
             <tr>
-                <th class="${node.state}"><f:message key="nodejsp_maghratea_state"/></th>
-                <td colspan="2" class="${node.state}"><c:out value="${node.maghrateaState}"/></td>
-            </tr>
-            <tr>
                 <th class="${node.state}"><f:message key="nodejsp_ntype"/></th>
                 <td colspan="2" class="${node.state}"><c:out value="${node.ntype}"/></td>
             </tr>
@@ -52,25 +48,26 @@
                             href="/queue/${node.requiredQueue}">${node.requiredQueue}</s:link></td>
                 </tr>
             </c:if>
+
             <c:if test="${node.scratch.hasSsd}">
             <tr>
                 <th class="${node.state}"><f:message key="nodejsp_scratch_size_ssd"/></th>
-                <td colspan="2" class="${node.state}"><c:out value="${node.scratch.ssdFreeHuman}"/></td>
+                <td colspan="2" class="${node.state}"><c:out value="${node.scratch.ssdSizeHuman}"/></td>
             </tr>
-            </c:if>
-
-            <c:if test="${node.scratch.hasNetwork}">
-                <tr>
-                    <th class="${node.state}"><f:message key="nodejsp_scratch_size_network"/></th>
-                    <td colspan="2" class="${node.state}"><c:out value="${node.scratch.networkFreeHuman}"/></td>
-                </tr>
             </c:if>
             <c:if test="${node.scratch.hasLocal}">
                 <tr>
                     <th class="${node.state}"><f:message key="nodejsp_scratch_size_local"/></th>
-                    <td colspan="2" class="${node.state}"><c:out value="${node.scratch.localFreeHuman}"/></td>
+                    <td colspan="2" class="${node.state}"><c:out value="${node.scratch.localSizeHuman}"/></td>
                 </tr>
             </c:if>
+            <c:if test="${node.scratch.hasShared}">
+                <tr>
+                    <th class="${node.state}"><f:message key="nodejsp_scratch_size_network"/></th>
+                    <td colspan="2" class="${node.state}"><c:out value="${node.scratch.sharedSizeHuman}"/></td>
+                </tr>
+            </c:if>
+
         </table>
         <!-- rezervace a vyuziti -->
         <table class="zakladni">
@@ -113,6 +110,18 @@
                     <th><f:message key="nodejsp_used_scratch_local"/></th>
                     <td>${node.scratch.localUsedPercent}%</td>
                     <td>${node.scratch.localUsedInPbsUnits} / ${node.scratch.localSizeInPbsUnits}</td>
+                </tr>
+            </c:if>
+            <c:if test="${node.scratch.hasShared}">
+                <tr>
+                    <th><f:message key="nodejsp_reserved_scratch_shared"/></th>
+                    <td>${node.scratch.sharedReservedPercent}%</td>
+                    <td>${node.scratch.sharedReservedInPbsUnits} / ${node.scratch.sharedSizeInPbsUnits}</td>
+                </tr>
+                <tr>
+                    <th><f:message key="nodejsp_used_scratch_shared"/></th>
+                    <td>${node.scratch.sharedUsedPercent}%</td>
+                    <td>${node.scratch.sharedUsedInPbsUnits} / ${node.scratch.sharedSizeInPbsUnits}</td>
                 </tr>
             </c:if>
         </table>

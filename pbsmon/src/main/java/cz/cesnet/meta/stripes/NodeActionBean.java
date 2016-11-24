@@ -67,6 +67,10 @@ public class NodeActionBean extends BaseActionBean {
             physicalMachineName = nodeFQDN;
         }
         node.setOutages(accounting.getOutagesForNode(node));
+
+        if(log.isDebugEnabled()) {
+            log.debug("scratch={}",node.getScratch());
+        }
         return new ForwardResolution("/nodes/node.jsp");
     }
 

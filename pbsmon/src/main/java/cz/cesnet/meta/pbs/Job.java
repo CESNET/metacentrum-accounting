@@ -780,20 +780,8 @@ public class Job extends PbsInfoObject {
             this.fairshareRank = fairshareRank;
     }
 
-    /*
-     Přidělené scratche jsou v atributu sched_nodespec (Torque) nebo exec_vnode (PBSPro), formáty se liší.
-     U Torque je potřeba rozdělit podle znaků + na jednotlivé hosty, a pro každý pak vyparsovat  scratch_type=local:scratch_volume
-     pokud tam je, může nebýt u typu first.
-        host=hildor24.metacentrum.cz:ppn=1:mem=409600KB:vmem=137438953472KB:scratch_type=shared:scratch_volume=10mb
-
-     U PBSPro je to
-        (storm1:scratch_local=10240kb:ngpus=1:mem=409600kb:ncpus=1)+(storm1:scratch_local=102400kb:mem=409600kb:ncpus=1)
-     */
     static final Pattern pst_torque = Pattern.compile("scratch_type=(\\w+):");
-    static final Pattern scratchRegex_torque = Pattern.compile("^host=([^:]+):.*:scratch_type=(\\w+):scratch_volume=([0-9]+[kmgp]b)");
-
     static final Pattern pst_pbspro = Pattern.compile("scratch_(\\w+)=");
-    static final Pattern scratchRegex_pbspro = Pattern.compile("^\\(([^:]+):scratch_(\\w+)=([0-9]+[kmgp]b)");
 
     /**
      * Gets the type of scratch for the first chunk.
@@ -822,7 +810,7 @@ public class Job extends PbsInfoObject {
 
     private Map<String, ReservedResources> nodeName2reservedResources;
 
-    // využito v node_detail.tag v seznamu úloh běžících na uzlu
+    // využito v node_detail.tag v seznamu úloh běžících na uzlu, zobrazuje kolik která úloha na uzlu využívá zdrojů
     public Map<String, ReservedResources> getNodeName2reservedResources() {
         if (nodeName2reservedResources == null) {
             synchronized (this) {
@@ -844,7 +832,6 @@ public class Job extends PbsInfoObject {
                                 chunkMemBytes + reservedResources.getMemBytes(),
                                 chunkCpus + reservedResources.getCpus()
                         );
-
                     }
                     nodeName2reservedResources.put(chunkNodeName, reservedResources);
                 }

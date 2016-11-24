@@ -289,7 +289,7 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
             if (scratchKB > 0) {
                 if (scratchtype.equals("ssd") && !nodeScratch.hasSsdSizeKiB(scratchKB)) continue;
                 if (scratchtype.equals("local") && !nodeScratch.hasLocalSizeKiB(scratchKB)) continue;
-                if (scratchtype.equals("shared") && !nodeScratch.getHasNetwork()) continue;
+                if (scratchtype.equals("shared") && !nodeScratch.getHasShared()) continue;
                 if (scratchtype.equals("-") && !nodeScratch.hasAnySizeKiB(scratchKB)) continue;
             }
             //musi mit GPU

@@ -229,13 +229,13 @@ public class PBS implements TimeStamped {
 
         //serazena pole
         queuesByPriority = new ArrayList<Queue>(queues.values());
-        Collections.sort(queuesByPriority, PbskyImpl.queuesPriorityComparator);
+        queuesByPriority.sort(PbskyImpl.queuesPriorityComparator);
 
         nodesByName = new ArrayList<Node>(nodes.values());
-        Collections.sort(nodesByName, PbskyImpl.nodesNameComparator);
+        nodesByName.sort(PbskyImpl.nodesNameComparator);
 
         jobsById = new ArrayList<Job>(jobs.values());
-        Collections.sort(jobsById, PbskyImpl.jobsIdComparator);
+        jobsById.sort(PbskyImpl.jobsIdComparator);
 
         //mapy
         queueToNodesMap = makeQueuesToNodeMap(queuesByPriority, nodesByName);
