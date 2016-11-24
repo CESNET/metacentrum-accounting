@@ -650,13 +650,13 @@ public class Node extends PbsInfoObject {
         scratch.setLocalSize(getStatus("scratch_local"));
         long allocatedSsd = 0L;
         long allocatedLocal = 0L;
-        for (Job.ReservedScratch reservedScratch : this.getReservedScratches()) {
-            switch (reservedScratch.getType()) {
+        for (Job.ReservedResources reservedResources : this.getReservedScratches()) {
+            switch (reservedResources.getScratchType()) {
                 case "ssd":
-                    allocatedSsd += reservedScratch.getVolumeB();
+                    allocatedSsd += reservedResources.getScratchVolumeBytes();
                     break;
                 case "local":
-                    allocatedLocal += reservedScratch.getVolumeB();
+                    allocatedLocal += reservedResources.getScratchVolumeBytes();
                     break;
             }
         }
@@ -665,11 +665,11 @@ public class Node extends PbsInfoObject {
         this.scratch = scratch;
     }
 
-    public List<Job.ReservedScratch> getReservedScratches() {
-        List<Job.ReservedScratch> list = new ArrayList<>();
+    public List<Job.ReservedResources> getReservedScratches() {
+        List<Job.ReservedResources> list = new ArrayList<>();
         for (Job job : this.getJobs()) {
-            Job.ReservedScratch reservedScratch = job.getNodeName2reservedScratchMap().get(this.getName());
-            if (reservedScratch != null) list.add(reservedScratch);
+            Job.ReservedResources reservedResources = job.getNodeName2reservedResources().get(this.getName());
+            if (reservedResources != null) list.add(reservedResources);
         }
         return list;
     }

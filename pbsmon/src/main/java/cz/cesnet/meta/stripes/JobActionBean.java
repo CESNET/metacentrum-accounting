@@ -47,12 +47,12 @@ public class JobActionBean extends BaseActionBean {
                     nodesMap.put(hostName, job.getPbs().getNodes().get(hostName));
                 }
             }
-            List<Job.NodeSpec> nodeSpecs = job.getScheduledNodeSpecs();
-            if(nodeSpecs!=null) {
+            List<Job.Chunk> chunks = job.getChunks();
+            if(chunks !=null) {
                 if(nodesMap==null) nodesMap = new HashMap<>();
-                for (Job.NodeSpec nodeSpec : nodeSpecs) {
-                    String hostname = nodeSpec.getHostname();
-                    nodesMap.put(hostname,job.getPbs().getNodes().get(hostname));
+                for (Job.Chunk chunk : chunks) {
+                    String nodeName = chunk.getNodeName();
+                    nodesMap.put(nodeName,job.getPbs().getNodes().get(nodeName));
                 }
             }
         }

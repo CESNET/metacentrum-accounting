@@ -175,10 +175,10 @@
                 <tr>
                 <td><s:link href="/job/${job.id}">${job.id}</s:link>
                 <td align="right"><s:link href="/user/${job.user}">${job.user}</s:link></td>
-                <td align="right">${job.reservedMemoryTotal}</td>
-                <td>${job.nodeName2reservedScratchMap[node.FQDN].type} </td>
-                <td>${job.nodeName2reservedScratchMap[node.FQDN].volume}</td>
-                <td align="center">${job.noOfUsedCPU} CPU</td>
+                <td align="right">${job.nodeName2reservedResources[node.name].mem}</td>
+                <td>${job.nodeName2reservedResources[node.name].scratchType} </td>
+                <td>${job.nodeName2reservedResources[node.name].volume}</td>
+                <td align="center">${job.nodeName2reservedResources[node.name].cpus} CPU</td>
                 <td>${job.jobName}</td>
                 <td align="center" class="${job.state}">${job.state} - <f:message key='jobs_${job.state}'/></td>
                     <td align="right"><f:formatDate value="${job.timeStarted}" pattern="d.M."/></td>
@@ -193,8 +193,8 @@
                         <td><s:link href="/job/${job.id}">${job.id}</s:link>
                         <td align="right"><s:link href="/user/${job.user}">${job.user}</s:link></td>
                         <td align="right">${job.reservedMemoryTotal}</td>
-                        <td>${job.nodeName2reservedScratchMap[node.FQDN].type} </td>
-                        <td>${job.nodeName2reservedScratchMap[node.FQDN].volume}</td>
+                        <td>${job.nodeName2reservedResources[node.name].scratchType} </td>
+                        <td>${job.nodeName2reservedResources[node.name].volume}</td>
                         <td align="center">${job.noOfUsedCPU} CPU</td>
                         <td>${job.jobName}</td>
                         <td align="center" class="${job.state}">${job.state} - <f:message key='jobs_${job.state}'/></td>

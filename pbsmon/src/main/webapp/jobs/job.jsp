@@ -158,34 +158,13 @@
       </tr>
    </c:if>
 
-   <%--
-   <c:if test="${!empty job.execHostFirst}">
-     <tr><th><f:message key="job_hosts"/></th>
-     <td colspan="9">
-     <c:set var="numinrow" value="${0}"/>
-     <table cellspacing="2" border="0">
-     <tr><td><s:link href="/node/${job.execHostFirstName}">${actionBean.nodesMap[job.execHostFirstName].shortName}/${job.execHostFirstCPU}</s:link></td></tr>
-     <c:forEach items="${job.execHostMore}" var="cpu">
-       <c:if test="${numinrow==6}">
-           <c:set var="numinrow" value="${0}"/>
-	   </tr><tr>
-       </c:if>
-       <td><s:link href="/node/${fn:substringBefore(cpu,'/')}">${actionBean.nodesMap[fn:substringBefore(cpu,'/')].shortName}/${fn:substringAfter(cpu,'/')}</s:link></td>
-       <!-- ${cpu} -->    
-       <c:set var="numinrow" value="${numinrow+1}"/>
-     </c:forEach>
-     </tr>
-     </table>
-     </td></tr>
-   </c:if>
-   --%>
-
    <tr><th><f:message key="job_variable_list"/></th>
        <td colspan="9"><c:forEach items="${job.variables}" var="vl">
            ${vl.key}=<c:out value="${fn:substring(vl.value,0,75)}"/><br>
        </c:forEach>
      </td></tr>
-   <c:if test="${! empty job.scheduledNodeSpecs}">
+
+   <c:if test="${! empty job.chunks}">
        <tr>
            <th><f:message key="job_scheduled_nodespec"/></th>
            <td colspan="9">
@@ -197,11 +176,11 @@
                        <th>RAM</th>
                        <th>scratch</th>
                    </tr>
-                   <c:forEach items="${job.scheduledNodeSpecs}" var="spec">
+                   <c:forEach items="${job.chunks}" var="spec">
                        <tr>
-                           <td><s:link href="/node/${spec.hostname}"><c:out value="${actionBean.nodesMap[spec.hostname].shortName}"/></s:link></td>
-                           <td align="center"><c:out value="${spec.ppn}"/></td>
-                           <td align="center"><c:out value="${spec.gpu}"/></td>
+                           <td><s:link href="/node/${spec.nodeName}"><c:out value="${actionBean.nodesMap[spec.nodeName].shortName}"/></s:link></td>
+                           <td align="center"><c:out value="${spec.ncpus}"/></td>
+                           <td align="center"><c:out value="${spec.ngpus}"/></td>
                            <td align="center"><c:out value="${spec.mem}"/></td>
                            <td><c:out value="${spec.scratchType}"/> <c:out value="${spec.scratchVolume}"/> </td>
                        </tr>
