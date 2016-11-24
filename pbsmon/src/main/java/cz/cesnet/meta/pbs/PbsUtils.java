@@ -1,5 +1,7 @@
 package cz.cesnet.meta.pbs;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
@@ -221,9 +223,9 @@ public class PbsUtils {
      * @param time in format hours:minutes:seconds
      * @return number of seconds
      */
-    public static Long parseTime(String time) {
+    public static Duration parseTime(String time) {
         if(time==null) return null;
         String[] c = time.split(":");
-        return Long.parseLong(c[0]) * 3600 + Long.parseLong(c[1]) * 60 + Long.parseLong(c[2]);
+        return Duration.of(Long.parseLong(c[0]) * 3600 + Long.parseLong(c[1]) * 60 + Long.parseLong(c[2]), ChronoUnit.SECONDS);
     }
 }

@@ -72,7 +72,7 @@
 
     <tr>
       <th> <f:message key="job_resource_nodes"/> </th>
-      <td colspan="9">nodes=<c:out value="${job.resourceNodes}"/></td>
+      <td colspan="9"><c:out value="${job.resourceNodes}"/></td>
     </tr>
     <!-- casy -->
     <tr>

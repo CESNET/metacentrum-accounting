@@ -13,6 +13,7 @@ import java.util.*;
  * @author Martin Kuba makub@ics.muni.cz
  * @version $Id: PbskyImpl.java,v 1.30 2014/04/11 08:38:08 makub Exp $
  */
+@SuppressWarnings("Convert2streamapi")
 public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     final static Logger log = LoggerFactory.getLogger(PbskyImpl.class);
@@ -61,9 +62,9 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     @Override
     protected void load() {
         try {
-            List<PBS> pbskyNew = new ArrayList<PBS>();
-            Map<String, Queue> queuesMapNew = new HashMap<String, Queue>();
-            List<PBS> oldPbsky = new ArrayList<PBS>();
+            List<PBS> pbskyNew = new ArrayList<>();
+            Map<String, Queue> queuesMapNew = new HashMap<>();
+            List<PBS> oldPbsky = new ArrayList<>();
             //nacti vsechno cerstve. pokud to jde, jinak si nech stara data
             for (PbsServerConfig server : pbsServers) {
                 PBS oldData = findPBSForServer(server, pbsky);
@@ -135,7 +136,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
             for (PBS pbs : list) {
                 jobCount += pbs.getJobsById().size();
             }
-            ArrayList<Job> jobs = new ArrayList<Job>(jobCount);
+            ArrayList<Job> jobs = new ArrayList<>(jobCount);
             for (PBS pbs : list) {
                 jobs.addAll(pbs.getJobsById());
             }
@@ -164,7 +165,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
         checkLoad();
         List<Job> jobs = getAllJobs();
         if (poradi != JobsSortOrder.Id) {
-            jobs = new ArrayList<Job>(jobs);
+            jobs = new ArrayList<>(jobs);
             switch (poradi) {
                 case CPU:
                     Collections.sort(jobs, jobCPUComparator);
@@ -208,7 +209,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
         for (PBS pbs : list) {
             nodeCount += pbs.getNodesByName().size();
         }
-        ArrayList<Node> nodes = new ArrayList<Node>(nodeCount);
+        ArrayList<Node> nodes = new ArrayList<>(nodeCount);
         for (PBS pbs : list) {
             nodes.addAll(pbs.getNodesByName());
         }
@@ -233,7 +234,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     @Override
     public List<Job> getUserJobs(String userName, JobsSortOrder sort) {
-        ArrayList<Job> jobs = new ArrayList<Job>();
+        ArrayList<Job> jobs = new ArrayList<>();
         for (Job job : this.getSortedJobs(sort)) {
             if (job.getUser().equals(userName)) {
                 jobs.add(job);
@@ -270,7 +271,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     }
 
     private static Set<String> getUserNames(List<PBS> list) {
-        Set<String> userNames = new TreeSet<String>();
+        Set<String> userNames = new TreeSet<>();
         for (PBS pbs : list) {
             userNames.addAll(pbs.getUsersMap().keySet());
         }
@@ -287,7 +288,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     public List<User> getSortedUsers(UsersSortOrder usersSortOrder) {
         //spojit udaje ze vsech PBSek
         List<PBS> list = getPbsky();
-        List<User> users = new ArrayList<User>();
+        List<User> users = new ArrayList<>();
         for (String userName : getUserNames(list)) {
             users.add(getUserByName(userName, list));
         }
@@ -335,9 +336,10 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
         return users;
     }
 
+    @SuppressWarnings("Convert2streamapi")
     @Override
     public List<TextWithCount> getReasonsForJobsQueued() {
-        HashMap<String, Integer> pocitadla = new HashMap<String, Integer>();
+        HashMap<String, Integer> pocitadla = new HashMap<>();
         for (PBS pbs : getPbsky()) {
             for (Job job : pbs.getJobsById()) {
                 if ("Q".equals(job.getState())) {
@@ -350,7 +352,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
                 }
             }
         }
-        List<TextWithCount> duvody = new ArrayList<TextWithCount>(pocitadla.size());
+        List<TextWithCount> duvody = new ArrayList<>(pocitadla.size());
         for (String duvod : pocitadla.keySet()) {
             duvody.add(new TextWithCount(duvod, pocitadla.get(duvod)));
         }
@@ -382,170 +384,78 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
 
     //comparators for array sorting
-    static final Comparator<Queue> queuesPriorityComparator = new Comparator<Queue>() {
-        public int compare(Queue o1, Queue o2) {
-            return o2.getPriority() - o1.getPriority();
-        }
-    };
+    static final Comparator<Queue> queuesPriorityComparator = (o1, o2) -> o2.getPriority() - o1.getPriority();
 
-    static Comparator<Node> nodesNameComparator = new Comparator<Node>() {
-        public int compare(Node h1, Node h2) {
-            String h1clustName = h1.getClusterName();
-            if (h1clustName == null) {
-                log.error("Node h1=" + h1 + " has no clusterName");
-                throw new IllegalArgumentException("node " + h1.getName() + " has no clusterName");
-            }
-            if (!h1clustName.equals(h2.getClusterName())) {
-                return h1.getClusterName().compareTo(h2.getClusterName());
+    static Comparator<Node> nodesNameComparator = (h1, h2) -> {
+        String h1clustName = h1.getClusterName();
+        if (h1clustName == null) {
+            log.error("Node h1=" + h1 + " has no clusterName");
+            throw new IllegalArgumentException("node " + h1.getName() + " has no clusterName");
+        }
+        if (!h1clustName.equals(h2.getClusterName())) {
+            return h1.getClusterName().compareTo(h2.getClusterName());
+        } else {
+            int diffNumInCluster = h1.getNumInCluster() - h2.getNumInCluster();
+            if (diffNumInCluster != 0) {
+                return diffNumInCluster;
             } else {
-                int diffNumInCluster = h1.getNumInCluster() - h2.getNumInCluster();
-                if (diffNumInCluster != 0) {
-                    return diffNumInCluster;
-                } else {
-                    return h1.getVirtNum() - h2.getVirtNum();
-                }
+                return h1.getVirtNum() - h2.getVirtNum();
             }
         }
     };
 
-    static final Comparator<Job> jobsIdComparator = new Comparator<Job>() {
-        public int compare(Job j1, Job j2) {
-            int diff = j1.getIdNum() - j2.getIdNum();
-            if (diff == 0) {
-                return j1.getIdSubNum() - j2.getIdSubNum();
-            } else {
-                return diff;
-            }
-        }
+    static final Comparator<Job> jobsIdComparator = (j1, j2) -> {
+        int diff = j1.getIdNum() - j2.getIdNum();
+        return (diff == 0) ? j1.getIdSubNum() - j2.getIdSubNum() : diff;
     };
 
 
-    private static Comparator<Job> jobCPUComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return o2.getNoOfUsedCPU() - o1.getNoOfUsedCPU();
-        }
+    private static Comparator<Job> jobCPUComparator = (o1, o2) -> o2.getNoOfUsedCPU() - o1.getNoOfUsedCPU();
+
+    private static Comparator<Job> jobNameComparator = (o1, o2) -> o1.getJobName().compareTo(o2.getJobName());
+
+    private static Comparator<Job> jobUserComparator = (o1, o2) -> o1.getUser().compareTo(o2.getUser());
+
+    private static Comparator<Job> jobCPUTimeUsedComparator = (o1, o2) -> (int) (o2.getCPUTimeUsedSec() - o1.getCPUTimeUsedSec());
+
+    private static Comparator<Job> jobWallTimeUsedComparator = (o1, o2) -> o1.getWalltimeUsed().compareTo(o2.getWalltimeUsed());
+
+    private static Comparator<Job> jobStateComparator = (o1, o2) -> JobState.valueOf(o1.getState()).compareTo(JobState.valueOf(o2.getState()));
+
+    private static Comparator<Job> jobQueueComparator = (o1, o2) -> o1.getQueueName().compareTo(o2.getQueueName());
+
+    private static Comparator<Job> jobCtimeComparator = (o1, o2) -> o1.getTimeCreated().compareTo(o2.getTimeCreated());
+
+    private static Comparator<Job> jobUsedMemComparator = (o1, o2) -> {
+        long l = o2.getUsedMemoryNum() - o1.getUsedMemoryNum();
+        return (l > 0 ? 1 : (l < 0 ? -1 : 0));
+    };
+    private static Comparator<Job> jobReservedMemTotalComparator = (o1, o2) -> {
+        long l = o2.getReservedMemoryTotalNum() - o1.getReservedMemoryTotalNum();
+        return (l > 0 ? 1 : (l < 0 ? -1 : 0));
     };
 
-    private static Comparator<Job> jobNameComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return o1.getJobName().compareTo(o2.getJobName());
-        }
-    };
+    private static Comparator<User> userNameComparator = (u1, u2) -> u1.getName().compareTo(u2.getName());
 
-    private static Comparator<Job> jobUserComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return o1.getUser().compareTo(o2.getUser());
-        }
-    };
+    private static Comparator<User> userJobsTotalComparator = (u1, u2) -> u2.getJobsTotal() - u1.getJobsTotal();
 
-    private static Comparator<Job> jobCPUTimeUsedComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return (int) (o2.getCPUTimeUsedSec() - o1.getCPUTimeUsedSec());
-        }
-    };
+    private static Comparator<User> userJobsStateQComparator = (u1, u2) -> u2.getJobsStateQ() - u1.getJobsStateQ();
 
-    private static Comparator<Job> jobWallTimeUsedComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return (int) (o2.getWallTimeUsedSec() - o1.getWallTimeUsedSec());
-        }
-    };
+    private static Comparator<User> userJobsStateRComparator = (u1, u2) -> u2.getJobsStateR() - u1.getJobsStateR();
 
-    private static Comparator<Job> jobStateComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return JobState.valueOf(o1.getState()).compareTo(JobState.valueOf(o2.getState()));
-        }
-    };
+    private static Comparator<User> userJobsStateCComparator = (u1, u2) -> u2.getJobsStateC() - u1.getJobsStateC();
 
-    private static Comparator<Job> jobQueueComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return o1.getQueueName().compareTo(o2.getQueueName());
-        }
-    };
+    private static Comparator<User> userJobsOtherComparator = (u1, u2) -> u2.getJobsOther() - u1.getJobsOther();
 
-    private static Comparator<Job> jobCtimeComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return o1.getTimeCreated().compareTo(o2.getTimeCreated());
-        }
-    };
+    private static Comparator<User> userCpusTotalComparator = (u1, u2) -> u2.getCpusTotal() - u1.getCpusTotal();
 
-    private static Comparator<Job> jobUsedMemComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            long l = o2.getUsedMemoryNum() - o1.getUsedMemoryNum();
-            return (l > 0 ? 1 : (l < 0 ? -1 : 0));
-        }
-    };
-    private static Comparator<Job> jobReservedMemTotalComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            long l = o2.getReservedMemoryTotalNum() - o1.getReservedMemoryTotalNum();
-            return (l > 0 ? 1 : (l < 0 ? -1 : 0));
-        }
-    };
+    private static Comparator<User> userCpusStateQComparator = (u1, u2) -> u2.getCpusStateQ() - u1.getCpusStateQ();
 
-    private static Comparator<User> userNameComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u1.getName().compareTo(u2.getName());
-        }
-    };
+    private static Comparator<User> userCpusStateRComparator = (u1, u2) -> u2.getCpusStateR() - u1.getCpusStateR();
 
-    private static Comparator<User> userJobsTotalComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getJobsTotal() - u1.getJobsTotal();
-        }
-    };
+    private static Comparator<User> userCpusStateCComparator = (u1, u2) -> u2.getCpusStateC() - u1.getCpusStateC();
 
-    private static Comparator<User> userJobsStateQComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getJobsStateQ() - u1.getJobsStateQ();
-        }
-    };
-
-    private static Comparator<User> userJobsStateRComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getJobsStateR() - u1.getJobsStateR();
-        }
-    };
-
-    private static Comparator<User> userJobsStateCComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getJobsStateC() - u1.getJobsStateC();
-        }
-    };
-
-    private static Comparator<User> userJobsOtherComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getJobsOther() - u1.getJobsOther();
-        }
-    };
-
-    private static Comparator<User> userCpusTotalComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getCpusTotal() - u1.getCpusTotal();
-        }
-    };
-
-    private static Comparator<User> userCpusStateQComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getCpusStateQ() - u1.getCpusStateQ();
-        }
-    };
-
-    private static Comparator<User> userCpusStateRComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getCpusStateR() - u1.getCpusStateR();
-        }
-    };
-
-    private static Comparator<User> userCpusStateCComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getCpusStateC() - u1.getCpusStateC();
-        }
-    };
-
-    private static Comparator<User> userCpusOtherComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getCpusOther() - u1.getCpusOther();
-        }
-    };
+    private static Comparator<User> userCpusOtherComparator = (u1, u2) -> u2.getCpusOther() - u1.getCpusOther();
 
 
 }

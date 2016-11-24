@@ -3,6 +3,8 @@ package cz.cesnet.meta.pbs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,12 +39,13 @@ public class Job extends PbsInfoObject {
     public static final String ATTRIBUTE_RESERVED_MEMORY_TORQUE = "resc_req_total.mem";
     public static final String ATTRIBUTE_RESERVED_MEMORY_PBSPRO = "Resource_List.mem";
     public static final String ATTRIBUTE_NODE_COUNT = "Resource_List.nodect";
-    public static final String ATTRIBUTE_NODES = "Resource_List.nodes";
+    public static final String ATTRIBUTE_NODES_TORQUE = "Resource_List.nodes";
+    public static final String ATTRIBUTE_NODES_PBSPRO = "Resource_List.select";
     public static final String ATTRIBUTE_VARIABLE_LIST = "Variable_List";
     public static final String ATTRIBUTE_JOB_OWNER = "Job_Owner";
     public static final String ATTRIBUTE_JOB_NAME = "Job_Name";
-    public static final String ATTRIBUTE_WALLTIME_REMAINING = "Walltime.Remaining";
-    public static final String ATTRIBUTE_WALLTIME_RESERVED = "Resource_List.walltime";
+    public static final String ATTRIBUTE_WALLTIME_REMAINING_TORQUE = "Walltime.Remaining";
+    public static final String ATTRIBUTE_WALLTIME_RESERVED = "Resource_List.walltime";   //both Troque and PBSPro
     public static final String ATTRIBUTE_JOB_STATE = "job_state";
     public static final String ATTRIBUTE_QUEUE = "queue";
     public static final String ATTRIBUTE_COMMENT = "comment";
@@ -103,7 +106,7 @@ public class Job extends PbsInfoObject {
     private String submitDir = null;
     private String workDir = null;
     private long cpuTimeUsedSec = -1L;
-    private long wallTimeUsedSec = -1L;
+    private Duration wallTimeUsed = null;
     private String execHostFirst = null;
     private String[] execHostMore = null;
     private Date ctime = null;
@@ -135,7 +138,7 @@ public class Job extends PbsInfoObject {
     static String[] orderedAttributeNames = new String[]{
             "submit_args", "Submit_arguments", ATTRIBUTE_COMMENT, ATTRIBUTE_JOB_NAME, ATTRIBUTE_JOB_OWNER, ATTRIBUTE_JOB_STATE, ATTRIBUTE_QUEUE,
             ATTRIBUTE_EXEC_HOST, "exec_vnode", "Output_Path", "Error_Path", "Join_Path",
-            ATTRIBUTE_TIME_CREATED, "qtime", ATTRIBUTE_TIME_ELIGIBLE, ATTRIBUTE_PLANNED_START_TORQUE, ATTRIBUTE_TIME_MODIFIED, ATTRIBUTE_TIME_STARTED_PBSPRO, ATTRIBUTE_TIME_STARTED_TORQUE, ATTRIBUTE_TIME_COMPLETED, ATTRIBUTE_WALLTIME_REMAINING,
+            ATTRIBUTE_TIME_CREATED, "qtime", ATTRIBUTE_TIME_ELIGIBLE, ATTRIBUTE_PLANNED_START_TORQUE, ATTRIBUTE_TIME_MODIFIED, ATTRIBUTE_TIME_STARTED_PBSPRO, ATTRIBUTE_TIME_STARTED_TORQUE, ATTRIBUTE_TIME_COMPLETED, ATTRIBUTE_WALLTIME_REMAINING_TORQUE,
     };
 
     public String getId() {
@@ -213,11 +216,12 @@ public class Job extends PbsInfoObject {
             if(pbs.isTorque()) {
                 comp_time = PbsUtils.getJavaTime(attrs.get(ATTRIBUTE_TIME_COMPLETED));
             } else {
+                if(!"F".equals(this.getState())) return null;
                 Date timeStarted = getTimeStarted();
                 if(timeStarted==null) return null;
-                long wallTimeUsedSeconds = getWallTimeUsedSec();
-                if(wallTimeUsedSeconds==-1L) return null;
-                comp_time = new Date(timeStarted.getTime()+wallTimeUsedSeconds*1000);
+                Duration wallTimeUsed = getWalltimeUsed();
+                if(wallTimeUsed==null) return null;
+                comp_time = Date.from(timeStarted.toInstant().plus(wallTimeUsed));
             }
         }
         return comp_time;
@@ -408,7 +412,7 @@ public class Job extends PbsInfoObject {
     }
 
     public String getResourceNodes() {
-        return attrs.get(ATTRIBUTE_NODES);
+        return attrs.get(pbs.isTorque()?ATTRIBUTE_NODES_TORQUE:ATTRIBUTE_NODES_PBSPRO);
     }
 
     /**
@@ -463,9 +467,9 @@ public class Job extends PbsInfoObject {
     public boolean isUnderusingCPUs() {
         String state = getState();
         if (!("R".equals(state) || "C".equals(state))) return false;
-        long walltimeUsedSec = getWallTimeUsedSec();
-        if (walltimeUsedSec < 5 * 60) return false;
-        return getCPUTimeUsedSec() < getNoOfUsedCPU() * walltimeUsedSec / 4 * 3;
+        Duration walltimeUsed = getWalltimeUsed();
+        if (walltimeUsed.compareTo(Duration.ofMinutes(5))<0) return false;
+        return getCPUTimeUsedSec() < getNoOfUsedCPU() * walltimeUsed.getSeconds() / 4 * 3;
     }
 
     /**
@@ -498,48 +502,58 @@ public class Job extends PbsInfoObject {
     }
 
     /**
-     * Returns used wall clock time in seconds.
+     * Returns used wall clock time.
      *
-     * @return used wall clock time in seconds
+     * @return used wall clock time
      */
-    public long getWallTimeUsedSec() {
-        if (wallTimeUsedSec == -1L) {
-            String stime = getWallTimeUsed();
-            if (stime == null || stime.isEmpty()) {
-                wallTimeUsedSec = 0L;
-                return 0L;
+    public Duration getWalltimeUsed() {
+        if (wallTimeUsed == null) {
+            String wallTimeUsed = getWallTimeUsed();
+            if (wallTimeUsed == null || wallTimeUsed.isEmpty()) {
+                this.wallTimeUsed = null;
+                return null;
             }
-            wallTimeUsedSec = PbsUtils.parseTime(stime);
+            this.wallTimeUsed = PbsUtils.parseTime(wallTimeUsed);
         }
-        return wallTimeUsedSec;
+        return wallTimeUsed;
     }
 
 
-    public Long getWalltimeRemaining() {
+    /**
+     * Gets milliseconds remaining for job
+     * @return milliseconds remaining
+     */
+    public Duration getWalltimeRemaining() {
         if(pbs.isTorque()) {
-            String s = attrs.get(ATTRIBUTE_WALLTIME_REMAINING);
+            String s = attrs.get(ATTRIBUTE_WALLTIME_REMAINING_TORQUE);
             if (s == null) return null;
             try {
-                return Long.parseLong(s) * 1000;
+                return Duration.of(Long.parseLong(s), ChronoUnit.SECONDS);
             } catch (NumberFormatException ex) {
                 log.warn("Job {} has non-parseable value for Walltime.Remaining={}", getId(), s);
                 return null;
             }
         } else {
-            Long reservedWalltime = PbsUtils.parseTime(attrs.get(ATTRIBUTE_WALLTIME_RESERVED));
+            Duration reservedWalltime = getWalltimeReserved();
             if(reservedWalltime==null) return null;
-            return reservedWalltime- getWallTimeUsedSec();
+            return reservedWalltime.minus(getWalltimeUsed());
         }
+    }
+
+    public Duration getWalltimeReserved() {
+        return PbsUtils.parseTime(attrs.get(ATTRIBUTE_WALLTIME_RESERVED));
     }
 
     private Date expectedEndTime;
 
     public Date getTimeExpectedEnd() {
         if (expectedEndTime == null) {
-            if (!"R".equals(this.getState())) return null;
-            Long walltimeRemaining = getWalltimeRemaining();
-            if (walltimeRemaining == null) return null;
-            expectedEndTime = new Date(getPbs().getTimeLoaded().getTime() + walltimeRemaining);
+            if(!"R".equals(this.getState())) return null;
+            Date timeStarted = getTimeStarted();
+            if(timeStarted==null) return null;
+            Duration walltimeReserved = getWalltimeReserved();
+            if(walltimeReserved==null) return null;
+            expectedEndTime = Date.from(timeStarted.toInstant().plus(getWalltimeReserved()));
         }
         return expectedEndTime;
     }
@@ -553,9 +567,9 @@ public class Job extends PbsInfoObject {
             if (!"Q".equals(this.getState())) return null;
             Date plannedStart = getPlannedStart();
             if (plannedStart == null) return null;
-            Long walltimeRemaining = getWalltimeRemaining();
+            Duration walltimeRemaining = getWalltimeRemaining();
             if (walltimeRemaining == null) return null;
-            plannedEnd = new Date(plannedStart.getTime() + walltimeRemaining);
+            plannedEnd = Date.from(plannedStart.toInstant().plus(walltimeRemaining));
         }
         return plannedEnd;
     }

@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -159,12 +160,12 @@ public class JobsActionBean extends BaseActionBean {
                 }
                 //kontrola na walltime remaining
                 if ("R".equals(jobState) || "E".equals(jobState)) {
-                    Long walltimeRemaining = job.getWalltimeRemaining();
+                    Duration walltimeRemaining = job.getWalltimeRemaining();
                     if (walltimeRemaining == null) {
                         String w = "Úloha je ve stavu " + jobState + " a nemá atribut Walltime.Remaining ";
                         warnings.put(job.getId(), w);
                         suspiciousJobs.put(job.getId(), job);
-                    } else if (walltimeRemaining < 0) {
+                    } else if (walltimeRemaining.isNegative()) {
                         Date expectedEnd = job.getTimeExpectedEnd();
                         String w = "Úloha je ve stavu " + jobState + " a má zápornou hodnotu atributu Walltime.Remaining, měla skončit "
                                 + (expectedEnd != null ? sdf.format(expectedEnd) : "???");
