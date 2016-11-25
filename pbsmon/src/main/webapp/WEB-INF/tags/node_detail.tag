@@ -49,22 +49,22 @@
                 </tr>
             </c:if>
 
-            <c:if test="${node.scratch.hasSsd}">
+            <c:if test="${node.scratch.hasFreeSsd}">
             <tr>
-                <th class="${node.state}"><f:message key="nodejsp_scratch_size_ssd"/></th>
-                <td colspan="2" class="${node.state}"><c:out value="${node.scratch.ssdSizeHuman}"/></td>
+                <th class="${node.state}"><f:message key="nodejsp_free_scratch_ssd"/></th>
+                <td colspan="2" class="${node.state}"><c:out value="${node.scratch.ssdFreeHuman}"/></td>
             </tr>
             </c:if>
-            <c:if test="${node.scratch.hasLocal}">
+            <c:if test="${node.scratch.hasFreeLocal}">
                 <tr>
-                    <th class="${node.state}"><f:message key="nodejsp_scratch_size_local"/></th>
-                    <td colspan="2" class="${node.state}"><c:out value="${node.scratch.localSizeHuman}"/></td>
+                    <th class="${node.state}"><f:message key="nodejsp_free_scratch_local"/></th>
+                    <td colspan="2" class="${node.state}"><c:out value="${node.scratch.localFreeHuman}"/></td>
                 </tr>
             </c:if>
-            <c:if test="${node.scratch.hasShared}">
+            <c:if test="${node.scratch.hasFreeShared}">
                 <tr>
-                    <th class="${node.state}"><f:message key="nodejsp_scratch_size_network"/></th>
-                    <td colspan="2" class="${node.state}"><c:out value="${node.scratch.sharedSizeHuman}"/></td>
+                    <th class="${node.state}"><f:message key="nodejsp_free_scratch_shared"/></th>
+                    <td colspan="2" class="${node.state}"><c:out value="${node.scratch.sharedFreeHuman}"/></td>
                 </tr>
             </c:if>
 
@@ -170,16 +170,20 @@
         <c:if test="${fn:length(node.jobs)>0 or fn:length(node.plannedJobs)>0}">
             <table class="job">
                 <tr>
-                    <th align="center"><f:message key="nodejsp_jobs"/></th>
-                    <th align="center"><f:message key="jobs_user"/></th>
+                    <th rowspan="2" align="center"><f:message key="nodejsp_jobs"/></th>
+                    <th rowspan="2" align="center"><f:message key="jobs_user"/></th>
+                    <th colspan="4" align="center"><f:message key="nodejsp_on_node"/></th>
+                    <th rowspan="2" align="center"><f:message key="jobs_jobname"/></th>
+                    <th rowspan="2" align="center"><f:message key="jobs_state"/></th>
+                    <th rowspan="2" align="center" colspan="2"><f:message key="job_start_time"/></th>
+                    <th rowspan="2" align="center" colspan="2"><f:message key="job_expected_endtime"/></th>
+                    <th rowspan="2" align="center"><f:message key="jobs_queue"/></th>
+                </tr>
+                <tr>
                     <th align="center">RAM</th>
                     <th align="center" colspan="2">scratch</th>
                     <th align="center"><f:message key="nodejsp_cpu_num"/></th>
-                    <th align="center"><f:message key="jobs_jobname"/></th>
-                    <th align="center"><f:message key="jobs_state"/></th>
-                    <th align="center" colspan="2"><f:message key="job_start_time"/></th>
-                    <th align="center" colspan="2"><f:message key="job_expected_endtime"/></th>
-                    <th align="center"><f:message key="jobs_queue"/></th>
+                </tr>
                 <c:forEach items="${node.jobs}" var="job" varStatus="j">
                 <tr>
                 <td><s:link href="/job/${job.id}">${job.id}</s:link>
@@ -201,10 +205,10 @@
                     <tr>
                         <td><s:link href="/job/${job.id}">${job.id}</s:link>
                         <td align="right"><s:link href="/user/${job.user}">${job.user}</s:link></td>
-                        <td align="right">${job.reservedMemoryTotal}</td>
+                        <td align="right">${job.nodeName2reservedResources[node.name].mem}</td>
                         <td>${job.nodeName2reservedResources[node.name].scratchType} </td>
                         <td>${job.nodeName2reservedResources[node.name].volume}</td>
-                        <td align="center">${job.noOfUsedCPU} CPU</td>
+                        <td align="center">${job.nodeName2reservedResources[node.name].cpus} CPU</td>
                         <td>${job.jobName}</td>
                         <td align="center" class="${job.state}">${job.state} - <f:message key='jobs_${job.state}'/></td>
                         <c:choose>

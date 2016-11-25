@@ -240,12 +240,27 @@ public class Job extends PbsInfoObject {
         return attrs.get(pbs.isTorque() ? ATTRIBUTE_PLANNED_NODES_TORQUE : ATTRIBUTE_PLANNED_NODES_PBSPRO);
     }
 
+    private static final Pattern HOSTNAME_FROM_EXEC_VNODE = Pattern.compile("\\(([^:]+):[^)]*\\)\\+?");
+
+    private static String[] parseNodeNames(String exec_vhost) {
+        Matcher m = HOSTNAME_FROM_EXEC_VNODE.matcher(exec_vhost);
+        List<String> nodeNames = new ArrayList<>();
+        while (m.find()) {
+            nodeNames.add(m.group(1));
+        }
+        return nodeNames.toArray(new String[nodeNames.size()]);
+    }
+
     private String[] nodeNames;
 
     public String[] getPlannedNodesNames() {
         if (nodeNames == null) {
             String plannedNodes = getPlannedNodes();
-            nodeNames = plannedNodes != null ? plannedNodes.split(", *") : new String[0];
+            if(pbs.isTorque()) {
+                nodeNames = plannedNodes != null ? plannedNodes.split(", *") : new String[0];
+            } else {
+                nodeNames = plannedNodes != null ? parseNodeNames(plannedNodes) : new String[0];
+            }
         }
         return nodeNames;
     }
@@ -540,7 +555,9 @@ public class Job extends PbsInfoObject {
         } else {
             Duration reservedWalltime = getWalltimeReserved();
             if (reservedWalltime == null) return null;
-            return reservedWalltime.minus(getWalltimeUsed());
+            Duration walltimeUsed = getWalltimeUsed();
+            if(walltimeUsed == null) return null;
+            return reservedWalltime.minus(walltimeUsed);
         }
     }
 
@@ -661,7 +678,7 @@ public class Job extends PbsInfoObject {
     public List<Chunk> getChunks() {
         if (chunks == null) {
             String spec = attrs.get(pbs.isTorque() ? ATTRIBUTE_SCHEDULED_NODES_SPECS : ATTRIBUTE_EXEC_VNODE);
-            if (spec == null) return null;
+            if (spec == null) return Collections.emptyList();
             chunks = new ArrayList<>();
             for (String hostString : spec.split("\\+")) {
                 //remove () around the string for PBSPro

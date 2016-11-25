@@ -120,12 +120,24 @@ public class Scratch {
         return hasSsdSizeKiB(1L);
     }
 
+    public boolean getHasFreeSsd() {
+        return hasSsdFreeKiB(1L);
+    }
+
     public boolean getHasLocal() {
         return hasLocalSizeKiB(1L);
     }
 
+    public boolean getHasFreeLocal() {
+        return hasLocalFreeKiB(1L);
+    }
+
     public boolean getHasShared() {
         return hasSharedSizeKiB(1L);
+    }
+
+    public boolean getHasFreeShared() {
+        return hasSharedFreeKiB(1L);
     }
 
     public String getLocalFreeHuman() {
@@ -136,7 +148,7 @@ public class Scratch {
         return PbsUtils.formatInHumanUnits(ssdFreeKiB * 1024);
     }
 
-    public String getNetworkFreeHuman() {
+    public String getSharedFreeHuman() {
         return PbsUtils.formatInHumanUnits(sharedFreeKiB * 1024);
     }
 
@@ -186,7 +198,7 @@ public class Scratch {
         this.ssdFreeKiB = ssdFreeKiB;
     }
 
-    public boolean hasNetworkFreeKiB(long scratchKB) {
+    public boolean hasSharedFreeKiB(long scratchKB) {
         return this.sharedFreeKiB != null && this.sharedFreeKiB >= scratchKB;
     }
 
@@ -196,30 +208,6 @@ public class Scratch {
 
     public void setSharedFreeKiB(long networkFreeKiB) {
         this.sharedFreeKiB = networkFreeKiB;
-    }
-
-    public Long getLocalSize() {
-        return localSize;
-    }
-
-    public String getLocalSizeHuman() {
-        return PbsUtils.formatInHumanUnits(localSize);
-    }
-
-    public Long getSharedSize() {
-        return sharedSize;
-    }
-
-    public String getSharedSizeHuman() {
-        return PbsUtils.formatInHumanUnits(sharedSize);
-    }
-
-    public Long getSsdSize() {
-        return ssdSize;
-    }
-
-    public String getSsdSizeHuman() {
-        return PbsUtils.formatInHumanUnits(ssdSize);
     }
 
     public void setSsdReservedByJobs(long ssdReservedByJobs) {

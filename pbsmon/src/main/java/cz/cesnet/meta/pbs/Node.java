@@ -665,13 +665,18 @@ public class Node extends PbsInfoObject {
         this.scratch = scratch;
     }
 
+    /*
+        resources_available.scratch_* je kolik zbývá volného místa
+        resources_assigned.scratch_* je kolik mají zarezervované úlohy
+        tato dvě čísla spolu nesouvisí, protože úloha může část zarezervovaného místa zaplnit a tím sníží volné místo
+     */
     public void setScratchPBSPro() {
         scratch = new Scratch();
-        scratch.setSsdSize(attrs.get("resources_available.scratch_ssd"));
+        scratch.setSsdFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_ssd"))/1024L);
         scratch.setSsdReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_ssd")));
-        scratch.setLocalSize(attrs.get("resources_available.scratch_local"));
+        scratch.setLocalFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_local"))/1024L);
         scratch.setLocalReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_local")));
-        scratch.setSharedSize(attrs.get("resources_available.scratch_shared"));
+        scratch.setSharedFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_shared"))/1024L);
         scratch.setSharedReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_shared")));
     }
 

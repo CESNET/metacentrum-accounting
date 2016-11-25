@@ -33,7 +33,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                     <property name="main" value="false"/>
                     <property name="torque" value="false"/>
                     <property name="by_queue" value="false"/>
-                    <property name="planbased" value="false"/>
+                    <property name="planbased" value="true"/>
                     <property name="fairshares">
                         <list>
                             <!--
