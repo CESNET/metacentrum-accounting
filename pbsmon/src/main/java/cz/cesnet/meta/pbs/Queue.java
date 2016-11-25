@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class representing a queue as reported by a PBS server.
@@ -30,6 +32,8 @@ public class Queue extends PbsInfoObject {
     public static final String ATTRIBUTE_MAX_RUNNING_JOBS = "max_running";
     public static final String ATTRIBUTE_MAX_USER_RUN = "max_user_run";
     public static final String ATTRIBUTE_MAX_USER_CPU = "max_user_proc";
+    public static final String ATTRIBUTE_MAX_RUN = "max_run";
+    public static final String ATTRIBUTE_MAX_RUN_RES_NCPUS = "max_run_res.ncpus";
     public static final String ATTRIBUTE_FAIRSHARE_TREE = "fairshare_tree";
     public static final String ATTRIBUTE_DESCRIPTION_CZECH = "description_cs";
     public static final String ATTRIBUTE_DESCRIPTION_ENGLISH = "description_en";
@@ -229,16 +233,43 @@ public class Queue extends PbsInfoObject {
         return this.isAclUsersEnabled() || this.isAclGroupsEnabled() || this.isAclHostsEnabled();
     }
 
+
+    private static final Pattern LIMIT_SPEC = Pattern.compile("([ougp]:[^=]+)=(\\d+)");
+
+    /*
+      See page 425 of PBS Professional 13.0 Reference Guide
+     */
+    private static Map<String, String> parseLimitSpec(String s) {
+        Matcher m = LIMIT_SPEC.matcher(s);
+        Map<String, String> limits = new LinkedHashMap<>();
+        while (m.find()) {
+            limits.put(m.group(1), m.group(2));
+        }
+        return limits;
+    }
+
     public String getMaxRunningJobs() {
         return attrs.get(ATTRIBUTE_MAX_RUNNING_JOBS);
     }
 
     public String getMaxUserRun() {
-        return attrs.get(ATTRIBUTE_MAX_USER_RUN);
+        if(pbs.isTorque()) {
+            return attrs.get(ATTRIBUTE_MAX_USER_RUN);
+        } else {
+            String max_run = attrs.get(ATTRIBUTE_MAX_RUN);
+            if(max_run==null) return null;
+            return parseLimitSpec(max_run).get("u:PBS_GENERIC");
+        }
     }
 
     public String getMaxUserCPU() {
-        return attrs.get(ATTRIBUTE_MAX_USER_CPU);
+        if(pbs.isTorque()) {
+            return attrs.get(ATTRIBUTE_MAX_USER_CPU);
+        } else {
+            String max_run_res_ncpus = attrs.get(ATTRIBUTE_MAX_RUN_RES_NCPUS);
+            if(max_run_res_ncpus==null) return null;
+            return parseLimitSpec(max_run_res_ncpus).get("u:PBS_GENERIC");
+        }
     }
 
     public String getFairshareTree() {

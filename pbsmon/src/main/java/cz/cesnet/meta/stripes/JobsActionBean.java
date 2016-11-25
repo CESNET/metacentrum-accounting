@@ -127,7 +127,7 @@ public class JobsActionBean extends BaseActionBean {
 
                 //dokoncene ulohy
                 Date comp = null;
-                if ("C".equals(jobState)) {
+                if ("C".equals(jobState)||"F".equals(jobState)) {
                     comp = job.getTimeCompleted();
                     if (comp != null) {
                         //ulohy ve stavu C bez casu dokonceni nebyly ani spusteny
@@ -176,8 +176,8 @@ public class JobsActionBean extends BaseActionBean {
                 //kontroly na stav neodpovidajici nastavenym casum
                 if (comp != null && comp.getTime() < nowtime) {
                     //má čas dokončení, měla by být ve stavu C
-                    if (!"C".equals(jobState)) {
-                        String w = "Úloha má být ve stavu C (protože má comp_time), ale je ve stavu " + jobState + ".";
+                    if (!("C".equals(jobState)||"F".equals(jobState))) {
+                        String w = "Úloha má být ve stavu C/F (protože má comp_time), ale je ve stavu " + jobState + ".";
                         warnings.put(job.getId(), w);
                         suspiciousJobs.put(job.getId(), job);
                     }
@@ -206,7 +206,7 @@ public class JobsActionBean extends BaseActionBean {
                         queuedJobs++;
                         queuedCPUs += job.getNoOfUsedCPU();
                     } else {
-                        if ("C".equals(jobState)) {
+                        if ("C".equals(jobState)||"F".equals(jobState)) {
                             //byla deleted, t je v pořádku
                         } else {
                             String cas = "";
