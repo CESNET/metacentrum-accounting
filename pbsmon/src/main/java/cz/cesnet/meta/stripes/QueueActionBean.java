@@ -63,7 +63,7 @@ public class QueueActionBean extends BaseActionBean {
 
     private void findMachinesForNodes() {
         Set<String> machineNames = new HashSet<String>(nodes.size());
-        machines = new ArrayList<Stroj>(nodes.size());
+        machines = new ArrayList<>(nodes.size());
         for (Node node : nodes) {
             String nodeFQDN = node.getFQDN();
             //try Magrathea

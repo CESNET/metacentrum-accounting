@@ -41,7 +41,7 @@
 
     <logger name="cz.cesnet.meta.stripes.PersonActionBean" level="info"/>
 
-    <logger name="cz.cesnet.meta.stripes.NodeActionBean" level="debug"/>
+    <logger name="cz.cesnet.meta.stripes.NodeActionBean" level="info"/>
     <logger name="cz.cesnet.meta.perun.impl.PerunJsonImpl" level="info"/>
 
     <logger name="cz.cesnet.meta.perun.api.FyzickeStroje" level="info"/>
@@ -52,6 +52,7 @@
     <logger name="cz.cesnet.meta.cloud.CloudImpl" level="info"/>
     <logger name="cz.cesnet.meta.cloud.CloudLoader" level="info"/>
 
+    <logger name="cz.cesnet.meta.pbs.PBS" level="info"/>
     <logger name="cz.cesnet.meta.pbs.PbskyImpl" level="info"/>
     <logger name="cz.cesnet.meta.pbs.PbsConnectorJNI" level="info"/>
     <logger name="cz.cesnet.meta.pbs" level="info"/>

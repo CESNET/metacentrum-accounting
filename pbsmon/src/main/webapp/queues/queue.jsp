@@ -38,7 +38,7 @@
  <c:if test="${q.aclUsersEnabled}">
         <tr>
             <th><img src="${pageContext.request.contextPath}/img/lock.png" alt="locked" />  <f:message key="jobs_locked_users"/></th>
-            <td><c:forEach var="u" items="${q.aclUsersArray}"><c:out value="${u}" /> </c:forEach></td>
+            <td><c:forEach var="u" items="${q.aclUsersArray}"><s:link href="/user/${u}"><c:out value="${u}" /></s:link>  </c:forEach></td>
         </tr>
  </c:if>
  <c:if test="${q.aclGroupsEnabled}">
@@ -78,7 +78,6 @@
                 </tr>
             </c:forEach>
         </table>
-
     </c:when>
     <c:otherwise>
         <h3><f:message key="q_nodes" /></h3>

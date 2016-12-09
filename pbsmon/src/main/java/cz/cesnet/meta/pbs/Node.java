@@ -780,5 +780,13 @@ public class Node extends PbsInfoObject {
         return attrs.get(RESOURCE_PREFIX +name);
     }
 
+    public List<String> getResourceOfTypeList(String resourceName) {
+        String resourceValue = getResource(resourceName);
+        return Arrays.asList(resourceValue == null ? new String[0] : resourceValue.split(","));
+    }
+
+    public List<String> getResourceQueueList() {
+        return getResourceOfTypeList(PBS.QUEUE_LIST);
+    }
 
 }

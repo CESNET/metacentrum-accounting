@@ -150,6 +150,18 @@ public class Queue extends PbsInfoObject {
     }
 
     /**
+     * Specifies what resources fo given name will be required by jobs assigned to this queue.
+     * @return value of attribute with name "default_chunk." + resourceName
+     */
+    public String getDefaultChunk(String resourceName) {
+        return attrs.get("default_chunk."+resourceName);
+    }
+
+    public String getDefaultChunkQueuesList() {
+        return getDefaultChunk(PBS.QUEUE_LIST);
+    }
+
+    /**
      * Array of user names in ACL list.
      *
      * @return value of acl_users attribute split at commas
