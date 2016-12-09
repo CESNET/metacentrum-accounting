@@ -13,8 +13,6 @@ public interface PbsCache extends TimeStamped {
 
     Mapping getMapping();
 
-    String getMagratheaStateForNode(Node node);
-
     Scratch getScratchForNode(Node node);
 
     PbsAccess getUserAccess(String userName);

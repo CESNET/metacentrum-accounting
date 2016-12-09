@@ -14,7 +14,6 @@ public class Stroj implements Comparable<Stroj> {
     private int numInCluster = 0;
     private VypocetniZdroj vypocetniZdroj;
     private int usedPercent = 0;
-    private boolean magratheaManaged = false;
     private boolean openNebulaManaged = false; //je v OpenNebule
     private boolean nebulaPbsHost = false; //je v OpenNebule a obsahuje VM ktery je v PBS
     private boolean openNebulaUsable = false; //lze na něm spustit uživatelský VM přes OpenNebulu
@@ -102,14 +101,6 @@ public class Stroj implements Comparable<Stroj> {
 
     public void setUsedPercent(int usedPercent) {
         this.usedPercent = usedPercent>100?100:usedPercent;
-    }
-
-    public boolean isMagratheaManaged() {
-        return magratheaManaged;
-    }
-
-    public void setMagratheaManaged(boolean magratheaManaged) {
-        this.magratheaManaged = magratheaManaged;
     }
 
     public boolean isOpenNebulaManaged() {

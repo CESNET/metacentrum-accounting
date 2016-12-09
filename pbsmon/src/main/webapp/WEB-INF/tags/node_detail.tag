@@ -6,11 +6,6 @@
 <%@ taglib prefix="s" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<c:choose>
-    <c:when test="${node.cloud}">
-        <p class="cloud_warning"><f:message key="nodejsp_cloud"/></p>
-    </c:when>
-    <c:otherwise>
 
         <table class="node" cellspacing="0">
             <tr>
@@ -301,5 +296,3 @@
                 <f:message key="node_detail_tag_none_found"/>
             </c:otherwise>
         </c:choose>
-    </c:otherwise>
-</c:choose>

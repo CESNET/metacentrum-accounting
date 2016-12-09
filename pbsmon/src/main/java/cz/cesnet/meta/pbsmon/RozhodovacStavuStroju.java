@@ -83,8 +83,7 @@ public class RozhodovacStavuStroju {
             String stav = Node.STATE_UNKNOWN;
             List<String> virtNames = mapping.getPhysical2virtual().get(jmenoStroje);
             if (virtNames != null) {
-                stroj.setMagratheaManaged(true);
-                //v pbsCache jsou z Magrathey udaje o virtualich strojich
+                //v pbsCache jsou udaje o virtualich strojich (urga)
                 List<Node> virtNodes = new ArrayList<Node>(virtNames.size());
                 for (String virtName : virtNames) {
                     if (frontendy.jeStrojFrontend(virtName)) {

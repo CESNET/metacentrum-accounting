@@ -78,7 +78,6 @@
 
         <h2 id="queue_nodes"><f:message key="queues_list_queueus_nodes_headline"/></h2>
         <c:forEach items="${actionBean.pbs}" var="pbs">
-            <c:if test="${not pbs.torque}">
             <c:forEach items="${pbs.queuesByPriority}" var="q">
                 <table class="queue">
                     <tr><td><s:link href="/queue/${q.name}">${q.name}</s:link></td></tr>
@@ -93,7 +92,6 @@
                 </c:choose>
                 <br>
             </c:forEach>
-            </c:if>
         </c:forEach>
 
     </s:layout-component>

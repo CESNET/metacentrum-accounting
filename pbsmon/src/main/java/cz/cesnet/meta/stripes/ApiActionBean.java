@@ -45,17 +45,17 @@ public class ApiActionBean extends BaseActionBean {
         Mapping mapping  = NodesActionBean.makeUnifiedMapping(this.pbsCache, this.cloud);
         for (Stroj s : vsechnyStroje) {
             String strojName = s.getName();
-            //PBs uzel primo na fyzickem - nevirtualizovane nebo Magratea-cloudove
+            //PBs uzel primo na fyzickem - nevirtualizovane
             Node pbsNode = pbsky.getNodeByFQDN(strojName);
-            if (pbsNode != null && pbsNode.isComputingNode() && !pbsNode.isDown()) {
+            if (pbsNode != null && !pbsNode.isDown()) {
                 pbsNodeNames.add(strojName);
             }
-            //virtualni podle Magrathea
+            //virtualni podle mappingu
             List<String> virtNames = mapping.getPhysical2virtual().get(strojName);
             if (virtNames != null) {
                 for (String virtName : virtNames) {
                     Node vn = pbsky.getNodeByFQDN(virtName);
-                    if (vn != null && vn.isComputingNode() && !vn.isDown()) {
+                    if (vn != null && !vn.isDown()) {
                         pbsNodeNames.add(virtName);
                     }
                 }

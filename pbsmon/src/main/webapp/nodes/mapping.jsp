@@ -69,7 +69,7 @@
                              <td class="node v2 ${vnode.state}">${vnode.noOfCPU} CPU</td>
                              <td class="node v3 ${vnode.state}">${vnode.totalMemoryB} RAM</td>
                              <td class="node v4 ${vnode.state}">${vnode.scratch.anySizeInHumanUnits} HDD
-                                 <c:if test="${! empty param.states}">(${vnode.pbsState}/${vnode.maghrateaState})</c:if>
+                                 <c:if test="${! empty param.states}">(${vnode.pbsState})</c:if>
                              </td>
                          </c:when>
                          <c:otherwise>

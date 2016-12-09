@@ -128,7 +128,7 @@ public class NodesActionBean extends BaseActionBean {
         //pripravit
         for (Stroj s : vsechnyStroje) {
             String strojName = s.getName();
-            //PBs uzel primo na fyzickem - nevirtualizovane nebo Magratea-cloudove
+            //PBs uzel primo na fyzickem - nevirtualizovane
             Node pbsNode = pbsky.getNodeByFQDN(strojName);
             if (pbsNode != null) nodeMap.put(strojName, pbsNode);
             // pro vsechny fyzicke vytahat virtualni s PBS uzly
@@ -171,10 +171,10 @@ public class NodesActionBean extends BaseActionBean {
         Map<String, String> virtual2physical = new HashMap<>();
         m.setPhysical2virtual(physical2virtual);
         m.setVirtual2physical(virtual2physical);
-        //Magrathea
-        Mapping magratheaMapping = pbsCache.getMapping();
-        physical2virtual.putAll(magratheaMapping.getPhysical2virtual());
-        virtual2physical.putAll(magratheaMapping.getVirtual2physical());
+        //Mapping of ungu and urga partitions
+        Mapping unguMapping = pbsCache.getMapping();
+        physical2virtual.putAll(unguMapping.getPhysical2virtual());
+        virtual2physical.putAll(unguMapping.getVirtual2physical());
         //OpenNebula
         Map<String, List<CloudVirtualHost>> hostName2VirtualHostsMap = cloud.getHostName2VirtualHostsMap();
         for (CloudPhysicalHost host : cloud.getPhysicalHosts()) {

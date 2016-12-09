@@ -29,12 +29,12 @@ public class PbsmonUtils {
     public static List<Node> getPbsNodesForPhysicalMachine(Stroj perunMachine, Pbsky pbsky, PbsCache pbsCache, Cloud cloud) {
         String machineName = perunMachine.getName();
         List<Node> pbsNodes = new ArrayList<>();
-        //PBS uzel odpovídající jménu fyzického stroje (bez virtualizace nebo dom0)
+        //PBS uzel odpovídající jménu fyzického stroje (bez virtualizace)
         Node node = pbsky.getNodeByFQDN(machineName);
-        if (node != null && node.isComputingNode()) {
+        if (node != null) {
             pbsNodes.add(node);
         }
-        //PBS uzly podle pbs_cache (virtualizace přes Magratheu)
+        //PBS uzly podle pbs_cache (virtualizace přes něco jiného než cloud)
         List<String> virtNames = pbsCache.getMapping().getPhysical2virtual().get(machineName);
         if (virtNames != null) {
             for (String virtName : virtNames) {

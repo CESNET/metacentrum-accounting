@@ -76,7 +76,6 @@ public class Node extends PbsInfoObject {
     private String shortName;
     private String state;
     private String pbsState;
-    private String maghrateaState;
     private String[] jobsIds;
     private List<Job> jobs;
     private String[] properties;
@@ -116,7 +115,6 @@ public class Node extends PbsInfoObject {
         shortName = null;
         state = null;
         pbsState = null;
-        maghrateaState = null;
         jobsIds = null;
         if (jobs != null) jobs.clear();
         jobs = null;
@@ -239,11 +237,6 @@ public class Node extends PbsInfoObject {
      */
     public String getState() {
         if (this.state != null) return this.state;
-
-        if (this.isCloud()) {
-            this.state = STATE_CLOUD;
-            return this.state;
-        }
         //report just text up to first comma
         this.state = getPbsState();
         if (this.isMaintenance()) {
@@ -256,36 +249,12 @@ public class Node extends PbsInfoObject {
         } else if (this.isTest()) {
             this.state = STATE_TEST;
         }
-        if (state.equals(STATE_FREE) && maghrateaState != null && !STATE_FREE.equals(maghrateaState) && !"running".equals(maghrateaState)) {
-            state = maghrateaState;
-        }
         return this.state;
     }
 
-    public void setMagratheaStatus(String state) {
-        this.maghrateaState = state;
-    }
-
-    public String getMaghrateaState() {
-        return maghrateaState;
-    }
-
     public String getNtype() {
-        //cluster, cloud, virtual
+        //cluster, cloud, virtual, PBS
         return attrs.get(ATTRIBUTE_NODE_TYPE);
-    }
-
-    /**
-     * Returns whether node type is cloud, i.e. dom0 on virtualized nodes.
-     *
-     * @return true of false
-     */
-    public boolean isCloud() {
-        return "cloud".equals(getNtype());
-    }
-
-    public boolean isComputingNode() {
-        return !isCloud();
     }
 
     public String getArch() {
@@ -535,7 +504,7 @@ public class Node extends PbsInfoObject {
                     jobs.add(job);
                 }
             }
-            Collections.sort(jobs, Job.TIME_STARTED_JOB_COMPARATOR);
+            jobs.sort(Job.TIME_STARTED_JOB_COMPARATOR);
             this.jobs = jobs;
         }
         return jobs;
@@ -557,7 +526,7 @@ public class Node extends PbsInfoObject {
                             }
                         }
                     });
-            Collections.sort(plannedJobs, Job.PLANNED_START_JOB_COMPARATOR);
+            plannedJobs.sort(Job.PLANNED_START_JOB_COMPARATOR);
             this.plannedJobs = plannedJobs;
         }
         return plannedJobs;

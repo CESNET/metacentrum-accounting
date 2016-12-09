@@ -346,7 +346,6 @@ public class PBS implements TimeStamped {
                 //TORQUE
                 //naprogramovano podle udaju od Simona v https://rt3.cesnet.cz/rt/Ticket/Display.html?id=28959
                 for (Node node : nodes) {
-                    if (node.isCloud()) continue; //dom0 nejsou ve frontach
                     String nrq = node.getRequiredQueue();//jmeno fronty vcetne pripony @server
                     if (nrq != null) {
                         if (nrq.equals(queueName)) {

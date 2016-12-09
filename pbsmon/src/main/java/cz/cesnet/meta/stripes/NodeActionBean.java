@@ -54,7 +54,7 @@ public class NodeActionBean extends BaseActionBean {
         virtual = perun.isNodeVirtual(nodeFQDN);
         log.debug("node virtual={}",virtual);
         if(virtual) {
-            //try pbs_cache with Magrathea mappings
+            //try pbs_cache with mappings
             physicalMachineName = pbsCache.getMapping().getVirtual2physical().get(nodeFQDN);
             //try cloud if not found in previous step
             if(physicalMachineName==null) {

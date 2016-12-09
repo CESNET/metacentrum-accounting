@@ -66,7 +66,7 @@ public class QueueActionBean extends BaseActionBean {
         machines = new ArrayList<>(nodes.size());
         for (Node node : nodes) {
             String nodeFQDN = node.getFQDN();
-            //try Magrathea
+            //try mapping
             String machineName = pbsCache.getMapping().getVirtual2physical().get(nodeFQDN);
             //try OpenNebula
             if (machineName == null) {

@@ -44,7 +44,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
     public Map<String, Integer> getRankMapForFairshareIdAndExistingUsers(String fairshareId, Set<String> userNames) {
         //assign ranks only to existing users
         List<String> usersRanked = this.getFairshareOrderedUsers(fairshareId);
-        Map<String, Integer> rankMap = new HashMap<String, Integer>(usersRanked.size());
+        Map<String, Integer> rankMap = new HashMap<>(usersRanked.size());
         int rank = 1;
         for (String userName : usersRanked) {
             if (userNames.contains(userName)) rankMap.put(userName, rank++);
@@ -68,8 +68,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
 
     protected void load() {
         log.debug("load()");
-        loadMapping();
-        loadMagratheaStates();
+        loadMapping();//only static mapping now
         loadScratchSizes();
         loadFairshare();
         loadGpuAllocation();
@@ -79,22 +78,12 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
 
 
     private Mapping mapping;
-    private Map<String, String> magratheaStates;
     private Map<String, Scratch> scratchSizes;
 
     public Mapping getMapping() {
         checkLoad();
         return this.mapping;
     }
-
-
-
-    @Override
-    public String getMagratheaStateForNode(Node node) {
-        checkLoad();
-        return this.magratheaStates.get(node.getName());
-    }
-
 
     @Override
     public Scratch getScratchForNode(Node node) {
@@ -105,8 +94,8 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
     @Override
     public PbsAccess getUserAccess(String userName) {
         PbsAccess p = new PbsAccess();
-        p.setQueues(new ArrayList<String>(20));
-        p.setQueueToHostsMap(new HashMap<String, List<String>>());
+        p.setQueues(new ArrayList<>(20));
+        p.setQueueToHostsMap(new HashMap<>());
         for (PbsServerConfig server : pbsServers) loadPbsAccess(p, server, userName);
         return p;
     }
@@ -143,13 +132,6 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
     public PbsCacheImpl() {
     }
 
-
-    private void loadMagratheaStates() {
-        Map<String, String> magratheaStates = new HashMap<String, String>();
-        for (PbsServerConfig server : pbsServers) loadMagratheaStates(server, magratheaStates);
-        this.magratheaStates = magratheaStates;
-    }
-
     private static class FairShareTuple {
         String user;
         Double fairshare;
@@ -177,7 +159,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
     /**
      * Maps hostname to map(gpu,jobId).
      */
-    private Map<String,Map<String,String>> gpuAllocMap;
+    private Map<String,Map<String,String>> gpuAllocMap = new HashMap<>();
 
     @Override
     public Map<String, String> getGpuAlloc(Node node) {
@@ -186,10 +168,10 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
 
     private void loadGpuAllocation() {
         loggpu.debug("loadGpuAllocation()");
-        Map<String,Map<String,String>> allocMap = new HashMap<String, Map<String, String>>();
+        Map<String,Map<String,String>> allocMap = new HashMap<>();
         // "value": "unallocated",    "key": "gram4.zcu.cz:/dev/nvidia2"
         // "value": "4688478.arien.ics.muni.cz","key": "gram1.zcu.cz:/dev/nvidia2"
-        List<PbsCacheEntry> entries = new ArrayList<PbsCacheEntry>();
+        List<PbsCacheEntry> entries = new ArrayList<>();
         for (PbsServerConfig server : pbsServers) {
             loadMetrics(server, "gpu_allocation", entries);
         }
@@ -204,7 +186,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
 
                 Map<String, String> gpu2jobIdMap = allocMap.get(hostname);
                 if(gpu2jobIdMap==null) {
-                    gpu2jobIdMap = new HashMap<String, String>();
+                    gpu2jobIdMap = new HashMap<>();
                     allocMap.put(hostname,gpu2jobIdMap);
                 }
                 gpu2jobIdMap.put(gpu,jobId);
@@ -221,14 +203,14 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
     }
 
     private void loadFairshare() {
-        Map<String, List<String>> fairshareRank = new HashMap<String, List<String>>();
-        List<FairshareConfig> fairshareConfigs = new ArrayList<FairshareConfig>();
+        Map<String, List<String>> fairshareRank = new HashMap<>();
+        List<FairshareConfig> fairshareConfigs = new ArrayList<>();
         for (PbsServerConfig server : pbsServers) {
             for (FairshareConfig fairshareConfig : server.getFairshares()) {
                 fairshareConfigs.add(fairshareConfig);
-                List<PbsCacheEntry> entries = new ArrayList<PbsCacheEntry>();
+                List<PbsCacheEntry> entries = new ArrayList<>();
                 loadMetrics(server, fairshareConfig.getMetrics(), entries);
-                ArrayList<FairShareTuple> ftups = new ArrayList<FairShareTuple>(entries.size());
+                ArrayList<FairShareTuple> ftups = new ArrayList<>(entries.size());
                 for (PbsCacheEntry entry : entries) {
                     ftups.add(new FairShareTuple(entry.getKey(), entry.getValue()));
                 }
@@ -238,7 +220,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
                         return t1.getFairshare().compareTo(t2.getFairshare());
                     }
                 });
-                List<String> ranked = new ArrayList<String>(ftups.size());
+                List<String> ranked = new ArrayList<>(ftups.size());
                 for (FairShareTuple ft : ftups) {
                     ranked.add(ft.getUser());
                 }
@@ -272,35 +254,12 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
         return false;
     }
 
-    private static boolean loadMagratheaStates(PbsServerConfig serverConfig, Map<String, String> magratheaStates) {
-        String server = serverConfig.getHost();
-        log.trace("loadMagratheaStates({})", server);
-        try {
-            HttpURLConnection uc = (HttpURLConnection) new URL("http://" + server + ":6666/magrathea").openConnection();
-            JSONArray ja = (JSONArray) new JSONParser(uc.getInputStream()).nextValue();
-            long mez = System.currentTimeMillis() - (30 * 60 * 1000L);
-            for (JSONValue js : ja.getValue()) {
-                JSONObject jo = (JSONObject) js;
-                JSONInteger ji = (JSONInteger) jo.get("timestamp");
-                long timestamp = ji.getValue().longValue();
-                timestamp *= 1000;//prevod na ms
-                String name = ((JSONString) jo.get("name")).getValue();
-                String state = ((JSONString) jo.get("state")).getValue();
-                if (timestamp > mez) {
-                    magratheaStates.put(name, state);
-                }
-            }
-            return true;
-        } catch (Exception ex) {
-            log.error("PbsCacheImpl.loadMagratheaStates() cannot read mapping from " + server, ex);
-        }
-        return false;
-    }
+
 
     static enum ScratchType {local, ssd, pool}
 
     private void loadScratchSizes() {
-        Map<String, Scratch> scratchSizes = new HashMap<String, Scratch>();
+        Map<String, Scratch> scratchSizes = new HashMap<>();
         for (PbsServerConfig server : pbsServers) {
             for (ScratchType scratchType : ScratchType.values()) {
                 loadScratchSizes(server, scratchSizes, scratchType);
@@ -310,6 +269,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
     }
 
     @SuppressWarnings("Java8ReplaceMapGet")
+    //TODO replace with direct call to " list_cache SERVER scratch_TYPE"
     private boolean loadScratchSizes(PbsServerConfig serverConfig, Map<String, Scratch> scratchSizes, ScratchType type) {
         String server = serverConfig.getHost();
         log.trace("loadScratchSizes({},{})", server, type);
@@ -356,7 +316,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
     }
 
     private Map<String, Long> loadNetworkScratchSizes(PbsServerConfig serverConfig) {
-        Map<String, Long> map = new HashMap<String, Long>();
+        Map<String, Long> map = new HashMap<>();
         try {
             log.trace("loadNetworkScratchSizes({})", serverConfig.getHost());
             RestTemplate rt = new RestTemplate();
@@ -378,9 +338,8 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
 
     private void loadMapping() {
         Mapping m = new Mapping();
-        m.setPhysical2virtual(new HashMap<String, List<String>>());
-        m.setVirtual2physical(new HashMap<String, String>());
-        for (PbsServerConfig server : pbsServers) loadMapping(server, m);
+        m.setPhysical2virtual(new HashMap<>());
+        m.setVirtual2physical(new HashMap<>());
         for (Map.Entry<String, List<String>> me : moreMappings.entrySet()) {
             m.getPhysical2virtual().put(me.getKey(), me.getValue());
             for (String vm : me.getValue()) {
@@ -390,36 +349,10 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
         this.mapping = m;
     }
 
-    private Map<String, List<String>> moreMappings = new HashMap<String, List<String>>();
+    private Map<String, List<String>> moreMappings = new HashMap<>();
 
     public void setMoreMappings(Map<String, List<String>> moreMappings) {
         this.moreMappings = moreMappings;
-    }
-
-    private static boolean loadMapping(PbsServerConfig serverConfig, Mapping m) {
-        String server = serverConfig.getHost();
-        log.trace("loadMapping({})", server);
-        HttpURLConnection uc;
-        try {
-            uc = (HttpURLConnection) new URL("http://" + server + ":6666/mapping").openConnection();
-            Mapping mapping2 = (Mapping) JSONMapper.toJava(new JSONParser(uc.getInputStream()).nextValue(), Mapping.class);
-
-            Map<String, List<String>> map = mapping2.getPhysical2virtual();
-            for (String key : map.keySet()) {
-                List<String> virtNames = map.get(key);
-                Collections.sort(virtNames);
-                m.getPhysical2virtual().put(key, virtNames);
-            }
-
-            Map<String, String> map1 = mapping2.getVirtual2physical();
-            for (String key : map1.keySet()) {
-                m.getVirtual2physical().put(key, map1.get(key));
-            }
-            return true;
-        } catch (Exception ex) {
-            log.error("PbsCacheImpl.loadMapping() cannot read mapping from " + server, ex);
-        }
-        return false;
     }
 
 }
