@@ -23,18 +23,9 @@ public class QueuesActionBean extends BaseActionBean {
 
     final static Logger log = LoggerFactory.getLogger(QueuesActionBean.class);
 
-    private List<TextWithCount> duvody;
+    private Map<String,List<TextWithCount>> duvody;
     private Map<String, List<Job>> queueNames2QueuedJobs;
-    private List<Job> plannedJobs;
-    private boolean showFairshare = false;
-
-    public boolean isShowFairshare() {
-        return showFairshare;
-    }
-
-    public void setShowFairshare(boolean showFairshare) {
-        this.showFairshare = showFairshare;
-    }
+    private Map<String,List<Job>> plannedJobs;
 
     @DefaultHandler
     public Resolution list() {
@@ -51,26 +42,28 @@ public class QueuesActionBean extends BaseActionBean {
      */
     public Resolution jobsQueued() {
         log.debug("jobsQueued() started");
-        duvody = pbsky.getReasonsForJobsQueued();
+        duvody = new HashMap<>();
+        for (PBS pbs : pbsky.getPbsky()) {
+            duvody.put(pbs.getServer().getHost(),pbsky.getReasonsForJobsQueued(pbs));
+        }
+
+        plannedJobs = new HashMap<>();
         queueNames2QueuedJobs = new HashMap<>();
         Set<String> userNames = pbsky.getUserNames();
         for (PBS pbs : pbsky.getPbsky()) {
             boolean planbased = pbs.getServerConfig().isPlanbased();
             if(planbased) {
-                Map<String, Integer> rankMap = pbsCache.getRankMapForFairshareIdAndExistingUsers(pbs.getServerConfig().getFairshares().get(0).getId(), userNames);
                 //u rozvrhového plánovače řadit podle planned_start
                 List<Job> queuedJobs = new ArrayList<>(pbs.getJobsQueuedCount());
                 for(Job job : pbs.getJobsById()) {
                     if("Q".equals(job.getState())) {
-                        if(showFairshare) job.setFairshareRank(rankMap.get(job.getUser()));
                         queuedJobs.add(job);
                     }
                 }
-                Collections.sort(queuedJobs, Job.PLANNED_START_JOB_COMPARATOR);
-                plannedJobs = queuedJobs;
+                queuedJobs.sort(Job.PLANNED_START_JOB_COMPARATOR);
+                plannedJobs.put(pbs.getServer().getHost(),queuedJobs);
             } else {
                 //dostat pro kazdou frontu seznam cekajicich uloh serazenych podle fairshare uzivatelu
-
                 for (FairshareConfig fairshare : pbs.getServerConfig().getFairshares()) {
                     Map<String, Integer> rankMap = pbsCache.getRankMapForFairshareIdAndExistingUsers(fairshare.getId(), userNames);
                     if (pbs.getServerConfig().isBy_queue()) {
@@ -86,7 +79,7 @@ public class QueuesActionBean extends BaseActionBean {
                                     }
                                 }
                                 //seradit podle fairshareRank
-                                Collections.sort(queuedJobs, Job.FAIRSHARE_JOB_COMPARATOR);
+                                queuedJobs.sort(Job.FAIRSHARE_JOB_COMPARATOR);
                                 queueNames2QueuedJobs.put(queueName, queuedJobs);
                             }
                         }
@@ -109,7 +102,7 @@ public class QueuesActionBean extends BaseActionBean {
                             }
                         }
                         //seradit podle fairshareRank
-                        Collections.sort(queuedJobs, Job.PRIORITY_FAIRSHARE_JOB_COMPARATOR);
+                        queuedJobs.sort(Job.PRIORITY_FAIRSHARE_JOB_COMPARATOR);
                         queueNames2QueuedJobs.put(fairshare.getId(), queuedJobs);
                     }
                 }
@@ -122,7 +115,7 @@ public class QueuesActionBean extends BaseActionBean {
         return pbsky.getPbsky();
     }
 
-    public List<TextWithCount> getDuvody() {
+    public Map<String, List<TextWithCount>> getDuvody() {
         return duvody;
     }
 
@@ -130,7 +123,7 @@ public class QueuesActionBean extends BaseActionBean {
         return queueNames2QueuedJobs;
     }
 
-    public List<Job> getPlannedJobs() {
+    public Map<String, List<Job>> getPlannedJobs() {
         return plannedJobs;
     }
 }

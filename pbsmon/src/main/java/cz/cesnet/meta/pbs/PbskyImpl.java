@@ -171,34 +171,34 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
             jobs = new ArrayList<>(jobs);
             switch (poradi) {
                 case CPU:
-                    Collections.sort(jobs, jobCPUComparator);
+                    jobs.sort(jobCPUComparator);
                     break;
                 case CPUTime:
-                    Collections.sort(jobs, jobCPUTimeUsedComparator);
+                    jobs.sort(jobCPUTimeUsedComparator);
                     break;
                 case Name:
-                    Collections.sort(jobs, jobNameComparator);
+                    jobs.sort(jobNameComparator);
                     break;
                 case Queue:
-                    Collections.sort(jobs, jobQueueComparator);
+                    jobs.sort(jobQueueComparator);
                     break;
                 case Ctime:
-                    Collections.sort(jobs, jobCtimeComparator);
+                    jobs.sort(jobCtimeComparator);
                     break;
                 case ReservedMemTotal:
-                    Collections.sort(jobs, jobReservedMemTotalComparator);
+                    jobs.sort(jobReservedMemTotalComparator);
                     break;
                 case UsedMem:
-                    Collections.sort(jobs, jobUsedMemComparator);
+                    jobs.sort(jobUsedMemComparator);
                     break;
                 case User:
-                    Collections.sort(jobs, jobUserComparator);
+                    jobs.sort(jobUserComparator);
                     break;
                 case WallTime:
-                    Collections.sort(jobs, jobWallTimeUsedComparator);
+                    jobs.sort(jobWallTimeUsedComparator);
                     break;
                 case State:
-                    Collections.sort(jobs, jobStateComparator);
+                    jobs.sort(jobStateComparator);
                     break;
             }
         }
@@ -216,7 +216,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
         for (PBS pbs : list) {
             nodes.addAll(pbs.getNodesByName());
         }
-        Collections.sort(nodes, nodesNameComparator);
+        nodes.sort(nodesNameComparator);
         return nodes;
     }
 
@@ -298,37 +298,37 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
         //seradit
         switch (usersSortOrder) {
             case name:
-                Collections.sort(users, userNameComparator);
+                users.sort(userNameComparator);
                 break;
             case jobsTotal:
-                Collections.sort(users, userJobsTotalComparator);
+                users.sort(userJobsTotalComparator);
                 break;
             case jobsStateQ:
-                Collections.sort(users, userJobsStateQComparator);
+                users.sort(userJobsStateQComparator);
                 break;
             case jobsStateR:
-                Collections.sort(users, userJobsStateRComparator);
+                users.sort(userJobsStateRComparator);
                 break;
             case jobsStateC:
-                Collections.sort(users, userJobsStateCComparator);
+                users.sort(userJobsStateCComparator);
                 break;
             case jobsOther:
-                Collections.sort(users, userJobsOtherComparator);
+                users.sort(userJobsOtherComparator);
                 break;
             case cpusTotal:
-                Collections.sort(users, userCpusTotalComparator);
+                users.sort(userCpusTotalComparator);
                 break;
             case cpusStateQ:
-                Collections.sort(users, userCpusStateQComparator);
+                users.sort(userCpusStateQComparator);
                 break;
             case cpusStateR:
-                Collections.sort(users, userCpusStateRComparator);
+                users.sort(userCpusStateRComparator);
                 break;
             case cpusStateC:
-                Collections.sort(users, userCpusStateCComparator);
+                users.sort(userCpusStateCComparator);
                 break;
             case cpusOther:
-                Collections.sort(users, userCpusOtherComparator);
+                users.sort(userCpusOtherComparator);
                 break;
             case fairshare:
                 //neni zatim podle ceho tridit
@@ -341,23 +341,21 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     @SuppressWarnings("Convert2streamapi")
     @Override
-    public List<TextWithCount> getReasonsForJobsQueued() {
-        HashMap<String, Integer> pocitadla = new HashMap<>();
-        for (PBS pbs : getPbsky()) {
+    public List<TextWithCount> getReasonsForJobsQueued(PBS pbs) {
+        HashMap<String, Integer> counters = new HashMap<>();
             for (Job job : pbs.getJobsById()) {
                 if ("Q".equals(job.getState())) {
-                    String duvod = job.getComment();
-                    Integer count = pocitadla.get(duvod);
+                    String comment = job.getComment();
+                    Integer count = counters.get(comment);
                     if (count == null) {
                         count = 0;
                     }
-                    pocitadla.put(duvod, count + 1);
+                    counters.put(comment, count + 1);
                 }
             }
-        }
-        List<TextWithCount> duvody = new ArrayList<>(pocitadla.size());
-        for (String duvod : pocitadla.keySet()) {
-            duvody.add(new TextWithCount(duvod, pocitadla.get(duvod)));
+        List<TextWithCount> duvody = new ArrayList<>(counters.size());
+        for (String duvod : counters.keySet()) {
+            duvody.add(new TextWithCount(duvod, counters.get(duvod)));
         }
         Collections.sort(duvody);
         return duvody;
@@ -415,19 +413,19 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     private static Comparator<Job> jobCPUComparator = (o1, o2) -> o2.getNoOfUsedCPU() - o1.getNoOfUsedCPU();
 
-    private static Comparator<Job> jobNameComparator = (o1, o2) -> o1.getJobName().compareTo(o2.getJobName());
+    private static Comparator<Job> jobNameComparator = Comparator.comparing(Job::getJobName);
 
-    private static Comparator<Job> jobUserComparator = (o1, o2) -> o1.getUser().compareTo(o2.getUser());
+    private static Comparator<Job> jobUserComparator = Comparator.comparing(Job::getUser);
 
     private static Comparator<Job> jobCPUTimeUsedComparator = (o1, o2) -> (int) (o2.getCPUTimeUsedSec() - o1.getCPUTimeUsedSec());
 
-    private static Comparator<Job> jobWallTimeUsedComparator = (o1, o2) -> o1.getWalltimeUsed().compareTo(o2.getWalltimeUsed());
+    private static Comparator<Job> jobWallTimeUsedComparator = Comparator.comparing(Job::getWalltimeUsed);
 
-    private static Comparator<Job> jobStateComparator = (o1, o2) -> JobState.valueOf(o1.getState()).compareTo(JobState.valueOf(o2.getState()));
+    private static Comparator<Job> jobStateComparator = Comparator.comparing(o -> JobState.valueOf(o.getState()));
 
-    private static Comparator<Job> jobQueueComparator = (o1, o2) -> o1.getQueueName().compareTo(o2.getQueueName());
+    private static Comparator<Job> jobQueueComparator = Comparator.comparing(Job::getQueueName);
 
-    private static Comparator<Job> jobCtimeComparator = (o1, o2) -> o1.getTimeCreated().compareTo(o2.getTimeCreated());
+    private static Comparator<Job> jobCtimeComparator = Comparator.comparing(Job::getTimeCreated);
 
     private static Comparator<Job> jobUsedMemComparator = (o1, o2) -> {
         long l = o2.getUsedMemoryNum() - o1.getUsedMemoryNum();
@@ -438,7 +436,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
         return (l > 0 ? 1 : (l < 0 ? -1 : 0));
     };
 
-    private static Comparator<User> userNameComparator = (u1, u2) -> u1.getName().compareTo(u2.getName());
+    private static Comparator<User> userNameComparator = Comparator.comparing(User::getName);
 
     private static Comparator<User> userJobsTotalComparator = (u1, u2) -> u2.getJobsTotal() - u1.getJobsTotal();
 

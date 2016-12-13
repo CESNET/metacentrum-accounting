@@ -675,9 +675,11 @@ public class Job extends PbsInfoObject {
     //může obsahovat ten stejný uzel vícekrát díky chunkům
     // sched_nodespec	host=gram9.zcu.cz:ppn=2:mem=716800KB:vmem=137438953472KB:gpu=2:cl_gram:scratch_type=ssd:scratch_volume=400mb:scratch_ssd=400mb+host=doom7.metacentrum.cz:ppn=1:mem=614400KB:vmem=137438953472KB:gpu=1:cl_doom:scratch_type=ssd:scratch_volume=400mb:scratch_ssd=400mb
     // exec_vnode (storm1:scratch_local=10240kb:ngpus=1:mem=409600kb:ncpus=1)+(storm1:scratch_local=102400kb:mem=409600kb:ncpus=1)
+    // estimated.exec_vnode    (tarkil2:ncpus=16:mem=16777216kb:scratch_local=16777216kb)
     public List<Chunk> getChunks() {
         if (chunks == null) {
-            String spec = attrs.get(pbs.isTorque() ? ATTRIBUTE_SCHEDULED_NODES_SPECS : ATTRIBUTE_EXEC_VNODE);
+            String spec = attrs.get(pbs.isTorque() ? ATTRIBUTE_SCHEDULED_NODES_SPECS :
+                    ("Q".equals(getState())? "estimated.exec_vnode" : ATTRIBUTE_EXEC_VNODE));
             if (spec == null) return Collections.emptyList();
             chunks = new ArrayList<>();
             for (String hostString : spec.split("\\+")) {

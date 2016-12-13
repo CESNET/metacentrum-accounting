@@ -26,7 +26,7 @@ public interface Pbsky extends TimeStamped {
 
     List<User> getSortedUsers(UsersSortOrder usersSortOrder);
 
-    List<TextWithCount> getReasonsForJobsQueued();
+    List<TextWithCount> getReasonsForJobsQueued(PBS pbs);
 
     User getUserByName(String userName);
 

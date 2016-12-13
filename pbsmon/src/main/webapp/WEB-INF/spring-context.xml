@@ -15,14 +15,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
     <context:annotation-config/>
     <tx:annotation-driven/>
 
-
     <bean id="pbsConnector" class="cz.cesnet.meta.pbs.PbsConnectorJNI"/>
-
-    <!--
-    pozor, JSON neposila informace o ulohach !
-    <bean id="pbsConnector" class="cz.cesnet.meta.pbs.PbsConnectorJson" scope="singleton">
-    </bean>
-    -->
 
     <bean id="servers" class="java.util.ArrayList">
         <constructor-arg>
@@ -46,8 +39,6 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                         </list>
                     </property>
                 </bean>
-
-                <!--
                 <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
                     <property name="host" value="arien.ics.muni.cz"/>
                     <property name="main" value="false"/>
@@ -84,12 +75,10 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                         </list>
                     </property>
                 </bean>
-                -->
-
             </list>
         </constructor-arg>
     </bean>
-
+    <!--
     <bean id="servers_pbscache" class="java.util.ArrayList">
         <constructor-arg>
             <list value-type="cz.cesnet.meta.pbs.PbsServerConfig">
@@ -132,10 +121,10 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
             </list>
         </constructor-arg>
     </bean>
-
+    -->
 
     <bean id="pbsCache" class="cz.cesnet.meta.pbscache.PbsCacheImpl">
-        <property name="pbsServers" ref="servers_pbscache"/>
+        <property name="pbsServers" ref="servers"/>
         <property name="loadRunTimeInMilliseconds" value="6000"/>
         <property name="moreMappings">
             <map key-type="java.lang.String" value-type="java.util.List">

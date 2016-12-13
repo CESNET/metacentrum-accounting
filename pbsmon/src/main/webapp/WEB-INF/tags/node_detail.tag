@@ -152,15 +152,8 @@
         <c:if test="${node.reserved}">
             <p class="comment"><f:message key="nodejsp_reserved"><f:param value="${node.comment}"/></f:message></p>
         </c:if>
-        <%--<c:if test="${node.enabledHT}">
-            <p class="hyperthreading">
-                <f:message key="nodejsp_ht">
-                    <f:param value="${node.noOfCPUInt}"/>
-                    <f:param value="${node.noOfHTCoresInt}"/>
-                </f:message>
-            </p>
-        </c:if>--%>
-        <!-- bezici ulohy -->
+
+        <!-- ulohy -->
         <br>
         <c:if test="${fn:length(node.jobs)>0 or fn:length(node.plannedJobs)>0}">
             <table class="job">
@@ -177,7 +170,7 @@
                 <tr>
                     <th align="center">RAM</th>
                     <th align="center" colspan="2">scratch</th>
-                    <th align="center"><f:message key="nodejsp_cpu_num"/></th>
+                    <th align="center">CPU</th>
                 </tr>
                 <c:forEach items="${node.jobs}" var="job" varStatus="j">
                 <tr>
@@ -186,7 +179,7 @@
                 <td align="right">${job.nodeName2reservedResources[node.name].mem}</td>
                 <td>${job.nodeName2reservedResources[node.name].scratchType} </td>
                 <td>${job.nodeName2reservedResources[node.name].volume}</td>
-                <td align="center">${job.nodeName2reservedResources[node.name].cpus} CPU</td>
+                <td align="center">${job.nodeName2reservedResources[node.name].cpus}</td>
                 <td>${job.jobName}</td>
                 <td align="center" class="${job.state}">${job.state} - <f:message key='jobs_${job.state}'/></td>
                     <td align="right"><f:formatDate value="${job.timeStarted}" pattern="d.M."/></td>
@@ -203,7 +196,7 @@
                         <td align="right">${job.nodeName2reservedResources[node.name].mem}</td>
                         <td>${job.nodeName2reservedResources[node.name].scratchType} </td>
                         <td>${job.nodeName2reservedResources[node.name].volume}</td>
-                        <td align="center">${job.nodeName2reservedResources[node.name].cpus} CPU</td>
+                        <td align="center">${job.nodeName2reservedResources[node.name].cpus}</td>
                         <td>${job.jobName}</td>
                         <td align="center" class="${job.state}">${job.state} - <f:message key='jobs_${job.state}'/></td>
                         <c:choose>
