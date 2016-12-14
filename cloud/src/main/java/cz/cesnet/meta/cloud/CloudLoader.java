@@ -115,7 +115,7 @@ public class CloudLoader {
             log.warn("adding {} fake physical hosts: ", fakeHosts.size(), fakeHosts);
             physicalHosts.addAll(fakeHosts);
         }
-        Collections.sort(physicalHosts, CloudPhysicalHost.CLOUD_PHYSICAL_HOST_COMPARATOR);
+        physicalHosts.sort(CloudPhysicalHost.CLOUD_PHYSICAL_HOST_COMPARATOR);
     }
 
 
@@ -123,11 +123,7 @@ public class CloudLoader {
         log.debug("prepareVMMap()");
         Map<String, List<CloudVirtualHost>> map = new HashMap<>(virtualHosts.size() * 2);
         for (CloudVirtualHost vm : virtualHosts) {
-            List<CloudVirtualHost> hostVMsList = map.get(vm.getCurrent_host());
-            if (hostVMsList == null) {
-                hostVMsList = new ArrayList<>(1);
-                map.put(vm.getCurrent_host(), hostVMsList);
-            }
+            List<CloudVirtualHost> hostVMsList = map.computeIfAbsent(vm.getCurrent_host(), k -> new ArrayList<>(1));
             hostVMsList.add(vm);
         }
         this.host2VMsMap = map;

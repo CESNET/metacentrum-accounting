@@ -110,6 +110,10 @@ public class RozhodovacStavuStroju {
             return Node.STATE_UNKNOWN;
         }
         stroj.setOpenNebulaManaged(true);
+        //http://docs.opennebula.org/4.14/administration/hosts_and_clusters/host_guide.html#host-life-cycle
+        if(!cloudHost.getState().endsWith("MONITORED")) {
+            return Node.STATE_UNKNOWN;
+        }
         List<CloudVirtualHost> cloudVirtualHosts = cloud.getHostName2VirtualHostsMap().get(cloudHost.getName());
         if (cloudVirtualHosts != null) {
             int cpusAvailable = stroj.getCpuNum();

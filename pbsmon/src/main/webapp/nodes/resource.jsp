@@ -24,8 +24,8 @@
 
         <p><f:message key="${actionBean.resource.popisKey}"/></p>
 
-        <f:message key="${actionBean.resource.specKey}" var="spec"/>
-        <c:if test="${! empty spec}">
+        <f:message key="${actionBean.resource.specKey}" var="chunk"/>
+        <c:if test="${! empty chunk}">
            <p><f:message key="${actionBean.resource.specKey}"/></p>
         </c:if>
 

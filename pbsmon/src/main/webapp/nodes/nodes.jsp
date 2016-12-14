@@ -140,8 +140,8 @@
                             <c:if test="${zdr.cluster}">(${actionBean.cpuMap[zdr.id]} CPU)</c:if>
                             - <f:message key="${zdr.popisKey}"/></td>
                     </tr>
-                    <f:message key="${zdr.specKey}" var="spec"/>
-                    <c:if test="${! empty spec}">
+                    <f:message key="${zdr.specKey}" var="chunk"/>
+                    <c:if test="${! empty chunk}">
                     <tr>
                         <td colspan="2" style="padding-left: 20px; font-size: x-small;"><f:message key="${zdr.specKey}"/></td>
                     </tr>

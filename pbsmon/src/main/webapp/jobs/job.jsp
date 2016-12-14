@@ -39,6 +39,10 @@
          <br>
          <p class="jobwarning"><f:message key="job_underusing_cpus"/></p>
      </c:if>
+     <c:if test="${job.exceedsCPUTime}">
+         <br>
+         <p class="jobwarning"><f:message key="job_exceeds_cputime"/></p>
+     </c:if>
 
     <a name="tblVars"></a><h3><f:message key="tabled_variables"/></h3>
 
@@ -64,7 +68,7 @@
       <td align="right" <c:if test="${job.memoryExceeded}">class="memexceeded"</c:if> >${job.usedMemory}</td>
       <td>${job.jobName}</td>
       <td align="right"><s:link href="/user/${job.user}">${job.user}</s:link></td>
-      <td align="right" <c:if test="${job.underusingCPUs}">class="wasting"</c:if>>${job.CPUTimeUsed}</td>
+      <td align="right" <c:if test="${job.underusingCPUs || job.exceedsCPUTime}">class="wasting"</c:if>>${job.CPUTimeUsed}</td>
       <td align="right">${job.wallTimeUsed}</td>
       <td align="center" class="${job.state}"><t:job_state job="${job}"/></td>
       <td align="center"><s:link beanclass="cz.cesnet.meta.stripes.QueueActionBean"><s:param name="queueName" value="${job.queueName}"/>${job.queueName}</s:link></td>
@@ -176,13 +180,13 @@
                        <th>RAM</th>
                        <th>scratch</th>
                    </tr>
-                   <c:forEach items="${job.chunks}" var="spec">
+                   <c:forEach items="${job.chunks}" var="chunk">
                        <tr>
-                           <td><s:link href="/node/${spec.nodeName}"><c:out value="${actionBean.nodesMap[spec.nodeName].shortName}"/></s:link></td>
-                           <td align="center"><c:out value="${spec.ncpus}"/></td>
-                           <td align="center"><c:out value="${spec.ngpus}"/></td>
-                           <td align="center"><c:out value="${spec.mem}"/></td>
-                           <td><c:out value="${spec.scratchType}"/> <c:out value="${spec.scratchVolume}"/> </td>
+                           <td><s:link href="/node/${chunk.nodeName}"><c:out value="${actionBean.nodesMap[chunk.nodeName].shortName}"/></s:link></td>
+                           <td align="center"><c:out value="${chunk.ncpus}"/></td>
+                           <td align="center"><c:out value="${chunk.ngpus}"/></td>
+                           <td align="center"><c:out value="${chunk.mem}"/></td>
+                           <td><c:out value="${chunk.scratchType}"/> <c:out value="${chunk.scratchVolume}"/> </td>
                        </tr>
                    </c:forEach>
                </table>

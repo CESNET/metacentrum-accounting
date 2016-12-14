@@ -4,6 +4,7 @@ import cz.cesnet.meta.cloud.CloudPhysicalHost;
 import cz.cesnet.meta.pbs.Job;
 import cz.cesnet.meta.pbs.Node;
 import cz.cesnet.meta.pbs.Queue;
+import cz.cesnet.meta.pbsmon.RozhodovacStavuStroju;
 import cz.cesnet.meta.perun.api.Perun;
 import cz.cesnet.meta.perun.api.Stroj;
 import net.sourceforge.stripes.action.*;
@@ -89,7 +90,12 @@ public class QueueActionBean extends BaseActionBean {
                 log.warn("findMachinesForNodes() no machine for machineName {}", machineName);
             }
         }
+        //sort physical machines by name
         Collections.sort(machines);
+        //update their state
+        for (Stroj stroj : machines) {
+            RozhodovacStavuStroju.rozhodniStav(stroj, pbsky, pbsCache.getMapping(), perun.getVyhledavacFrontendu(), perun.getVyhledavacVyhrazenychStroju(), cloud);
+        }
     }
 
     public List<Queue> getDestinations() {

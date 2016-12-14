@@ -490,6 +490,14 @@ public class Job extends PbsInfoObject {
         return getCPUTimeUsedSec() < getNoOfUsedCPU() * walltimeUsed.getSeconds() / 4 * 3;
     }
 
+    public boolean getExceedsCPUTime() {
+        String state = getState();
+        if (!("R".equals(state) || "C".equals(state))) return false;
+        Duration walltimeUsed = getWalltimeUsed();
+        return getCPUTimeUsedSec() > getNoOfUsedCPU() * walltimeUsed.getSeconds();
+    }
+
+
     /**
      * Returns used CPU time in seconds.
      *

@@ -55,6 +55,7 @@ public class NodesActionBean extends BaseActionBean {
      *
      * @return stránka nodes.jsp
      */
+    @SuppressWarnings("unused")
     @DefaultHandler
     public Resolution physical() {
         log.debug("physical({})", ctx.getRequest().getRemoteHost());
@@ -111,6 +112,7 @@ public class NodesActionBean extends BaseActionBean {
         return gpuNodes;
     }
 
+    @SuppressWarnings("unused")
     public Resolution virtual() {
         log.debug("virtual()");
         List<Stroj> vsechnyStroje = this.perun.getMetacentroveStroje();
@@ -156,10 +158,8 @@ public class NodesActionBean extends BaseActionBean {
         }
 
         //rozhodni stav podle virtualnich
-        VyhledavacFrontendu frontendy = perun.getVyhledavacFrontendu();
-        VyhledavacVyhrazenychStroju vyhrazene = perun.getVyhledavacVyhrazenychStroju();
         for (Stroj stroj : fyzicke) {
-            RozhodovacStavuStroju.rozhodniStav(stroj, pbsky, pbsCache.getMapping(), frontendy, vyhrazene, cloud);
+            RozhodovacStavuStroju.rozhodniStav(stroj, pbsky, pbsCache.getMapping(), perun.getVyhledavacFrontendu(), perun.getVyhledavacVyhrazenychStroju(), cloud);
         }
 
         return new ForwardResolution("/nodes/mapping.jsp");

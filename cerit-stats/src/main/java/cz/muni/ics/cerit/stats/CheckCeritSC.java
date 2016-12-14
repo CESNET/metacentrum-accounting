@@ -93,7 +93,7 @@ public class CheckCeritSC {
                     }
                 } else {
                     //neni v PBS
-                    //http://opennebula.org/documentation:archives:rel3.6:host_guide#host_life-cycle
+                    //http://docs.opennebula.org/4.14/administration/hosts_and_clusters/host_guide.html#host-life-cycle
                     String state = host.getState();
                     if ("MONITORING_MONITORED".equals(state)) {
                         state = "MONITORED";
