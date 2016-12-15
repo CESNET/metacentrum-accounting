@@ -24,8 +24,6 @@ public interface PbsCache extends TimeStamped {
      */
     Scratch getScratchForNode(Node node);
 
-    PbsAccess getUserAccess(String userName);
-
     List<FairshareConfig> getFairshareConfigs();
 
     Map<String,Integer> getRankMapForFairshareIdAndExistingUsers(String pbsServer, Set<String> userNames);

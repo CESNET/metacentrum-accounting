@@ -91,43 +91,6 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
         return this.scratchSizes.get(node.getName());
     }
 
-    @Override
-    public PbsAccess getUserAccess(String userName) {
-        PbsAccess p = new PbsAccess();
-        p.setQueues(new ArrayList<>(20));
-        p.setQueueToHostsMap(new HashMap<>());
-        for (PbsServerConfig server : pbsServers) loadPbsAccess(p, server, userName);
-        return p;
-    }
-
-    private void loadPbsAccess(PbsAccess pbsAccess, PbsServerConfig serverConfig, String userName) {
-        String server = serverConfig.getHost();
-        log.debug("loadPbsAccess({},{})", server, userName);
-        try {
-            HttpURLConnection uc = (HttpURLConnection)
-                    new URL("http://" + server + ":6666/pbsaccess?user=" + userName).openConnection();
-            PbsAccess pb2 = (PbsAccess) JSONMapper.toJava(new JSONParser(uc.getInputStream()).nextValue(), PbsAccess.class);
-
-            if (serverConfig.isMain()) {
-                //spojit fronty
-                pbsAccess.getQueues().addAll(pb2.getQueues());
-                //spojit mapovani fronty na uzly
-                pbsAccess.getQueueToHostsMap().putAll(pb2.getQueueToHostsMap());
-            } else {
-                //String pripona = "@" + PbsUtils.substringBefore(server, '.');
-                String pripona = "@" + server;
-                for (String queue : pb2.getQueues()) {
-                    pbsAccess.getQueues().add(queue + pripona);
-                }
-                for (String queue : pb2.getQueueToHostsMap().keySet()) {
-                    pbsAccess.getQueueToHostsMap().put(queue + pripona, pb2.getQueueToHostsMap().get(queue));
-                }
-            }
-        } catch (Exception ex) {
-            log.error("cannot load user access for " + userName + " from " + server);
-            log.error(ex.getClass().getCanonicalName() + ": " + ex.getMessage());
-        }
-    }
 
     public PbsCacheImpl() {
     }
@@ -227,7 +190,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
     }
 
 
-    private static boolean loadMetrics(PbsServerConfig serverConfig, String metrics, List<PbsCacheEntry> entries) {
+    private static void loadMetrics(PbsServerConfig serverConfig, String metrics, List<PbsCacheEntry> entries) {
         String server = serverConfig.getHost();
         log.trace("loadMetrics({},{})", server, metrics);
         File tempFile=null;
@@ -240,7 +203,10 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
                     .directory(Paths.get(System.getProperty("java.io.tmpdir", "/tmp")).toFile())
                     .start();
             int exit = p.waitFor();
-            System.out.println("exit = " + exit);
+            if(exit!=0) {
+                log.error("list_cache {} {} failed with exit status {}",server,metrics,exit);
+                return;
+            }
 
             List<String> lines = Files.readAllLines(tempFile.toPath(), Charset.defaultCharset());
             Pattern linePattern = Pattern.compile("^([^\\t]+)\\t(\\d+)\\t(.+)");
@@ -252,11 +218,10 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
                     String value = m.group(3);
                     entries.add(new PbsCacheEntry(key, value, timestamp));
                 } else {
-                    return false;
+                    log.error("Line from {} {} does not parse: '{}'",server,metrics,line);
+                    return;
                 }
             }
-
-            return true;
         } catch (Exception ex) {
             log.error("cannot read pbs_cache metrics " + metrics + " from server " + server, ex);
         } finally {
@@ -264,8 +229,6 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
                 log.warn("Cannot delete file " + tempFile);
             }
         }
-
-        return false;
     }
 
 
@@ -285,7 +248,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
 
     private boolean loadScratchSizes(PbsServerConfig serverConfig, Map<String, Scratch> scratchSizes, ScratchType type) {
         String server = serverConfig.getHost();
-        log.trace("loadScratchSizes({},{})", server, type);
+        //log.trace("loadScratchSizes({},{})", server, type);
         Map<String, Long> pools = null;
         if (type == ScratchType.pool) {
             pools = loadNetworkScratchSizes(serverConfig);

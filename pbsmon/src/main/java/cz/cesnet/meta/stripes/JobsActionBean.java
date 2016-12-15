@@ -2,7 +2,6 @@ package cz.cesnet.meta.stripes;
 
 import cz.cesnet.meta.acct.Accounting;
 import cz.cesnet.meta.pbs.*;
-import cz.cesnet.meta.pbscache.PbsAccess;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 import org.slf4j.Logger;
@@ -78,7 +77,7 @@ public class JobsActionBean extends BaseActionBean {
         warnings = new LinkedHashMap<>(40);
         suspiciousJobs = new HashMap<>(40);
         //ziskame ulohy
-        for (PBS pbs : pbsky.getPbsky()) {
+        for (PBS pbs : pbsky.getListOfPBS()) {
             for (Job job : pbs.getJobsById()) {
                 //pocty CPU uloh
                 PbsUtils.updateCount(jobsCPU, job.getNoOfUsedCPU(), 1);
@@ -307,16 +306,12 @@ public class JobsActionBean extends BaseActionBean {
     public Resolution my() throws UnsupportedEncodingException {
         HttpServletRequest request = ctx.getRequest();
         HttpSession session = request.getSession(true);
-        PbsAccess pbsAccess;
         if (user != null) {
             //prichazime z Osobniho, nastavit
-            pbsAccess = pbsCache.getUserAccess(user);
             session.setAttribute(PersonActionBean.PERSON, user);
-            session.setAttribute(PersonActionBean.ACCESS, pbsAccess);
         } else {
-            pbsAccess = (PbsAccess) session.getAttribute(PersonActionBean.ACCESS);
             user = (String) session.getAttribute(PersonActionBean.PERSON);
-            if (pbsAccess == null) {
+            if (user == null) {
                 //nic nevime, poslat na Osobni, at nam povi, kdo to je
                 String backurl = request.getScheme() + "://" + request.getServerName()
                         + ":" + request.getServerPort() + request.getContextPath() + "/jobs/my";
@@ -337,7 +332,7 @@ public class JobsActionBean extends BaseActionBean {
 
     public Resolution missingStarted() {
         HashSet<String> startedJobIdsSet = new HashSet<>(accounting.getStartedJobIds());
-        for (PBS pbs : pbsky.getPbsky()) {
+        for (PBS pbs : pbsky.getListOfPBS()) {
             for (Job job : pbs.getJobsById()) {
                 startedJobIdsSet.remove(job.getId());
             }

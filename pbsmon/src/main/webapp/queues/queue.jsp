@@ -44,13 +44,13 @@
  <c:if test="${q.aclGroupsEnabled}">
         <tr>
             <th><img src="${pageContext.request.contextPath}/img/lock.png" alt="locked" />  <f:message key="jobs_locked_groups"/></th>
-            <td><c:forEach var="g" items="${q.aclGroupsArray}"><c:out value="${g}" /> </c:forEach></td>
+            <td><c:forEach var="group" items="${q.aclGroupsArray}"><s:link href="/group/${q.pbs.server.host}/${group}">${group}</s:link> </c:forEach></td>
         </tr>
  </c:if>
  <c:if test="${q.aclHostsEnabled}">
         <tr>
             <th><img src="${pageContext.request.contextPath}/img/lock.png" alt="locked" />  <f:message key="jobs_locked_hosts"/></th>
-            <td><c:forEach var="g" items="${q.aclHostsArray}"><c:out value="${g}" /> </c:forEach></td>
+            <td><c:forEach var="host" items="${q.aclHostsArray}"><c:out value="${host}" /> </c:forEach></td>
         </tr>
  </c:if>
     </table>

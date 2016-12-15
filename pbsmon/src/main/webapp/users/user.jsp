@@ -6,7 +6,6 @@
 <%@ taglib prefix="s" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="h" uri="http://stripes.sourceforge.net/stripes.tld" %>
 
 <s:useActionBean beanclass="cz.cesnet.meta.stripes.UserActionBean" var="actionBean"/>
 <f:message var="titlestring" key="user.titul" scope="request"><f:param value="${actionBean.userName}"/></f:message>

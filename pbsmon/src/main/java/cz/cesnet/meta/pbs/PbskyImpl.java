@@ -43,8 +43,8 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     }
 
     @Override
-    public List<PBS> getPbsky() {
-        //obsahuje checkLoad(), takze neni potreba tam, kde se volaji getPbsky()
+    public List<PBS> getListOfPBS() {
+        //obsahuje checkLoad(), takze neni potreba tam, kde se volaji getListOfPBS()
         checkLoad();
         return pbsky;
     }
@@ -133,7 +133,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     }
 
     private synchronized List<Job> getAllJobs() {
-        List<PBS> list = getPbsky();
+        List<PBS> list = getListOfPBS();
         if (allJobs == null) {
             int jobCount = 0;
             for (PBS pbs : list) {
@@ -156,7 +156,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     @Override
     public Job getJobByName(String jobName) {
-        for (PBS pbs : getPbsky()) {
+        for (PBS pbs : getListOfPBS()) {
             Job job = pbs.getJobs().get(jobName);
             if (job != null) return job;
         }
@@ -208,7 +208,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     @Override
     public List<Node> getAllNodes() {
         int nodeCount = 0;
-        List<PBS> list = getPbsky();
+        List<PBS> list = getListOfPBS();
         for (PBS pbs : list) {
             nodeCount += pbs.getNodesByName().size();
         }
@@ -232,7 +232,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     }
 
     public User getUserByName(String userName) {
-        return getUserByName(userName, getPbsky());
+        return getUserByName(userName, getListOfPBS());
     }
 
     @Override
@@ -248,7 +248,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     @Override
     public Node getNodeByName(String nodeName) {
-        for (PBS pbs : getPbsky()) {
+        for (PBS pbs : getListOfPBS()) {
             Node node = pbs.getNodes().get(nodeName);
             if (node != null) return node;
         }
@@ -257,7 +257,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     @Override
     public Node getNodeByFQDN(String fqdn) {
-        for (PBS pbs : getPbsky()) {
+        for (PBS pbs : getListOfPBS()) {
             Node node = pbs.getFqdnToNodeMap().get(fqdn);
             if (node != null) return node;
         }
@@ -267,7 +267,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     @Override
     public int getJobsQueuedCount() {
         int total = 0;
-        for (PBS pbs : getPbsky()) {
+        for (PBS pbs : getListOfPBS()) {
             total += pbs.getJobsQueuedCount();
         }
         return total;
@@ -283,14 +283,14 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     @Override
     public Set<String> getUserNames() {
-        return getUserNames(getPbsky());
+        return getUserNames(getListOfPBS());
     }
 
 
     @Override
     public List<User> getSortedUsers(UsersSortOrder usersSortOrder) {
         //spojit udaje ze vsech PBSek
-        List<PBS> list = getPbsky();
+        List<PBS> list = getListOfPBS();
         List<User> users = new ArrayList<>();
         for (String userName : getUserNames(list)) {
             users.add(getUserByName(userName, list));

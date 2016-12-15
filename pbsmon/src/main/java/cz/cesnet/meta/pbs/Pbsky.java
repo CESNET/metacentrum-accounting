@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public interface Pbsky extends TimeStamped {
 
-    List<PBS> getPbsky();
+    List<PBS> getListOfPBS();
 
     Queue getQueueByName(String queueName);
 
@@ -31,6 +31,8 @@ public interface Pbsky extends TimeStamped {
     User getUserByName(String userName);
 
     List<Job> getUserJobs(String userName, JobsSortOrder sort);
+
+
 
     Node getNodeByName(String nodeName);
 

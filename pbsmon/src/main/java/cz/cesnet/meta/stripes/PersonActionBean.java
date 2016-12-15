@@ -2,7 +2,6 @@ package cz.cesnet.meta.stripes;
 
 import cz.cesnet.meta.pbs.*;
 import cz.cesnet.meta.pbs.Queue;
-import cz.cesnet.meta.pbscache.PbsAccess;
 import cz.cesnet.meta.pbscache.PbsCache;
 import cz.cesnet.meta.pbscache.Scratch;
 import net.sourceforge.stripes.action.*;
@@ -41,7 +40,9 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
     @SpringBean("pbsky")
     protected Pbsky pbsky;
 
-    static final String ACCESS = "access";
+    @SpringBean("userAccess")
+    UserAccess userAccess;
+
     static final String PERSON = "person";
 
     private String user;
@@ -65,8 +66,6 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
     List<String> props;
     Map<String,Set<String>> resourceValues;
 
-
-    PbsAccess pbsAccess;
 
     @DefaultHandler
     public Resolution show() throws UnsupportedEncodingException {
@@ -94,13 +93,10 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
 
             if (user != null) {
                 //prichazime z Osobniho, nastavit
-                pbsAccess = pbsCache.getUserAccess(user);
                 session.setAttribute(PERSON, user);
-                session.setAttribute(ACCESS, pbsAccess);
             } else {
-                pbsAccess = (PbsAccess) session.getAttribute(ACCESS);
                 user = (String) session.getAttribute(PERSON);
-                if (pbsAccess == null) {
+                if (user == null) {
                     //nic nevime, poslat na Osobni, at nam povi, kdo to je
                     String backurl = request.getScheme() + "://" + request.getServerName()
                             + ":" + request.getServerPort() + request.getContextPath() + "/person";
@@ -114,21 +110,17 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
             //a seznam resources
             q2n = new HashMap<>();
             resourceValues = new HashMap<>();
-            for (String qname : pbsAccess.getQueues()) {
-                Queue q = pbsky.getQueueByName(qname);
+            for (Queue q : userAccess.getUserQueues(user)) {
                 queues.add(q);
                 //budeme předpokládat, že uživatel může na všechny uzly fronty, do které může
                 List<Node> nodes = q.getPbs().getQueueToNodesMap().get(q.getName());
-                q2n.put(qname, nodes);
+                q2n.put(q.getName(), nodes);
                 //resources
                 for(Node node : nodes) {
                     Map<String, String> nodeResources = node.getResources();
                     for (String r : nodeResources.keySet()) {
-                        Set<String> values = resourceValues.get(r);
-                        if(values==null) {
-                            values = new TreeSet<>();
-                            resourceValues.put(r,values);
-                        }
+                        //pro sestavovač Torque
+                        Set<String> values = resourceValues.computeIfAbsent(r, k -> new TreeSet<>());
                         if (!r.equals("mem") && !r.equals("vmem") && !r.startsWith("scratch")) {
                             values.add(nodeResources.get(r));
                         }
@@ -136,7 +128,7 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
                 }
             }
             //sort
-            Collections.sort(queues, (q1, q2) -> {
+            queues.sort((q1, q2) -> {
                 if (q1 == null) {
                     log.error("q1 is null");
                     return +1;
@@ -568,14 +560,8 @@ public class PersonActionBean extends BaseActionBean implements ValidationErrorH
             for (Node node : pbsky.getAllNodes()) {
                 propSet.addAll(Arrays.asList(node.getProperties()));
             }
-            Iterator<String> iterator = propSet.iterator();
-            while (iterator.hasNext()) {
-                String prop = iterator.next();
-                //omit properties not intended for users
-                if (prop.startsWith("q_") || prop.startsWith("max_") || prop.startsWith("min_") || OMIT_PROPERTIES.contains(prop)) {
-                    iterator.remove();
-                }
-            }
+            //omit properties not intended for users
+            propSet.removeIf(prop -> prop.startsWith("q_") || prop.startsWith("max_") || prop.startsWith("min_") || OMIT_PROPERTIES.contains(prop));
             props = new ArrayList<>(propSet);
             Collections.sort(props);
         }

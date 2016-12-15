@@ -20,7 +20,7 @@ public class StoragesDiskArrayMotdImpl extends RefreshLoader implements Storages
     private StoragesInfo storagesInfo;
 
     public StoragesDiskArrayMotdImpl() {
-        setDataMaxAgeInMilliseconds(3600 * 1000l);
+        setDataMaxAgeInMilliseconds(3600 * 1000L);
     }
 
     public void setFile(String file) {
@@ -37,8 +37,8 @@ public class StoragesDiskArrayMotdImpl extends RefreshLoader implements Storages
     protected void load() {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            String line = null;
-            List<Storage> storages = new ArrayList<Storage>();
+            String line;
+            List<Storage> storages = new ArrayList<>();
 
             while ((line = in.readLine()) != null) {
                 String[] strings = line.split(" ");

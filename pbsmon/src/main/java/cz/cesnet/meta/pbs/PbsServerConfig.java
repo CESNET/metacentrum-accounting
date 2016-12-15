@@ -15,6 +15,7 @@ public class PbsServerConfig {
     private boolean torque = true;
     private boolean by_queue;
     private List<FairshareConfig> fairshares;
+    private String groupFile;
     /**
      * If true, server uses plan-based scheduler, thus waiting jobs are sorted by planned_start instead of by queue priority and fairshare.
      */
@@ -73,6 +74,14 @@ public class PbsServerConfig {
 
     public void setFairshares(List<FairshareConfig> fairshares) {
         this.fairshares = fairshares;
+    }
+
+    public String getGroupFile() {
+        return groupFile;
+    }
+
+    public void setGroupFile(String groupFile) {
+        this.groupFile = groupFile;
     }
 
     @Override

@@ -43,14 +43,14 @@ public class QueuesActionBean extends BaseActionBean {
     public Resolution jobsQueued() {
         log.debug("jobsQueued() started");
         duvody = new HashMap<>();
-        for (PBS pbs : pbsky.getPbsky()) {
+        for (PBS pbs : pbsky.getListOfPBS()) {
             duvody.put(pbs.getServer().getHost(),pbsky.getReasonsForJobsQueued(pbs));
         }
 
         plannedJobs = new HashMap<>();
         queueNames2QueuedJobs = new HashMap<>();
         Set<String> userNames = pbsky.getUserNames();
-        for (PBS pbs : pbsky.getPbsky()) {
+        for (PBS pbs : pbsky.getListOfPBS()) {
             boolean planbased = pbs.getServerConfig().isPlanbased();
             if(planbased) {
                 //u rozvrhového plánovače řadit podle planned_start
@@ -112,7 +112,7 @@ public class QueuesActionBean extends BaseActionBean {
     }
 
     public List<PBS> getPbs() {
-        return pbsky.getPbsky();
+        return pbsky.getListOfPBS();
     }
 
     public Map<String, List<TextWithCount>> getDuvody() {

@@ -53,6 +53,10 @@
                 value="${actionBean.cloudPhysicalHost.hostname}"/></f:message></p>
         <table class="zakladni">
             <tr>
+                <th>Stav v OpenNebule</th>
+                <td>${actionBean.cloudPhysicalHost.state}</td>
+            </tr>
+            <tr>
                 <th>CPU v Perunovi</th>
                 <td>${actionBean.perunMachine.cpuNum} CPU</td>
             </tr>
@@ -64,7 +68,13 @@
                 <th>Rezervovaných CPU</th>
                 <td>${actionBean.cloudPhysicalHost.cpuReservedString} CPU</td>
             </tr>
+            <tr>
+                <th>CPU info</th>
+                <td>${actionBean.cloudPhysicalHost.cpu_info}</td>
+            </tr>
         </table>
+
+
         <% if (actionBean.getCloudVirtualHosts() != null && !actionBean.getCloudVirtualHosts().isEmpty()) { %>
 
         <p><f:message key="machine_jsp_cloud_vms"/></p>

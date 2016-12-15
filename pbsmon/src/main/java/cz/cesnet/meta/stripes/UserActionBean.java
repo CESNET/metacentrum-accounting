@@ -51,12 +51,8 @@ public class UserActionBean extends BaseActionBean {
         }
         try {
             perunUser = perun.getUserByName(userName);
-            if (perunUser.getPublications().get(METACENTRUM) == null) {
-                perunUser.getPublications().put(METACENTRUM, 0);
-            }
-            if (perunUser.getPublications().get(CERIT_SC) == null) {
-                perunUser.getPublications().put(CERIT_SC, 0);
-            }
+            perunUser.getPublications().putIfAbsent(METACENTRUM, 0);
+            perunUser.getPublications().putIfAbsent(CERIT_SC, 0);
         } catch (Exception ex) {
             log.warn("Nemohu nacist PerunUser {} kvuli {} ", userName, ex.getMessage());
             return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND, "User not found.");
@@ -86,11 +82,7 @@ public class UserActionBean extends BaseActionBean {
         jobInfosByQueue = new HashMap<String, JobsInfo>();
         for(Job job : jobs) {
             String queueName = job.getQueueName();
-            List<Job> qjobs = jobsByQueue.get(queueName);
-            if(qjobs==null) {
-                qjobs = new ArrayList<Job>();
-                jobsByQueue.put(queueName, qjobs);
-            }
+            List<Job> qjobs = jobsByQueue.computeIfAbsent(queueName, k -> new ArrayList<>());
             qjobs.add(job);
         }
         usedQueueNames = new ArrayList<String>(jobsByQueue.keySet());

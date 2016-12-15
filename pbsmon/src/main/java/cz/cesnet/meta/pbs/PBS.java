@@ -272,6 +272,7 @@ public class PBS implements TimeStamped {
                     user.addCpusStateR(job.getNoOfUsedCPU());
                     break;
                 case "C":
+                case "F":
                     user.incJobsStateC();
                     user.addCpusStateC(job.getNoOfUsedCPU());
                     break;
@@ -294,7 +295,7 @@ public class PBS implements TimeStamped {
             for (Job job : queueToJobsMap.get(queue.getName())) {
                 total++;
                 String state = job.getState();
-                if ("C".equals(state)) {
+                if ("C".equals(state)||"F".equals(state)) {
                     completed++;
                 } else if ("R".equals(state)) {
                     running++;

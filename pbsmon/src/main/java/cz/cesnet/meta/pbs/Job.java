@@ -484,16 +484,24 @@ public class Job extends PbsInfoObject {
     @SuppressWarnings("SimplifiableIfStatement")
     public boolean isUnderusingCPUs() {
         String state = getState();
-        if (!("R".equals(state) || "C".equals(state))) return false;
+        if (!("R".equals(state) || "C".equals(state)|| "F".equals(state))) return false;
         Duration walltimeUsed = getWalltimeUsed();
+        if(walltimeUsed==null) {
+            log.warn("Job {} has no walltime in state {}",this.getId(),this.getState());
+            return false;
+        }
         if (walltimeUsed.compareTo(Duration.ofMinutes(5)) < 0) return false;
         return getCPUTimeUsedSec() < getNoOfUsedCPU() * walltimeUsed.getSeconds() / 4 * 3;
     }
 
     public boolean getExceedsCPUTime() {
         String state = getState();
-        if (!("R".equals(state) || "C".equals(state))) return false;
+        if (!("R".equals(state) || "C".equals(state)|| "F".equals(state))) return false;
         Duration walltimeUsed = getWalltimeUsed();
+        if(walltimeUsed==null) {
+            log.warn("Job {} has no walltime in state {}",this.getId(),this.getState());
+            return false;
+        }
         return getCPUTimeUsedSec() > getNoOfUsedCPU() * walltimeUsed.getSeconds();
     }
 
@@ -851,9 +859,9 @@ public class Job extends PbsInfoObject {
 
                     ReservedResources reservedResources = nodeName2reservedResources.get(chunkNodeName);
                     if (reservedResources == null) { //první chunk na stroji
-                        reservedResources = new ReservedResources(chunkScratchType, chunkScratchVolume, chunkMemBytes, chunkCpus);
+                        reservedResources = new ReservedResources(this,chunkNodeName,chunkScratchType, chunkScratchVolume, chunkMemBytes, chunkCpus);
                     } else { //další chunk na stejném stroji, přičíst k předešlému
-                        reservedResources = new ReservedResources(
+                        reservedResources = new ReservedResources(this,chunkNodeName,
                                 chunkScratchType.equals(reservedResources.getScratchType()) ? chunkScratchType : "mixed",
                                 chunkScratchVolume + reservedResources.getScratchVolumeBytes(),
                                 chunkMemBytes + reservedResources.getMemBytes(),
@@ -868,16 +876,28 @@ public class Job extends PbsInfoObject {
     }
 
     public static class ReservedResources {
-        private String scratchType;
-        private long scratchVolumeBytes;
-        private long memBytes;
-        private int cpus;
+        private final Job job;
+        private final String nodeName;
+        private final String scratchType;
+        private final long scratchVolumeBytes;
+        private final long memBytes;
+        private final int cpus;
 
-        public ReservedResources(String scratchType, long scratchVolumeBytes, long memBytes, int cpus) {
+        public ReservedResources(Job job, String nodeName, String scratchType, long scratchVolumeBytes, long memBytes, int cpus) {
+            this.job = job;
+            this.nodeName = nodeName;
             this.scratchType = scratchType;
             this.scratchVolumeBytes = scratchVolumeBytes;
             this.memBytes = memBytes;
             this.cpus = cpus;
+        }
+
+        public Job getJob() {
+            return job;
+        }
+
+        public String getNodeName() {
+            return nodeName;
         }
 
         public String getScratchType() {

@@ -60,14 +60,14 @@
 
 <a name="group2node"><h3><f:message key="props_group2node"/></h3></a>
 <table>
- <c:forEach items="${actionBean.propsGroupMap}" var="g">
- <tr><td>${g.key}</td></tr>
+ <c:forEach items="${actionBean.propsGroupMap}" var="host">
+ <tr><td>${host.key}</td></tr>
  <tr>
   <td>
   <c:set var="numinrow" value="${0}"/>
   <table class="nodes" cellspacing="0" border="0">
   <tr>
-  <c:forEach items="${g.value}" var="node">
+  <c:forEach items="${host.value}" var="node">
      <c:if test="${numinrow==8}">
          <c:set var="numinrow" value="${0}"/>
          </tr><tr>

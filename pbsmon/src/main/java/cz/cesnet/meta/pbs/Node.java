@@ -491,6 +491,10 @@ public class Node extends PbsInfoObject {
     }
 
 
+    /**
+     * Gets jobs listed in the "jobs" attribute of node.
+     * @return list of jobs
+     */
     public List<Job> getJobs() {
         if (jobs == null) {
             String[] jobIds = getJobIds();
@@ -619,14 +623,19 @@ public class Node extends PbsInfoObject {
         scratch.setLocalSize(getStatus("scratch_local"));
         long allocatedSsd = 0L;
         long allocatedLocal = 0L;
-        for (Job.ReservedResources reservedResources : this.getReservedScratches()) {
-            switch (reservedResources.getScratchType()) {
-                case "ssd":
-                    allocatedSsd += reservedResources.getScratchVolumeBytes();
-                    break;
-                case "local":
-                    allocatedLocal += reservedResources.getScratchVolumeBytes();
-                    break;
+        for (Job.ReservedResources reservedResources : this.getResourcesReservedByJobs()) {
+            String scratchType = reservedResources.getScratchType();
+            if(scratchType==null) {
+                log.warn("Node {} job-reserved resource {}-{} scratchType is null!",this.getName(),reservedResources.getNodeName(),reservedResources.getJob().getId());
+            } else {
+                switch (scratchType) {
+                    case "ssd":
+                        allocatedSsd += reservedResources.getScratchVolumeBytes();
+                        break;
+                    case "local":
+                        allocatedLocal += reservedResources.getScratchVolumeBytes();
+                        break;
+                }
             }
         }
         scratch.setSsdReservedByJobs(allocatedSsd);
@@ -649,7 +658,7 @@ public class Node extends PbsInfoObject {
         scratch.setSharedReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_shared")));
     }
 
-    public List<Job.ReservedResources> getReservedScratches() {
+    private List<Job.ReservedResources> getResourcesReservedByJobs() {
         List<Job.ReservedResources> list = new ArrayList<>();
         for (Job job : this.getJobs()) {
             Job.ReservedResources reservedResources = job.getNodeName2reservedResources().get(this.getName());

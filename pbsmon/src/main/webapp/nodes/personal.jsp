@@ -40,8 +40,6 @@
 
     <p><a href="https://metavo.metacentrum.cz/${pageContext.request.locale}/myaccount/kvoty"><f:message key="nodes_jsp_person_quotas_link"/></a>.</p>
 
-    <p><s:link beanclass="cz.cesnet.meta.stripes.PersonActionBean"><f:message key="nodes_jsp_personlink_link"/></s:link>.</p>
-
 <h3><f:message key="person_sestavovac"/></h3>
 <div style="border: 1px solid blue; background-color: azure; margin: 10px; padding: 1em;">
     <s:form beanclass="cz.cesnet.meta.stripes.PersonActionBean" method="post">
@@ -151,6 +149,7 @@
          </c:forEach>
         </table>
 
+<%--
         <c:forEach items="${actionBean.queues}" var="q">
          <c:set var="nodes" value="${actionBean.q2n[q.name]}" scope="request" />
          <h3><f:message key="person_hosts_h3" ><f:param value="${actionBean.user}" /><f:param value="${q.name}" /></f:message></h3>
@@ -168,7 +167,10 @@
         </c:forEach>
 
 
-<h2><f:message key="nodes_jsp_barvy"/></h2>
-<jsp:include page="node_states_table.jsp" />
+        <h2><f:message key="nodes_jsp_barvy"/></h2>
+        <jsp:include page="node_states_table.jsp" />
+--%>
+
+
             </s:layout-component>
 </s:layout-render>
