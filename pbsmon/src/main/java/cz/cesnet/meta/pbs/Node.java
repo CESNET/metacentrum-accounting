@@ -625,9 +625,7 @@ public class Node extends PbsInfoObject {
         long allocatedLocal = 0L;
         for (Job.ReservedResources reservedResources : this.getResourcesReservedByJobs()) {
             String scratchType = reservedResources.getScratchType();
-            if(scratchType==null) {
-                log.warn("Node {} job-reserved resource {}-{} scratchType is null!",this.getName(),reservedResources.getNodeName(),reservedResources.getJob().getId());
-            } else {
+            if (scratchType != null) {
                 switch (scratchType) {
                     case "ssd":
                         allocatedSsd += reservedResources.getScratchVolumeBytes();
