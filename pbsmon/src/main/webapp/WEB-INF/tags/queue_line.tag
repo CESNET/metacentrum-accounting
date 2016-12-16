@@ -10,7 +10,6 @@
     <td><c:if test="${queue.locked}"><s:link href="/queues/list" anchor="urceni"><img border="0" src="${pageContext.request.contextPath}/img/lock.png" alt="locked" title="<f:message key="queue_line_tag_locked"/>: ${queue.lockedFor}"/></s:link></c:if></td>
     <td>${queue.priority}</td>
     <td> ${(empty queue.walltimeMin) ? 0 : queue.walltimeMin} - ${(empty queue.walltimeMax) ? 0 : queue.walltimeMax }</td>
-    <td><c:if test="${! empty queue.requiredProperty}"><s:link href="/props" anchor="${queue.requiredProperty}">${queue.requiredProperty}</s:link></c:if></td>
     <td>${queue.jobsQueued}</td>
     <td>${queue.jobsRunning} / ${queue.maxRunningJobs}</td>
     <td>${queue.jobsCompleted}</td>

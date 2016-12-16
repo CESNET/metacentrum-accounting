@@ -261,7 +261,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
                 String nodename = pce.getKey();
                 Scratch scratch = scratchSizes.get(nodename);
                 if (scratch == null) {
-                    scratch = new Scratch();
+                    scratch = new Scratch(nodename);
                     scratchSizes.put(nodename, scratch);
                 }
                 if (type == ScratchType.local) {

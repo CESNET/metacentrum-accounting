@@ -56,9 +56,7 @@ public class PbsServerConfig {
         this.torque = torque;
     }
 
-    public boolean isPBSPro() {
-        return ! isTorque();
-    }
+
 
     public boolean isBy_queue() {
         return by_queue;

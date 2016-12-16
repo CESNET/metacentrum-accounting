@@ -14,6 +14,8 @@ import java.util.Set;
  */
 public interface Pbsky extends TimeStamped {
 
+    List<PbsServerConfig> getPbsServerConfigs();
+
     List<PBS> getListOfPBS();
 
     Queue getQueueByName(String queueName);

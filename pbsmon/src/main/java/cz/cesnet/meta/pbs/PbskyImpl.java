@@ -31,6 +31,11 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
         this.pbsServers = pbsServers;
     }
 
+    @Override
+    public List<PbsServerConfig> getPbsServerConfigs() {
+        return pbsServers;
+    }
+
     public void setPbsCache(PbsCache pbsCache) {
         this.pbsCache = pbsCache;
     }

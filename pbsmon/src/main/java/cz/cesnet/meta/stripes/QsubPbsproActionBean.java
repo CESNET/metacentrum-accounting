@@ -21,18 +21,20 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Sestavovač qsub pro Torque.
+ * Sestavovač qsub pro PBSPro.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: PersonActionBean.java,v 1.17 2014/10/17 12:33:03 makub Exp $
  */
 @SuppressWarnings("unused") //methods are accessed by Stripes through reflection
-@UrlBinding("/qsub_torque")
-public class QsubTorqueActionBean extends BaseActionBean implements ValidationErrorHandler {
+@UrlBinding(QsubPbsproActionBean.URI_BINDING)
+public class QsubPbsproActionBean extends BaseActionBean implements ValidationErrorHandler {
 
-    final static Logger log = LoggerFactory.getLogger(QsubTorqueActionBean.class);
+    final static Logger log = LoggerFactory.getLogger(QsubPbsproActionBean.class);
 
-    public static final String PERSONALIZE_URL = "https://metavo.metacentrum.cz/osobniv3/personal/personalize?backurl=";
+    private static final String PERSONALIZE_URL = "https://metavo.metacentrum.cz/osobniv3/personal/personalize?backurl=";
+    private static final String JSP_PAGE = "/nodes/qsub_pbspro.jsp";
+    public static final String URI_BINDING = "/qsub_pbspro";
+    private static final String CPU_FLAG = "cpu_flag";
 
     @SpringBean("pbsCache")
     protected PbsCache pbsCache;
@@ -64,7 +66,7 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
     List<Queue> queues;
     List<Queue> offerQueues;
     List<String> props;
-    Map<String,Set<String>> resourceValues;
+    Map<String, Set<String>> resourceValues;
 
 
     @DefaultHandler
@@ -72,7 +74,7 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
         log.debug("show()");
         Resolution r = data();
         if (r != null) return r;
-        return new ForwardResolution("/nodes/qsub_torque.jsp");
+        return new ForwardResolution(JSP_PAGE);
     }
 
     @Override
@@ -99,7 +101,7 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
                 if (user == null) {
                     //nic nevime, poslat na Osobni, at nam povi, kdo to je
                     String backurl = request.getScheme() + "://" + request.getServerName()
-                            + ":" + request.getServerPort() + request.getContextPath() + "/qsub_torque";
+                            + ":" + request.getServerPort() + request.getContextPath() + URI_BINDING;
                     return new RedirectResolution(PERSONALIZE_URL + URLEncoder.encode(backurl, "utf-8"), false);
                 }
             }
@@ -109,30 +111,35 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
             //priprav mapovani nazvu fronty na pristupne uzly
             //a seznam resources
             q2n = new HashMap<>();
-            resourceValues = new HashMap<>();
+            resourceValues = new TreeMap<>();
             for (Queue q : userAccess.getUserQueues(user)) {
-                if(!q.getPbs().isTorque()) continue;
+                if (!q.getPbs().isPBSPro()) continue;
                 queues.add(q);
                 //budeme předpokládat, že uživatel může na všechny uzly fronty, do které může
                 List<Node> nodes = q.getPbs().getQueueToNodesMap().get(q.getName());
                 q2n.put(q.getName(), nodes);
                 //resources
-                for(Node node : nodes) {
+                for (Node node : nodes) {
                     Map<String, String> nodeResources = node.getResources();
                     for (String r : nodeResources.keySet()) {
                         //pro sestavovač Torque
-                        Set<String> values = resourceValues.computeIfAbsent(r, k -> new TreeSet<>());
-                        if (!r.equals("mem") && !r.equals("vmem") && !r.startsWith("scratch")) {
-                            values.add(nodeResources.get(r));
+                        if (!r.equals("mem") && !r.equals("vmem") && !r.startsWith("scratch")
+                                && !r.equals("ncpus") && !r.equals("ngpus") && !r.equals("queue_list")) {
+                            Set<String> foundValues = resourceValues.computeIfAbsent(r, k -> new TreeSet<>());
+                            if (r.equals(CPU_FLAG)) {
+                                //multivalued resource
+                                foundValues.addAll(Arrays.asList(nodeResources.get(r).split(",")));
+                            } else {
+                                foundValues.add(nodeResources.get(r));
+                            }
                         }
                     }
                 }
             }
-
-            //censored queues
+            //censored queues for offering the -q parameter
             offerQueues = new ArrayList<>(queues.size());
             for (Queue q : queues) {
-                if (q.getName().startsWith("q_")) continue;
+                if (q.isFromRouteOnly()) continue;
                 if (q.getName().startsWith("default")) continue;
                 offerQueues.add(q);
             }
@@ -152,45 +159,37 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
 
 
     //formular
-    String fronta = "default";
+    String fronta = "default@arien-pro.ics.muni.cz";
     @Validate(on = {"sestavovac"}, required = true, minvalue = 1)
     long mem = 400;
     String memu = "mb";
     int nodes = 1;
-    int ppn = 1;
+    int ncpus = 1;
+    int ngpus = 0;
     @Validate(on = {"sestavovac"}, required = true, minvalue = 0)
     long scratch = 400;
     String scratchu = "mb";
-    String scratchtype = "-";
-    String prop1 = "";
-    String prop2 = "";
-    String prop3 = "";
-    int ww = 0;
-    int wd = 1;
+    String scratchtype = "local";
+
     int wm = 0;
-    int wh = 0;
+    int wh = 1;
     int ws = 0;
+
     Queue queue;
     Queue finalQueue;
-    int gpu;
-    String cluster="";
-    String city="";
-    String room="";
-    String home="";
-    String infiniband="";
-    /*
-     resources:
-     gpu = [2, 4]
-     cluster = [doom, minos, manegrot, ajax, luna, bofur, losgar, zubat, quark, upol128, haldir, mudrc, lex, loslab, ramdal, mandos, gram, ida, eru, hildor, tarkil, krux, konos, perian, alfrid]
-     city = [ostrava, praha, plzen, budejovice, olomouc, brno]
-     home = [ostrava1, plzen1, brno3-cerit, brno2, praha1, budejovice1, olomouc1]
-     room = [fzu1, ntis, ics2, jcu-umbr1, ics1, ics3, zcu-ul011, ncbr1, zcu-ui419, ostrava1, ncbr, cesnet, uk1, upol128, cvut]
-     infiniband = [elixir, mandos, ncbr, minos, tarkil, alfrid, manegrot, hildor, luna, bofur, brno]
-     */
 
+    Map<String, String> resources = new HashMap<>();
+
+    public Map<String, String> getResources() {
+        return resources;
+    }
+
+    public void setResources(Map<String, String> resources) {
+        this.resources = resources;
+    }
 
     private long walltimeSecs() {
-        return 7L * 24L * 3600L * ww + 24L * 3600L * wd + 3600L * wh + 60L * wm + ws;
+        return 3600L * wh + 60L * wm + ws;
     }
 
     public Resolution sestavovac() throws UnsupportedEncodingException {
@@ -198,8 +197,8 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
         Resolution r = data();
         if (r != null) return r;
         //Sestavovac
-        log.info("sestavovac() user={} -l walltime={}w{}d{}h{}m{}s,q={},nodes={}:ppn={}:{}:{}:{},scratch={}{}:{},mem={}{}",
-                user, ww, wd, wh, wm, ws, fronta, nodes, ppn, prop1, prop2, prop3, scratch, scratchu, scratchtype, mem, memu);
+        log.info("sestavovac() user={} -l walltime={}:{}:{}:,q={},nodes={}:ncpus={}:scratch_{}={}{}:mem={}{}: resources= {}",
+                user, wh, wm, ws, fronta, nodes, ncpus, scratchtype, scratch, scratchu, mem, memu, resources);
 
         long memBytes = PbsUtils.parsePbsBytes(this.mem + this.memu);
         long scratchKB = PbsUtils.parsePbsBytes(this.scratch + this.scratchu) / 1024;
@@ -230,69 +229,88 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
             }
             finalQueue = queue;
         }
-        log.debug("finalQueue={}",finalQueue.getName());
+        log.debug("finalQueue={}", finalQueue.getName());
         nodesList = q2n.get(finalQueue.getName());
         potencialni = new ArrayList<>(nodesList.size());
         tedVolne = new ArrayList<>(nodesList.size());
 
-        List<String> props = new ArrayList<>(3);
-        if (prop1 != null && prop1.trim().length() > 0) props.add(prop1);
-        if (prop2 != null && prop2.trim().length() > 0) props.add(prop2);
-        if (prop3 != null && prop3.trim().length() > 0) props.add(prop3);
-
-        if(log.isDebugEnabled()) {
-            log.debug("nodesList="+nodesList.stream().map(Node::getShortName).collect(Collectors.joining(",")));
+        if (log.isDebugEnabled()) {
+            log.debug("nodesList=" + nodesList.stream().map(Node::getShortName).collect(Collectors.joining(",")));
         }
-        NODES: for (Node node : nodesList) {
-            String nodeShortName = node.getShortName();
-            log.debug("deciding node {}", nodeShortName);
-            //musi mit dost procesoru
-            if (node.getNoOfCPUInt() < ppn) continue;
-            //musi mit dost pameti
-            long totalMem = node.getTotalMemoryInt();
-            if (totalMem < memBytes) continue;
-            //musi mit vhodne vlastnosti
-            for(String prop : props) {
-                if(!node.hasProperty(prop)) continue NODES;
+        NODES:
+        for (Node node : nodesList) {
+            log.debug("deciding node {}", node.getShortName());
+            //musi mit dost CPU
+            if (node.getNoOfCPUInt() < ncpus) {
+                log.debug("node {} has not enough CPUs: {}<{}", node.getName(), node.getNoOfCPUInt(), ncpus);
+                continue;
             }
-            //musi povolovat ulohy dane delky pres min_ a max_
-            if(!node.allowsWalltime(walltimeSecs)) continue;
+            //musit mit dost GPU
+            if (node.getNoOfGPUInt() < ngpus) {
+                log.debug("node {} has not enough GPUs: {}<{}", node.getName(), node.getNoOfGPUInt(), ngpus);
+                continue;
+            }
+            //musi mit dost pameti
+            if (node.getTotalMemoryInt() < memBytes) {
+                log.debug("node {} has not enough RAM: {}<{}", node.getName(), node.getTotalMemoryInt(), memBytes);
+                continue;
+            }
             //musi mit vhodny typ scratche
             Scratch nodeScratch = node.getScratch();
             if (scratchKB > 0) {
-                if (scratchtype.equals("ssd") && !nodeScratch.hasSsdSizeKiB(scratchKB)) continue;
-                if (scratchtype.equals("local") && !nodeScratch.hasLocalSizeKiB(scratchKB)) continue;
-                if (scratchtype.equals("shared") && !nodeScratch.getHasShared()) continue;
-                if (scratchtype.equals("-") && !nodeScratch.hasAnySizeKiB(scratchKB)) continue;
+                if (scratchtype.equals("ssd") && !nodeScratch.getHasFreeSsd()) {
+                    log.debug("node {} has not enough scratch_ssd", node.getName());
+                    continue;
+                }
+                if (scratchtype.equals("local") && !nodeScratch.getHasFreeLocal()) {
+                    log.debug("node {} has not enough scratch_local={}", node.getName(), scratchKB);
+                    continue;
+                }
+                if (scratchtype.equals("shared") && !nodeScratch.getHasFreeShared()) {
+                    log.debug("node {} has not enough scratch_shared", node.getName());
+                    continue;
+                }
             }
-            //musi mit GPU
-            if(gpu>0 && node.getNoOfGPUInt()<gpu) continue;
-            //musi mit pozadovane resources
-            if(cluster!=null && !cluster.isEmpty() && !cluster.equals(node.getResource("cluster"))) continue;
-            if(city!=null && !city.isEmpty() && !city.equals(node.getResource("city"))) continue;
-            if(room!=null && !room.isEmpty() && !room.equals(node.getResource("room"))) continue;
-            if(home!=null && !home.isEmpty() && !home.equals(node.getResource("home"))) continue;
-            if(infiniband!=null && !infiniband.isEmpty() && !infiniband.equals(node.getResource("infiniband"))) continue;
-
-            //kdy se to dostalo az sem, je potencialne vhodny
+            //resources
+            for (Map.Entry<String, String> re : resources.entrySet()) {
+                String resourceName = re.getKey();
+                String requiredValue = re.getValue();
+                if(requiredValue==null||requiredValue.isEmpty()) continue;
+                String nodeValue = node.getResources().get(resourceName);
+                if (resourceName.equals(CPU_FLAG)) {
+                    if (nodeValue == null || !nodeValue.contains(requiredValue)) {
+                        log.debug("node {} has not resource {}={}, only {}", node.getName(), resourceName, requiredValue, nodeValue);
+                        continue NODES;
+                    }
+                } else {
+                    if (nodeValue == null || !nodeValue.equals(requiredValue)) {
+                        log.debug("node {} has not resource {}={}, only {}", node.getName(), resourceName, requiredValue, nodeValue);
+                        continue NODES;
+                    }
+                }
+            }
+            //kdy se to dostalo az sem, uzel je potencialne vhodny
+            log.debug("node {} is potential", node.getName());
             potencialni.add(node);
+
+
             //ted zkontrolujeme, zda ma ted dost volnych prostredku
             //musi byt volny aspon castecne
-            if (!(node.getState().equals(Node.STATE_FREE) || node.getState().equals(Node.STATE_PARTIALY_FREE) || node.getState().equals(Node.STATE_OCCUPIED_WOULD_PREEMPT)))
+            if (!(node.getState().equals(Node.STATE_FREE) || node.getState().equals(Node.STATE_PARTIALY_FREE)))
                 continue;
-            //musi mit dost volnych procesoru
-            if (node.getNoOfFreeCPUInt() < ppn) continue;
+            //musi mit dost volnych CPU
+            if (node.getNoOfFreeCPUInt() < ncpus) continue;
+            //musimit dost volnych GPU
+            if (node.getNoOfFreeGPUInt() < ngpus) continue;
             //musi mit dost volne pameti
             if (node.getFreeMemoryInt() < memBytes) continue;
             //musi mit dost volneho scratche
-            if(scratchKB>0) {
+            if (scratchKB > 0) {
                 if (scratchtype.equals("ssd") && !nodeScratch.hasSsdFreeKiB(scratchKB)) continue;
                 if (scratchtype.equals("local") && !nodeScratch.hasLocalFreeKiB(scratchKB)) continue;
                 if (scratchtype.equals("shared") && !nodeScratch.hasSharedFreeKiB(scratchKB)) continue;
-                if (scratchtype.equals("-")&& nodeScratch.getAnyFreeKiB() < scratchKB) continue;
             }
-            //musi mit dost gpu
-            if(gpu>0 && node.getNoOfFreeGPUInt()<gpu) continue;
+
             //kdyz se to dostalo az, je i ted volny
             tedVolne.add(node);
         }
@@ -307,7 +325,7 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
         }
         log.info("SestavovacQsub vysledek: " + vysledek);
         vyber = true;
-        return new ForwardResolution("/nodes/qsub_torque.jsp");
+        return new ForwardResolution(JSP_PAGE);
     }
 
     public Queue getQueue() {
@@ -316,10 +334,6 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
 
     public Queue getFinalQueue() {
         return finalQueue;
-    }
-
-    public Map<String, List<Node>> getQ2n() {
-        return q2n;
     }
 
     public User getJobUser() {
@@ -367,36 +381,20 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
         this.nodes = nodes;
     }
 
-    public int getPpn() {
-        return ppn;
+    public int getNcpus() {
+        return ncpus;
     }
 
-    public void setPpn(int ppn) {
-        this.ppn = ppn;
+    public void setNcpus(int ncpus) {
+        this.ncpus = ncpus;
     }
 
-    public String getProp1() {
-        return prop1;
+    public int getNgpus() {
+        return ngpus;
     }
 
-    public void setProp1(String prop1) {
-        this.prop1 = prop1;
-    }
-
-    public String getProp2() {
-        return prop2;
-    }
-
-    public void setProp2(String prop2) {
-        this.prop2 = prop2;
-    }
-
-    public String getProp3() {
-        return prop3;
-    }
-
-    public void setProp3(String prop3) {
-        this.prop3 = prop3;
+    public void setNgpus(int ngpus) {
+        this.ngpus = ngpus;
     }
 
     public long getScratch() {
@@ -431,22 +429,6 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
         this.scratchtype = scratchtype;
     }
 
-    public int getWw() {
-        return ww;
-    }
-
-    public void setWw(int ww) {
-        this.ww = ww;
-    }
-
-    public int getWd() {
-        return wd;
-    }
-
-    public void setWd(int wd) {
-        this.wd = wd;
-    }
-
     public int getWm() {
         return wm;
     }
@@ -471,81 +453,8 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
         this.ws = ws;
     }
 
-    public String getInfiniband() {
-        return infiniband;
-    }
-
-    public void setInfiniband(String infiniband) {
-        this.infiniband = infiniband;
-    }
-
-    public String getHome() {
-        return home;
-    }
-
-    public void setHome(String home) {
-        this.home = home;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getCluster() {
-        return cluster;
-    }
-
-    public void setCluster(String cluster) {
-        this.cluster = cluster;
-    }
-
-    public int getGpu() {
-        return gpu;
-    }
-
-    public void setGpu(int gpu) {
-        this.gpu = gpu;
-    }
-
-    public String getRoom() {
-        return room;
-    }
-
-    public void setRoom(String room) {
-        this.room = room;
-    }
-
     public Map<String, Set<String>> getResourceValues() {
         return resourceValues;
     }
 
-    static private final HashSet<String> OMIT_PROPERTIES = new HashSet<String>() {{
-        add("globus");
-        add("pa177");
-        add("jcu");
-        add("zsc");
-        add("iti");
-        add("forprivileged");
-        add("quark");
-        add("xentest");
-        add("maintenance");
-    }};
-
-    public List<String> getProps() {
-        if (props == null) {
-            HashSet<String> propSet = new HashSet<>(50);
-            for (Node node : pbsky.getAllNodes()) {
-                propSet.addAll(Arrays.asList(node.getProperties()));
-            }
-            //omit properties not intended for users
-            propSet.removeIf(prop -> prop.startsWith("q_") || prop.startsWith("max_") || prop.startsWith("min_") || OMIT_PROPERTIES.contains(prop));
-            props = new ArrayList<>(propSet);
-            Collections.sort(props);
-        }
-        return props;
-    }
 }

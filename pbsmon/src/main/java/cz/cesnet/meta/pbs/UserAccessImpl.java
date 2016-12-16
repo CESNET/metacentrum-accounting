@@ -29,14 +29,13 @@ public class UserAccessImpl extends RefreshLoader implements UserAccess {
         List<Queue> allowedQueues = new ArrayList<>();
         for (PBS pbs : pbsky.getListOfPBS()) {
             for(Queue q : pbs.getQueuesByPriority()) {
-                if(q.isFromRouteOnly()) continue;
                 if(!q.isLocked()) {
                     allowedQueues.add(q);
                 } else if(q.isAclUsersEnabled()&& Arrays.asList(q.getAclUsersArray()).contains(userName)) {
                     allowedQueues.add(q);
                 } else if(q.isAclGroupsEnabled()) {
                     boolean found = false;
-                    Map<String, Group> groupMap = pbs2groupName2GroupMap.get(pbs.getServer().getHost());
+                    Map<String, Group> groupMap = pbs2groupName2GroupMap.get(pbs.getHost());
                     for (String aclGroup : q.getAclGroupsArray()) {
                         Group group = groupMap.get(aclGroup);
                         if(group.getUsers().contains(userName)) {
@@ -62,12 +61,12 @@ public class UserAccessImpl extends RefreshLoader implements UserAccess {
 
     @Override
     protected void load() {
-        log.debug("load()");
+        log.debug("load() started");
         LinkedHashMap<String, Map<String,Group>> map = new LinkedHashMap<>();
-        for (PBS pbs : pbsky.getListOfPBS()) {
-            List<Group> groups = loadGroups(pbs.getServerConfig());
+        for (PbsServerConfig pbsServerConfig : pbsky.getPbsServerConfigs()) {
+            List<Group> groups = loadGroups(pbsServerConfig);
             Map<String,Group> groupMap = new HashMap<>();
-            String host = pbs.getServer().getHost();
+            String host = pbsServerConfig.getHost();
             map.put(host,groupMap);
             if(groups!=null) {
                 for(Group group : groups) {
@@ -77,6 +76,7 @@ public class UserAccessImpl extends RefreshLoader implements UserAccess {
             }
         }
         pbs2groupName2GroupMap = map;
+        log.debug("load() done");
     }
 
     LinkedHashMap<String, Map<String,Group>> pbs2groupName2GroupMap;

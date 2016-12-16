@@ -45,7 +45,7 @@
                         </c:if>
                         <c:if test="${q.aclGroupsEnabled}">
                             <f:message key="queues_list_locked_for_groups"/>:
-                            <c:forEach items="${q.aclGroupsArray}" var="group"><s:link href="/group/${pbs.server.host}/${group}">${group}</s:link> </c:forEach>
+                            <c:forEach items="${q.aclGroupsArray}" var="group"><s:link href="/group/${pbs.host}/${group}">${group}</s:link> </c:forEach>
                         </c:if>
                         <c:if test="${q.aclHostsEnabled}">
                             <f:message key="queues_list_locked_for_hosts"/>:

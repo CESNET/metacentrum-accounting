@@ -46,7 +46,7 @@ public class GroupActionBean extends BaseActionBean {
     public Resolution show() {
         PBS pbsServer = null;
         for(PBS pbs : pbsky.getListOfPBS()) {
-            if(pbs.getServer().getHost().equals(pbsServerName)) {
+            if(pbs.getHost().equals(pbsServerName)) {
                 pbsServer = pbs;
             }
         }

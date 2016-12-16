@@ -44,7 +44,7 @@
      <h3><t:i18n cs="Sestavovače qsub" en="Qsub assemblers"/></h3>
      <ul>
          <li><s:link href="/qsub_torque?user=${actionBean.user}"><t:i18n cs="Sestavovač qsub pro Torque" en="Qsub assembler for Torque"/></s:link></li>
-         <li><%--<s:link href="/qsub_pbspro?user=${actionBean.user}">--%><t:i18n cs="Sestavovač qsub pro PBSPro" en="Qsub assembler for PBSPro"/><%--</s:link>--%></li>
+         <li><s:link href="/qsub_pbspro?user=${actionBean.user}"><t:i18n cs="Sestavovač qsub pro PBSPro" en="Qsub assembler for PBSPro"/></s:link></li>
      </ul>
 <h3><f:message key="person_accessible_queues"/> <c:out value="${actionBean.user}" /></h3>
 

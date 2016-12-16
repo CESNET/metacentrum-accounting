@@ -128,7 +128,7 @@ public class PBS implements TimeStamped {
         return server;
     }
 
-    public String getPbsServerHost() {
+    public String getHost() {
         return serverConfig.getHost();
     }
 
@@ -424,6 +424,10 @@ public class PBS implements TimeStamped {
 
     public boolean isTorque() {
         return torque;
+    }
+
+    public boolean isPBSPro() {
+        return ! isTorque();
     }
 
     @Override

@@ -612,13 +612,14 @@ public class Node extends PbsInfoObject {
     public Scratch getScratch() {
         if (scratch == null) {
             //happens for nodes that are down
-            scratch = new Scratch();
+            log.debug("creating empty scratch for node {}",this.getName());
+            scratch = new Scratch(this.getName());
         }
         return scratch;
     }
 
     public void setScratch(Scratch scratch) {
-        if (scratch == null) scratch = new Scratch();
+        if (scratch == null) scratch = new Scratch(this.getName());
         scratch.setSsdSize(getStatus("scratch_ssd"));
         scratch.setLocalSize(getStatus("scratch_local"));
         long allocatedSsd = 0L;
@@ -647,7 +648,8 @@ public class Node extends PbsInfoObject {
         tato dvě čísla spolu nesouvisí, protože úloha může část zarezervovaného místa zaplnit a tím sníží volné místo
      */
     public void setScratchPBSPro() {
-        scratch = new Scratch();
+        log.debug("setScratchPBSPro() for node {}",this.getName());
+        scratch = new Scratch(this.getName());
         scratch.setSsdFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_ssd"))/1024L);
         scratch.setSsdReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_ssd")));
         scratch.setLocalFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_local"))/1024L);

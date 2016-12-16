@@ -1,6 +1,8 @@
 package cz.cesnet.meta.pbscache;
 
 import cz.cesnet.meta.pbs.PbsUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,6 +11,9 @@ import cz.cesnet.meta.pbs.PbsUtils;
  */
 public class Scratch {
 
+    final static Logger log = LoggerFactory.getLogger(Scratch.class);
+
+    private String nodeName;
     Long localFreeKiB;
     Long ssdFreeKiB;
     Long sharedFreeKiB;
@@ -19,7 +24,8 @@ public class Scratch {
     private long localReservedByJobs;
     private long sharedReservedByJobs;
 
-    public Scratch() {
+    public Scratch(String nodeName) {
+        this.nodeName = nodeName;
     }
 
     public long getAnyFreeKiB() {
