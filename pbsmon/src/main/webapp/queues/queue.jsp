@@ -123,7 +123,7 @@
    <td align="center">${job.noOfUsedCPU}</td>
    <td align="center">${job.usedGPU}</td>
    <td><c:out value="${job.jobName}"/></td>
-   <td align="right">${job.user}</td>
+   <td align="right"><s:link href="/user/${job.user}">${job.user}</s:link></td>
    <td align="right">${job.CPUTimeUsed}</td>
    <td align="right">${job.wallTimeUsed}</td>
    <td align="center" class="${job.state}"><t:job_state job="${job}"/></td>

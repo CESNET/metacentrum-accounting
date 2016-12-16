@@ -29,6 +29,7 @@ public class UserAccessImpl extends RefreshLoader implements UserAccess {
         List<Queue> allowedQueues = new ArrayList<>();
         for (PBS pbs : pbsky.getListOfPBS()) {
             for(Queue q : pbs.getQueuesByPriority()) {
+                if(q.isFromRouteOnly()) continue;
                 if(!q.isLocked()) {
                     allowedQueues.add(q);
                 } else if(q.isAclUsersEnabled()&& Arrays.asList(q.getAclUsersArray()).contains(userName)) {

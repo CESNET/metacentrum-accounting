@@ -21,22 +21,11 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
     <bean id="servers" class="java.util.ArrayList">
         <constructor-arg>
             <list value-type="cz.cesnet.meta.pbs.PbsServerConfig">
-                <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
-                    <property name="host" value="arien-pro.ics.muni.cz"/>
-                    <property name="main" value="false"/>
-                    <property name="torque" value="false"/>
-                    <property name="by_queue" value="false"/>
-                    <property name="planbased" value="true"/>
-                    <property name="fairshares">
-                        <list>
-                        </list>
-                    </property>
-                    <property name="groupFile" value="/etc/pbsmon/group/arien-pro"/>
-                </bean>
+
 
                 <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
                     <property name="host" value="arien.ics.muni.cz"/>
-                    <property name="main" value="false"/>
+                    <property name="main" value="true"/> <!-- jedna musí být kvůli sestavovači -->
                     <property name="torque" value="true"/>
                     <property name="by_queue" value="false"/>
                     <property name="fairshares">
@@ -73,6 +62,20 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                     </property>
                     <property name="groupFile" value="/etc/pbsmon/group/wagap"/>
                 </bean>
+
+                <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
+                    <property name="host" value="arien-pro.ics.muni.cz"/>
+                    <property name="main" value="false"/>
+                    <property name="torque" value="false"/>
+                    <property name="by_queue" value="false"/>
+                    <property name="planbased" value="true"/>
+                    <property name="fairshares">
+                        <list>
+                        </list>
+                    </property>
+                    <property name="groupFile" value="/etc/pbsmon/group/arien-pro"/>
+                </bean>
+
             </list>
         </constructor-arg>
     </bean>

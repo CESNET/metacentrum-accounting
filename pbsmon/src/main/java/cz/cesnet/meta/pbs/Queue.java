@@ -37,6 +37,7 @@ public class Queue extends PbsInfoObject {
     public static final String ATTRIBUTE_FAIRSHARE_TREE = "fairshare_tree";
     public static final String ATTRIBUTE_DESCRIPTION_CZECH = "description_cs";
     public static final String ATTRIBUTE_DESCRIPTION_ENGLISH = "description_en";
+    public static final String ATTRIBUTE_FROM_ROUTE_ONLY = "from_route_only";
 
     public Queue() {
         super();
@@ -226,12 +227,13 @@ public class Queue extends PbsInfoObject {
         return "True".equals(attrs.get(ATTRIBUTE_ACL_HOSTS_ENABLED));
     }
 
+    /*
     public String getLockedForKey() {
         if (isAclUsersEnabled()) return "users";
         if (isAclGroupsEnabled()) return "groups";
         if (isAclHostsEnabled()) return "hosts";
         return null;
-    }
+    } */
 
     public String getLockedFor() {
         if (isAclUsersEnabled()) return getAclUsers().replace(',', ' ');
@@ -359,5 +361,9 @@ public class Queue extends PbsInfoObject {
     public boolean isDescriptionAvailable() {
         if (!descriptionsPrepared) prepareDescriptions();
         return descriptionAvailable;
+    }
+
+    public boolean isFromRouteOnly() {
+        return "True".equals(attrs.get(ATTRIBUTE_FROM_ROUTE_ONLY));
     }
 }
