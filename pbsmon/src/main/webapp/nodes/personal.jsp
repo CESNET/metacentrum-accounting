@@ -1,4 +1,3 @@
-<%@ page import="java.util.Date" %>
 <%@ page pageEncoding="utf-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -40,6 +39,7 @@
 
     <p><a href="https://metavo.metacentrum.cz/${pageContext.request.locale}/myaccount/kvoty"><f:message key="nodes_jsp_person_quotas_link"/></a>.</p>
 
+     <t:vms_list vms="${actionBean.userVMs}"/>
 
      <h3><t:i18n cs="Sestavovače qsub" en="Qsub assemblers"/></h3>
      <ul>

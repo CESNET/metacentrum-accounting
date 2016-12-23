@@ -40,6 +40,8 @@
     </table>
 </c:if>
 
+        <t:vms_list vms="${actionBean.userVMs}"/>
+
         <h2><f:message key="user_jsp_ulohy_v_PBS"/></h2>
 
 <c:choose>
@@ -83,6 +85,7 @@
              </c:forTokens>
          </tr>
      </table>
+
 
 
      <hr>

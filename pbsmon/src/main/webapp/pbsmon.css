@@ -21,6 +21,10 @@
 
  table.node td a:link { color: gold; }
 
+ table.vms td.ACTIVE { background-color: #6060FF; }
+ table.vms td.POWEROFF,  table.vms td.SUSPENDED { background-color: #C0C0C0; }
+ table.vms td.cloud-virt { font-weight: bold; }
+
 
  .free          { background-color: #00d000; border-color: #00d000; color: black;}
  .partialy-free { background-color: #6EED6E; border-color: #6EED6E; color: black; }

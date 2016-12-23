@@ -1,5 +1,7 @@
 package cz.cesnet.meta.stripes;
 
+import cz.cesnet.meta.cloud.Cloud;
+import cz.cesnet.meta.cloud.CloudVirtualHost;
 import cz.cesnet.meta.pbs.Pbsky;
 import cz.cesnet.meta.pbs.Queue;
 import cz.cesnet.meta.pbs.User;
@@ -14,7 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Akce pro personalizaci pohledu na PBS.
@@ -29,14 +33,9 @@ public class PersonActionBean extends BaseActionBean {
 
     public static final String PERSONALIZE_URL = "https://metavo.metacentrum.cz/osobniv3/personal/personalize?backurl=";
 
-    @SpringBean("pbsCache")
-    protected PbsCache pbsCache;
-
-    @SpringBean("pbsky")
-    protected Pbsky pbsky;
-
     @SpringBean("userAccess")
     UserAccess userAccess;
+
 
     static final String PERSON = "person";
 
@@ -53,6 +52,7 @@ public class PersonActionBean extends BaseActionBean {
 
     User jobUser;
     List<Queue> queues;
+    List<CloudVirtualHost> userVMs;
 
     @DefaultHandler
     public Resolution show() throws UnsupportedEncodingException {
@@ -79,6 +79,12 @@ public class PersonActionBean extends BaseActionBean {
             jobUser = pbsky.getUserByName(user);
             if (jobUser == null) jobUser = new User(user);
         }
+
+        //VM z cloudu
+        userVMs = cloud.getVirtualHosts().stream()
+                .filter(vm -> user.equals(vm.getOwner().getName()))
+                .collect(Collectors.toList());
+
         return new ForwardResolution("/nodes/personal.jsp");
     }
 
@@ -92,4 +98,7 @@ public class PersonActionBean extends BaseActionBean {
         return queues;
     }
 
+    public List<CloudVirtualHost> getUserVMs() {
+        return userVMs;
+    }
 }
