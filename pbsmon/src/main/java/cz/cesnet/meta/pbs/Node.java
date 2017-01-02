@@ -19,10 +19,13 @@ public class Node extends PbsInfoObject {
 
     final static Logger log = LoggerFactory.getLogger(Node.class);
 
-    //used attribute names
-    public static final String ATTRIBUTE_PREFIX_RESOURCES_TOTAL_TORQUE = "resources_total.";
-    public static final String ATTRIBUTE_PREFIX_RESOURCES_TOTAL_PBSPRO = "resources_available.";
 
+    public static final String ATTRIBUTE_PREFIX_RESOURCES_AVAILABLE_TORQUE = "resources_total.";
+    public static final String ATTRIBUTE_PREFIX_RESOURCES_AVAILABLE_PBSPRO = "resources_available.";
+    public static final String ATTRIBUTE_PREFIX_RESOURCES_ASSIGNED_TORQUE = "resources_used.";
+    public static final String ATTRIBUTE_PREFIX_RESOURCES_ASSIGNED_PBSPRO = "resources_assigned.";
+
+    //used attribute names
     public static final String ATTRIBUTE_STATE = "state";
     public static final String ATTRIBUTE_EXCLUSIVELY_ASSIGNED = "exclusively_assigned";
     public static final String ATTRIBUTE_NODE_TYPE = "ntype";
@@ -157,7 +160,7 @@ public class Node extends PbsInfoObject {
     }
 
     public String getFQDN() {
-        if(pbs!=null && !pbs.isTorque()) {
+        if (pbs != null && !pbs.isTorque()) {
             return attrs.get("Mom");
         } else {
             return name;
@@ -274,7 +277,7 @@ public class Node extends PbsInfoObject {
     }
 
     public String getNoOfCPU() {
-        return attrs.get(pbs.isTorque()?ATTRIBUTE_NUMBER_OF_PROCESSORS_TORQUE : ATTRIBUTE_NUMBER_OF_PROCESSORS_PBSPRO);
+        return attrs.get(pbs.isTorque() ? ATTRIBUTE_NUMBER_OF_PROCESSORS_TORQUE : ATTRIBUTE_NUMBER_OF_PROCESSORS_PBSPRO);
     }
 
     public int getNoOfCPUInt() {
@@ -283,7 +286,7 @@ public class Node extends PbsInfoObject {
     }
 
     public String getNoOfGPU() {
-        return attrs.get(pbs.isTorque()?ATTRIBUTE_RESOURCES_TOTAL_GPU_TORQUE : ATTRIBUTE_RESOURCES_TOTAL_GPU_PBSPRO);
+        return attrs.get(pbs.isTorque() ? ATTRIBUTE_RESOURCES_TOTAL_GPU_TORQUE : ATTRIBUTE_RESOURCES_TOTAL_GPU_PBSPRO);
     }
 
     public int getNoOfGPUInt() {
@@ -296,7 +299,7 @@ public class Node extends PbsInfoObject {
     }
 
     public String getNoOfUsedGPU() {
-        return attrs.get(pbs.isTorque()?ATTRIBUTE_RESOURCES_USED_GPU_TORQUE:ATTRIBUTE_RESOURCES_USED_GPU_PBSPRO);
+        return attrs.get(pbs.isTorque() ? ATTRIBUTE_RESOURCES_USED_GPU_TORQUE : ATTRIBUTE_RESOURCES_USED_GPU_PBSPRO);
     }
 
     public int getNoOfUsedGPUInt() {
@@ -332,7 +335,7 @@ public class Node extends PbsInfoObject {
     }
 
     public String getNoOfFreeCPU() {
-        if(pbs.isTorque()) {
+        if (pbs.isTorque()) {
             return attrs.get(ATTRIBUTE_NUMBER_OF_FREE_CPUS);
         } else {
             return Integer.toString(getNoOfCPUInt() - getNoOfUsedCPUInt());
@@ -493,6 +496,7 @@ public class Node extends PbsInfoObject {
 
     /**
      * Gets jobs listed in the "jobs" attribute of node.
+     *
      * @return list of jobs
      */
     public List<Job> getJobs() {
@@ -612,7 +616,7 @@ public class Node extends PbsInfoObject {
     public Scratch getScratch() {
         if (scratch == null) {
             //happens for nodes that are down
-            log.debug("creating empty scratch for node {}",this.getName());
+            log.debug("creating empty scratch for node {}", this.getName());
             scratch = new Scratch(this.getName());
         }
         return scratch;
@@ -648,13 +652,13 @@ public class Node extends PbsInfoObject {
         tato dvě čísla spolu nesouvisí, protože úloha může část zarezervovaného místa zaplnit a tím sníží volné místo
      */
     public void setScratchPBSPro() {
-        log.debug("setScratchPBSPro() for node {}",this.getName());
+        log.debug("setScratchPBSPro() for node {}", this.getName());
         scratch = new Scratch(this.getName());
-        scratch.setSsdFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_ssd"))/1024L);
+        scratch.setSsdFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_ssd")) / 1024L);
         scratch.setSsdReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_ssd")));
-        scratch.setLocalFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_local"))/1024L);
+        scratch.setLocalFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_local")) / 1024L);
         scratch.setLocalReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_local")));
-        scratch.setSharedFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_shared"))/1024L);
+        scratch.setSharedFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_shared")) / 1024L);
         scratch.setSharedReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_shared")));
     }
 
@@ -704,14 +708,14 @@ public class Node extends PbsInfoObject {
     public boolean allowsWalltime(long walltimeSecs) {
         String[] properties = getProperties();
         String max = findPrefixedProperty("max_");
-        if(max!=null) {
+        if (max != null) {
             long maxSeconds = PbsUtils.parseWalltime(max);
-            if(walltimeSecs>maxSeconds) return false;
+            if (walltimeSecs > maxSeconds) return false;
         }
         String min = findPrefixedProperty("min_");
-        if(min!=null) {
+        if (min != null) {
             long minSeconds = PbsUtils.parseWalltime(min);
-            if(walltimeSecs<minSeconds) return false;
+            if (walltimeSecs < minSeconds) return false;
         }
         return true;
     }
@@ -726,6 +730,7 @@ public class Node extends PbsInfoObject {
 
     /**
      * Searches node properties and returns the first that start with given prefix, with the prefix truncated.
+     *
      * @param prefix characters for beginning of the string
      * @return null or value of property without prefix
      */
@@ -735,31 +740,32 @@ public class Node extends PbsInfoObject {
                 return prop.substring(prefix.length());
             }
         }
-        return  null;
+        return null;
     }
 
     /**
      * Returns attributes that started with resources_total, but without the prefix.
+     *
      * @return map of attributes with attribute names without the prefix
      */
-    public Map<String,String> getResources() {
-        String RESOURCE_PREFIX = pbs.isTorque()?ATTRIBUTE_PREFIX_RESOURCES_TOTAL_TORQUE:ATTRIBUTE_PREFIX_RESOURCES_TOTAL_PBSPRO;
-        Map<String,String> map = new HashMap<>();
-        for(Map.Entry<String,String> e : getAttributes().entrySet()) {
-            if(e.getKey().startsWith(RESOURCE_PREFIX)) {
-                map.put(e.getKey().substring(RESOURCE_PREFIX.length()),e.getValue());
+    public Map<String, String> getResources() {
+        String RESOURCE_PREFIX = pbs.isTorque() ? ATTRIBUTE_PREFIX_RESOURCES_AVAILABLE_TORQUE : ATTRIBUTE_PREFIX_RESOURCES_AVAILABLE_PBSPRO;
+        Map<String, String> map = new HashMap<>();
+        for (Map.Entry<String, String> e : getAttributes().entrySet()) {
+            if (e.getKey().startsWith(RESOURCE_PREFIX)) {
+                map.put(e.getKey().substring(RESOURCE_PREFIX.length()), e.getValue());
             }
         }
         return map;
     }
 
-    public String getResource(String name) {
-        String RESOURCE_PREFIX = pbs.isTorque()?ATTRIBUTE_PREFIX_RESOURCES_TOTAL_TORQUE:ATTRIBUTE_PREFIX_RESOURCES_TOTAL_PBSPRO;
-        return attrs.get(RESOURCE_PREFIX +name);
+    public String getResourceString(String name) {
+        String RESOURCE_PREFIX = pbs.isTorque() ? ATTRIBUTE_PREFIX_RESOURCES_AVAILABLE_TORQUE : ATTRIBUTE_PREFIX_RESOURCES_AVAILABLE_PBSPRO;
+        return attrs.get(RESOURCE_PREFIX + name);
     }
 
     public List<String> getResourceOfTypeList(String resourceName) {
-        String resourceValue = getResource(resourceName);
+        String resourceValue = getResourceString(resourceName);
         return Arrays.asList(resourceValue == null ? new String[0] : resourceValue.split(","));
     }
 
@@ -767,4 +773,96 @@ public class Node extends PbsInfoObject {
         return getResourceOfTypeList(PBS.QUEUE_LIST);
     }
 
+
+    private List<NodeResource> nodeResources;
+    /**
+     * Parses and returns available and assigned resources
+     * @return list of NodeResource objects
+     */
+    public List<NodeResource> getNodeResources() {
+        if(nodeResources!=null) return nodeResources;
+        if(pbs.isTorque()) return Collections.emptyList();
+
+        Map<String,String> assigned = new HashMap<>();
+        Map<String,String> available = new HashMap<>();
+
+        for (Map.Entry<String, String> e : getAttributes().entrySet()) {
+            String key = e.getKey();
+            if (key.startsWith(ATTRIBUTE_PREFIX_RESOURCES_AVAILABLE_PBSPRO)) {
+                String resourceName = key.substring(ATTRIBUTE_PREFIX_RESOURCES_AVAILABLE_PBSPRO.length());
+                available.put(resourceName,e.getValue());
+            } else if (key.startsWith(ATTRIBUTE_PREFIX_RESOURCES_ASSIGNED_PBSPRO)) {
+                String resourceName = key.substring(ATTRIBUTE_PREFIX_RESOURCES_ASSIGNED_PBSPRO.length());
+                assigned.put(resourceName,e.getValue());
+            }
+        }
+        Set<String> allResourceNames = new HashSet<>();
+        allResourceNames.addAll(available.keySet());
+        allResourceNames.addAll(assigned.keySet());
+        List<NodeResource> tmpNodeResources = new ArrayList<>(allResourceNames.size());
+        for (String resourceName : allResourceNames) {
+            tmpNodeResources.add(new NodeResource(resourceName,available.get(resourceName),assigned.get(resourceName)));
+        }
+        tmpNodeResources.sort((o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
+        nodeResources = tmpNodeResources;
+        return nodeResources;
+    }
+
+    public static class NodeResource {
+        public enum Type {INT, LIST, SIZE, BOOLEAN, STRING}
+
+        private Type type;
+        private String name;
+        private String available;
+        private String assigned;
+
+        public NodeResource(String name, String available, String assigned) {
+            this.name = name;
+            this.available = available;
+            this.assigned = assigned;
+            this.type = detectType(available!=null?available:assigned);
+        }
+
+        public static Type detectType(String value) {
+            Type type;
+            if ("True".equals(value)) {
+                type = Type.BOOLEAN;
+            } else if (value.matches("\\d+")) {
+                type = Type.INT;
+            } else if (value.matches("\\d+[kmg]b")) {
+                type = Type.SIZE;
+            } else if (value.contains(",")) {
+                type = Type.LIST;
+            } else {
+                type = Type.STRING;
+            }
+            return type;
+        }
+
+        public Type getType() {
+            return type;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getAvailable() {
+            return available;
+        }
+
+        public String getAssigned() {
+            return assigned;
+        }
+
+        @Override
+        public String toString() {
+            return "NodeResource{" +
+                    "type=" + type +
+                    ", name='" + name + '\'' +
+                    ", available='" + available + '\'' +
+                    ", assigned='" + assigned + '\'' +
+                    '}';
+        }
+    }
 }

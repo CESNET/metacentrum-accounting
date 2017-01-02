@@ -136,7 +136,29 @@
             </table>
         </c:if>
 
-
+<!-- resources -->
+<c:if test="${node.pbs.PBSPro}">
+    <table class="zakladni">
+        <tr>
+            <th><t:i18n cs="zdroj" en="resource"/></th>
+            <th><t:i18n cs="dostupné" en="available"/></th>
+            <th><t:i18n cs="použito" en="assigned"/></th>
+        </tr>
+        <c:forEach items="${node.nodeResources}" var="res">
+            <tr>
+                <td><c:out value="${res.name}"/></td>
+                <td>
+                    <c:choose>
+                        <c:when test="${fn:length(res.available)>25}"><c:out
+                                value="${fn:substring(res.available, 0, 25)}"/> ...</c:when>
+                        <c:otherwise><c:out value="${res.available}"/></c:otherwise>
+                    </c:choose>
+                </td>
+                <td><c:out value="${res.assigned}"/></td>
+            </tr>
+        </c:forEach>
+    </table>
+</c:if>
 
         <c:if test="${node.maintenance}">
             <p class="maintenance"><f:message key="nodejsp_maintenance"><f:param
@@ -152,6 +174,8 @@
         <c:if test="${node.reserved}">
             <p class="comment"><f:message key="nodejsp_reserved"><f:param value="${node.comment}"/></f:message></p>
         </c:if>
+
+
 
         <!-- ulohy -->
         <br>
@@ -227,6 +251,7 @@
             </c:if>
         </c:if>
 
+        <!-- fronty -->
         <br>
         <f:message key="node_detail_fronty"/> <s:link href="/queues/list" anchor="${node.pbs.server.name}"><c:out
             value="${node.pbs.server.shortName}"/></s:link>:
@@ -243,6 +268,9 @@
             </div>
         </c:if>
 
+
+
+        <!-- atributy -->
         <br>
         <table class="attributes">
             <c:forEach items="${node.attributes}" var="met">

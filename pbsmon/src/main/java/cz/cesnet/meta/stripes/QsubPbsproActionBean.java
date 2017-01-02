@@ -1,6 +1,8 @@
 package cz.cesnet.meta.stripes;
 
 import cz.cesnet.meta.pbs.*;
+import cz.cesnet.meta.pbs.Node.NodeResource;
+import cz.cesnet.meta.pbs.Node.NodeResource.Type;
 import cz.cesnet.meta.pbs.Queue;
 import cz.cesnet.meta.pbscache.PbsCache;
 import cz.cesnet.meta.pbscache.Scratch;
@@ -120,18 +122,23 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
                 q2n.put(q.getName(), nodes);
                 //resources
                 for (Node node : nodes) {
-                    Map<String, String> nodeResources = node.getResources();
-                    for (String r : nodeResources.keySet()) {
-                        //pro sestavovač Torque
-                        if (!r.equals("mem") && !r.equals("vmem") && !r.startsWith("scratch")
-                                && !r.equals("ncpus") && !r.equals("ngpus") && !r.equals("queue_list")) {
-                            Set<String> foundValues = resourceValues.computeIfAbsent(r, k -> new TreeSet<>());
-                            if (r.equals(CPU_FLAG)) {
-                                //multivalued resource
-                                foundValues.addAll(Arrays.asList(nodeResources.get(r).split(",")));
-                            } else {
-                                foundValues.add(nodeResources.get(r));
-                            }
+                    for (NodeResource nr : node.getNodeResources()) {
+                        if (nr.getType() == Type.INT) continue;
+                        if (nr.getType() == Type.SIZE) continue;
+                        if (nr.getAvailable() == null) continue;
+                        if(nr.getName().equals("queue_list")) continue;
+                        Set<String> foundValues = resourceValues.computeIfAbsent(nr.getName(), k -> new TreeSet<>());
+                        switch (nr.getType()) {
+                            case STRING:
+                                foundValues.add(nr.getAvailable());
+                                break;
+                            case BOOLEAN:
+                                foundValues.add("True");
+                                foundValues.add("False");
+                                break;
+                            case LIST:
+                                foundValues.addAll(Arrays.asList(nr.getAvailable().split(",")));
+                                break;
                         }
                     }
                 }
@@ -237,6 +244,7 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
         if (log.isDebugEnabled()) {
             log.debug("nodesList=" + nodesList.stream().map(Node::getShortName).collect(Collectors.joining(",")));
         }
+
         NODES:
         for (Node node : nodesList) {
             log.debug("deciding node {}", node.getShortName());
@@ -275,16 +283,16 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
             for (Map.Entry<String, String> re : resources.entrySet()) {
                 String resourceName = re.getKey();
                 String requiredValue = re.getValue();
-                if(requiredValue==null||requiredValue.isEmpty()) continue;
+                if (requiredValue == null || requiredValue.isEmpty()) continue;
                 String nodeValue = node.getResources().get(resourceName);
-                if (resourceName.equals(CPU_FLAG)) {
-                    if (nodeValue == null || !nodeValue.contains(requiredValue)) {
-                        log.debug("node {} has not resource {}={}, only {}", node.getName(), resourceName, requiredValue, nodeValue);
+                if(requiredValue.equals("False")) {
+                    if("True".equals(nodeValue)) {
+                        log.debug("node {} has resource {}={}, but False was required", node.getName(), resourceName, nodeValue, requiredValue);
                         continue NODES;
                     }
                 } else {
-                    if (nodeValue == null || !nodeValue.equals(requiredValue)) {
-                        log.debug("node {} has not resource {}={}, only {}", node.getName(), resourceName, requiredValue, nodeValue);
+                    if (nodeValue == null || !nodeValue.contains(requiredValue)) {
+                        log.debug("node {} has no resource {}={}, only {}", node.getName(), resourceName, requiredValue, nodeValue);
                         continue NODES;
                     }
                 }

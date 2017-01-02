@@ -268,11 +268,11 @@ public class QsubTorqueActionBean extends BaseActionBean implements ValidationEr
             //musi mit GPU
             if(gpu>0 && node.getNoOfGPUInt()<gpu) continue;
             //musi mit pozadovane resources
-            if(cluster!=null && !cluster.isEmpty() && !cluster.equals(node.getResource("cluster"))) continue;
-            if(city!=null && !city.isEmpty() && !city.equals(node.getResource("city"))) continue;
-            if(room!=null && !room.isEmpty() && !room.equals(node.getResource("room"))) continue;
-            if(home!=null && !home.isEmpty() && !home.equals(node.getResource("home"))) continue;
-            if(infiniband!=null && !infiniband.isEmpty() && !infiniband.equals(node.getResource("infiniband"))) continue;
+            if(cluster!=null && !cluster.isEmpty() && !cluster.equals(node.getResourceString("cluster"))) continue;
+            if(city!=null && !city.isEmpty() && !city.equals(node.getResourceString("city"))) continue;
+            if(room!=null && !room.isEmpty() && !room.equals(node.getResourceString("room"))) continue;
+            if(home!=null && !home.isEmpty() && !home.equals(node.getResourceString("home"))) continue;
+            if(infiniband!=null && !infiniband.isEmpty() && !infiniband.equals(node.getResourceString("infiniband"))) continue;
 
             //kdy se to dostalo az sem, je potencialne vhodny
             potencialni.add(node);
