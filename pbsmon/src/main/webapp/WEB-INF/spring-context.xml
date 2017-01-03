@@ -15,21 +15,18 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
     <context:annotation-config/>
     <tx:annotation-driven/>
 
-
     <bean id="pbsConnector" class="cz.cesnet.meta.pbs.PbsConnectorJNI"/>
 
-    <!--
-    pozor, JSON neposila informace o ulohach !
-    <bean id="pbsConnector" class="cz.cesnet.meta.pbs.PbsConnectorJson" scope="singleton">
-    </bean>
-    -->
-
+    <!-- main configuration of PBS servers -->
     <bean id="servers" class="java.util.ArrayList">
         <constructor-arg>
             <list value-type="cz.cesnet.meta.pbs.PbsServerConfig">
+
+
                 <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
                     <property name="host" value="arien.ics.muni.cz"/>
-                    <property name="main" value="true"/>
+                    <property name="main" value="true"/> <!-- jedna musí být kvůli sestavovači -->
+                    <property name="torque" value="true"/>
                     <property name="by_queue" value="false"/>
                     <property name="fairshares">
                         <list>
@@ -45,10 +42,13 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                             </bean>
                         </list>
                     </property>
+                    <property name="groupFile" value="/etc/pbsmon/group/arien"/>
                 </bean>
+
                 <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
                     <property name="host" value="wagap.cerit-sc.cz"/>
                     <property name="main" value="false"/>
+                    <property name="torque" value="true"/>
                     <property name="by_queue" value="false"/>
                     <property name="planbased" value="true"/>
                     <property name="fairshares">
@@ -60,7 +60,22 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                             </bean>
                         </list>
                     </property>
+                    <property name="groupFile" value="/etc/pbsmon/group/wagap"/>
                 </bean>
+
+                <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
+                    <property name="host" value="arien-pro.ics.muni.cz"/>
+                    <property name="main" value="false"/>
+                    <property name="torque" value="false"/>
+                    <property name="by_queue" value="false"/>
+                    <property name="planbased" value="true"/>
+                    <property name="fairshares">
+                        <list>
+                        </list>
+                    </property>
+                    <property name="groupFile" value="/etc/pbsmon/group/arien-pro"/>
+                </bean>
+
             </list>
         </constructor-arg>
     </bean>
@@ -92,7 +107,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
         <property name="pbsConnector" ref="pbsConnector"/>
         <property name="pbsServers" ref="servers"/>
         <property name="pbsCache" ref="pbsCache"/>
-        <property name="loadRunTimeInMilliseconds" value="10000"/>
+        <property name="loadRunTimeInMilliseconds" value="25000"/>
     </bean>
 
     <bean id="perun" class="cz.cesnet.meta.perun.impl.PerunJsonImpl">
@@ -119,18 +134,27 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
 
     <bean id="cloud" class="cz.cesnet.meta.cloud.CloudImpl" >
         <property name="dataMaxAgeInMilliseconds" value="300000"/>
-        <property name="loadRunTimeInMilliseconds" value="15000"/>
+        <property name="loadRunTimeInMilliseconds" value="17000"/>
     </bean>
 
     <bean id="diskArrays" class="cz.cesnet.meta.storages.StoragesDiskArrayMotdImpl">
-        <property name="file" value="/home/makub/motd.storage"/>
+        <property name="file" value="/home/pbsmon/motd.storage"/>
         <property name="dataMaxAgeInMilliseconds" value="300000"/>
     </bean>
 
     <bean id="hsms" class="cz.cesnet.meta.storages.StoragesHsmImpl" >
         <property name="url" value="https://accounting.du.cesnet.cz/du/du_motd_info.txt"/>
-        <property name="cerit4File" value="/home/makub/brno4-cerit-hsm.txt" />
+        <property name="cerit4File" value="/home/pbsmon/brno4-cerit-hsm.txt" />
         <property name="dataMaxAgeInMilliseconds" value="3600000"/>
+    </bean>
+
+    <bean id="userAccess" class="cz.cesnet.meta.pbs.UserAccessImpl" >
+        <property name="pbsky" ref="pbsky"/>
+        <property name="dataMaxAgeInMilliseconds" value="300000"/>
+        <!--
+        Perun post-scripts in (arien,arien-pro,wagap):/etc/perun/group.d/post_pbsmon
+        make copies of /etc/group from each PBS server in /etc/perun/group
+        -->
     </bean>
 
 </beans>

@@ -352,18 +352,24 @@ public class PerunJsonImpl extends PerunAbstractImpl {
 
     @Override
     public boolean isNodeVirtual(String nodeName) {
-        return ! isNodePhysical(nodeName);
+        boolean b = !isNodePhysical(nodeName);
+        log.debug("isNodeVirtual({}) returns {}",nodeName,b);
+        return b;
     }
 
     @Override
     public boolean isNodePhysical(String nodeName) {
         Stroj stroj = getStrojByName(nodeName);
-        return stroj != null && !stroj.isVirtual();
+        boolean b = stroj != null && !stroj.isVirtual();
+        log.debug("isNodePhysical({}) returns {}",nodeName,b);
+        return b;
     }
 
     @Override
     public Stroj getStrojByName(String machineName) {
-        return allMachinesMap.get(machineName);
+        Stroj stroj = allMachinesMap.get(machineName);
+        log.debug("getStrojByName({}) returns {}",machineName,stroj);
+        return stroj;
     }
 
     @Override

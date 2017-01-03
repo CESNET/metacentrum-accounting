@@ -2,6 +2,7 @@ package cz.cesnet.meta.stripes;
 
 import cz.cesnet.meta.acct.Accounting;
 import cz.cesnet.meta.acct.UserInfo;
+import cz.cesnet.meta.cloud.CloudVirtualHost;
 import cz.cesnet.meta.pbs.*;
 import cz.cesnet.meta.perun.api.Perun;
 import cz.cesnet.meta.perun.api.PerunUser;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,8 +43,8 @@ public class UserActionBean extends BaseActionBean {
     private Map<String, String> nodesShortNamesMap;
     private JobsSortOrder sort = JobsSortOrder.Id;
     private List<String> usedQueueNames;
-    private Map<String,List<Job>> jobsByQueue;
     private Map<String,JobsInfo> jobInfosByQueue;
+    private List<CloudVirtualHost> userVMs;
 
     @DefaultHandler
     public Resolution show() {
@@ -51,12 +53,8 @@ public class UserActionBean extends BaseActionBean {
         }
         try {
             perunUser = perun.getUserByName(userName);
-            if (perunUser.getPublications().get(METACENTRUM) == null) {
-                perunUser.getPublications().put(METACENTRUM, 0);
-            }
-            if (perunUser.getPublications().get(CERIT_SC) == null) {
-                perunUser.getPublications().put(CERIT_SC, 0);
-            }
+            perunUser.getPublications().putIfAbsent(METACENTRUM, 0);
+            perunUser.getPublications().putIfAbsent(CERIT_SC, 0);
         } catch (Exception ex) {
             log.warn("Nemohu nacist PerunUser {} kvuli {} ", userName, ex.getMessage());
             return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND, "User not found.");
@@ -69,7 +67,7 @@ public class UserActionBean extends BaseActionBean {
         user = pbsky.getUserByName(userName);
         jobs = pbsky.getUserJobs(userName,sort);
         //node names
-        nodesShortNamesMap = new HashMap<String, String>(jobs.size());
+        nodesShortNamesMap = new HashMap<>(jobs.size());
         for (Job job : jobs) {
             if ("R".equals(job.getState())) {
                 String execHostFirstName = job.getExecHostFirstName();
@@ -82,22 +80,24 @@ public class UserActionBean extends BaseActionBean {
             }
         }
         //stats per queue
-        jobsByQueue = new HashMap<String, List<Job>>();
-        jobInfosByQueue = new HashMap<String, JobsInfo>();
+        Map<String, List<Job>> jobsByQueue = new HashMap<>();
+        jobInfosByQueue = new HashMap<>();
         for(Job job : jobs) {
             String queueName = job.getQueueName();
-            List<Job> qjobs = jobsByQueue.get(queueName);
-            if(qjobs==null) {
-                qjobs = new ArrayList<Job>();
-                jobsByQueue.put(queueName, qjobs);
-            }
+            List<Job> qjobs = jobsByQueue.computeIfAbsent(queueName, k -> new ArrayList<>());
             qjobs.add(job);
         }
-        usedQueueNames = new ArrayList<String>(jobsByQueue.keySet());
+        usedQueueNames = new ArrayList<>(jobsByQueue.keySet());
         Collections.sort(usedQueueNames);
         for(String queueName : usedQueueNames) {
             jobInfosByQueue.put(queueName,new JobsInfo(jobsByQueue.get(queueName)));
         }
+
+        //VM z cloudu
+        userVMs = cloud.getVirtualHosts().stream()
+                .filter(vm -> userName.equals(vm.getOwner().getName()))
+                .collect(Collectors.toList());
+
         return new ForwardResolution("/users/user.jsp");
     }
 
@@ -143,11 +143,15 @@ public class UserActionBean extends BaseActionBean {
         return usedQueueNames;
     }
 
-    public Map<String, List<Job>> getJobsByQueue() {
-        return jobsByQueue;
-    }
+//    public Map<String, List<Job>> getJobsByQueue() {
+//        return jobsByQueue;
+//    }
 
     public Map<String, JobsInfo> getJobInfosByQueue() {
         return jobInfosByQueue;
+    }
+
+    public List<CloudVirtualHost> getUserVMs() {
+        return userVMs;
     }
 }

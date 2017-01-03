@@ -38,19 +38,19 @@
  <c:if test="${q.aclUsersEnabled}">
         <tr>
             <th><img src="${pageContext.request.contextPath}/img/lock.png" alt="locked" />  <f:message key="jobs_locked_users"/></th>
-            <td><c:forEach var="u" items="${q.aclUsersArray}"><c:out value="${u}" /> </c:forEach></td>
+            <td><c:forEach var="u" items="${q.aclUsersArray}"><s:link href="/user/${u}"><c:out value="${u}" /></s:link>  </c:forEach></td>
         </tr>
  </c:if>
  <c:if test="${q.aclGroupsEnabled}">
         <tr>
             <th><img src="${pageContext.request.contextPath}/img/lock.png" alt="locked" />  <f:message key="jobs_locked_groups"/></th>
-            <td><c:forEach var="g" items="${q.aclGroupsArray}"><c:out value="${g}" /> </c:forEach></td>
+            <td><c:forEach var="group" items="${q.aclGroupsArray}"><s:link href="/group/${q.pbs.host}/${group}">${group}</s:link> </c:forEach></td>
         </tr>
  </c:if>
  <c:if test="${q.aclHostsEnabled}">
         <tr>
             <th><img src="${pageContext.request.contextPath}/img/lock.png" alt="locked" />  <f:message key="jobs_locked_hosts"/></th>
-            <td><c:forEach var="g" items="${q.aclHostsArray}"><c:out value="${g}" /> </c:forEach></td>
+            <td><c:forEach var="host" items="${q.aclHostsArray}"><c:out value="${host}" /> </c:forEach></td>
         </tr>
  </c:if>
     </table>
@@ -78,7 +78,6 @@
                 </tr>
             </c:forEach>
         </table>
-
     </c:when>
     <c:otherwise>
         <h3><f:message key="q_nodes" /></h3>
@@ -124,7 +123,7 @@
    <td align="center">${job.noOfUsedCPU}</td>
    <td align="center">${job.usedGPU}</td>
    <td><c:out value="${job.jobName}"/></td>
-   <td align="right">${job.user}</td>
+   <td align="right"><s:link href="/user/${job.user}">${job.user}</s:link></td>
    <td align="right">${job.CPUTimeUsed}</td>
    <td align="right">${job.wallTimeUsed}</td>
    <td align="center" class="${job.state}"><t:job_state job="${job}"/></td>

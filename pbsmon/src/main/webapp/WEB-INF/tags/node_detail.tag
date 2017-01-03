@@ -6,11 +6,6 @@
 <%@ taglib prefix="s" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<c:choose>
-    <c:when test="${node.cloud}">
-        <p class="cloud_warning"><f:message key="nodejsp_cloud"/></p>
-    </c:when>
-    <c:otherwise>
 
         <table class="node" cellspacing="0">
             <tr>
@@ -32,10 +27,6 @@
                 <td colspan="2" class="${node.state}"><c:out value="${node.pbsState}"/></td>
             </tr>
             <tr>
-                <th class="${node.state}"><f:message key="nodejsp_maghratea_state"/></th>
-                <td colspan="2" class="${node.state}"><c:out value="${node.maghrateaState}"/></td>
-            </tr>
-            <tr>
                 <th class="${node.state}"><f:message key="nodejsp_ntype"/></th>
                 <td colspan="2" class="${node.state}"><c:out value="${node.ntype}"/></td>
             </tr>
@@ -52,25 +43,26 @@
                             href="/queue/${node.requiredQueue}">${node.requiredQueue}</s:link></td>
                 </tr>
             </c:if>
-            <c:if test="${node.scratch.hasSsd}">
+
+            <c:if test="${node.scratch.hasFreeSsd}">
             <tr>
-                <th class="${node.state}"><f:message key="nodejsp_scratch_size_ssd"/></th>
+                <th class="${node.state}"><f:message key="nodejsp_free_scratch_ssd"/></th>
                 <td colspan="2" class="${node.state}"><c:out value="${node.scratch.ssdFreeHuman}"/></td>
             </tr>
             </c:if>
-
-            <c:if test="${node.scratch.hasNetwork}">
+            <c:if test="${node.scratch.hasFreeLocal}">
                 <tr>
-                    <th class="${node.state}"><f:message key="nodejsp_scratch_size_network"/></th>
-                    <td colspan="2" class="${node.state}"><c:out value="${node.scratch.networkFreeHuman}"/></td>
-                </tr>
-            </c:if>
-            <c:if test="${node.scratch.hasLocal}">
-                <tr>
-                    <th class="${node.state}"><f:message key="nodejsp_scratch_size_local"/></th>
+                    <th class="${node.state}"><f:message key="nodejsp_free_scratch_local"/></th>
                     <td colspan="2" class="${node.state}"><c:out value="${node.scratch.localFreeHuman}"/></td>
                 </tr>
             </c:if>
+            <c:if test="${node.scratch.hasFreeShared}">
+                <tr>
+                    <th class="${node.state}"><f:message key="nodejsp_free_scratch_shared"/></th>
+                    <td colspan="2" class="${node.state}"><c:out value="${node.scratch.sharedFreeHuman}"/></td>
+                </tr>
+            </c:if>
+
         </table>
         <!-- rezervace a vyuziti -->
         <table class="zakladni">
@@ -115,6 +107,18 @@
                     <td>${node.scratch.localUsedInPbsUnits} / ${node.scratch.localSizeInPbsUnits}</td>
                 </tr>
             </c:if>
+            <c:if test="${node.scratch.hasShared}">
+                <tr>
+                    <th><f:message key="nodejsp_reserved_scratch_shared"/></th>
+                    <td>${node.scratch.sharedReservedPercent}%</td>
+                    <td>${node.scratch.sharedReservedInPbsUnits} / ${node.scratch.sharedSizeInPbsUnits}</td>
+                </tr>
+                <tr>
+                    <th><f:message key="nodejsp_used_scratch_shared"/></th>
+                    <td>${node.scratch.sharedUsedPercent}%</td>
+                    <td>${node.scratch.sharedUsedInPbsUnits} / ${node.scratch.sharedSizeInPbsUnits}</td>
+                </tr>
+            </c:if>
         </table>
 
         <c:if test="${not empty node.gpuJobMap}">
@@ -132,7 +136,29 @@
             </table>
         </c:if>
 
-
+<!-- resources -->
+<c:if test="${node.pbs.PBSPro}">
+    <table class="zakladni">
+        <tr>
+            <th><t:i18n cs="zdroj" en="resource"/></th>
+            <th><t:i18n cs="dostupné" en="available"/></th>
+            <th><t:i18n cs="použito" en="assigned"/></th>
+        </tr>
+        <c:forEach items="${node.nodeResources}" var="res">
+            <tr>
+                <td><c:out value="${res.name}"/></td>
+                <td>
+                    <c:choose>
+                        <c:when test="${fn:length(res.available)>25}"><c:out
+                                value="${fn:substring(res.available, 0, 25)}"/> ...</c:when>
+                        <c:otherwise><c:out value="${res.available}"/></c:otherwise>
+                    </c:choose>
+                </td>
+                <td><c:out value="${res.assigned}"/></td>
+            </tr>
+        </c:forEach>
+    </table>
+</c:if>
 
         <c:if test="${node.maintenance}">
             <p class="maintenance"><f:message key="nodejsp_maintenance"><f:param
@@ -148,37 +174,36 @@
         <c:if test="${node.reserved}">
             <p class="comment"><f:message key="nodejsp_reserved"><f:param value="${node.comment}"/></f:message></p>
         </c:if>
-        <%--<c:if test="${node.enabledHT}">
-            <p class="hyperthreading">
-                <f:message key="nodejsp_ht">
-                    <f:param value="${node.noOfCPUInt}"/>
-                    <f:param value="${node.noOfHTCoresInt}"/>
-                </f:message>
-            </p>
-        </c:if>--%>
-        <!-- bezici ulohy -->
+
+
+
+        <!-- ulohy -->
         <br>
         <c:if test="${fn:length(node.jobs)>0 or fn:length(node.plannedJobs)>0}">
             <table class="job">
                 <tr>
-                    <th align="center"><f:message key="nodejsp_jobs"/></th>
-                    <th align="center"><f:message key="jobs_user"/></th>
+                    <th rowspan="2" align="center"><f:message key="nodejsp_jobs"/></th>
+                    <th rowspan="2" align="center"><f:message key="jobs_user"/></th>
+                    <th colspan="4" align="center"><f:message key="nodejsp_on_node"/></th>
+                    <th rowspan="2" align="center"><f:message key="jobs_jobname"/></th>
+                    <th rowspan="2" align="center"><f:message key="jobs_state"/></th>
+                    <th rowspan="2" align="center" colspan="2"><f:message key="job_start_time"/></th>
+                    <th rowspan="2" align="center" colspan="2"><f:message key="job_expected_endtime"/></th>
+                    <th rowspan="2" align="center"><f:message key="jobs_queue"/></th>
+                </tr>
+                <tr>
                     <th align="center">RAM</th>
                     <th align="center" colspan="2">scratch</th>
-                    <th align="center"><f:message key="nodejsp_cpu_num"/></th>
-                    <th align="center"><f:message key="jobs_jobname"/></th>
-                    <th align="center"><f:message key="jobs_state"/></th>
-                    <th align="center" colspan="2"><f:message key="job_start_time"/></th>
-                    <th align="center" colspan="2"><f:message key="job_expected_endtime"/></th>
-                    <th align="center"><f:message key="jobs_queue"/></th>
+                    <th align="center">CPU</th>
+                </tr>
                 <c:forEach items="${node.jobs}" var="job" varStatus="j">
                 <tr>
                 <td><s:link href="/job/${job.id}">${job.id}</s:link>
                 <td align="right"><s:link href="/user/${job.user}">${job.user}</s:link></td>
-                <td align="right">${job.reservedMemoryTotal}</td>
-                <td>${job.nodeName2reservedScratchMap[node.name].type} </td>
-                <td>${job.nodeName2reservedScratchMap[node.name].volume}</td>
-                <td align="center">${job.noOfUsedCPU} CPU</td>
+                <td align="right">${job.nodeName2reservedResources[node.name].mem}</td>
+                <td>${job.nodeName2reservedResources[node.name].scratchType} </td>
+                <td>${job.nodeName2reservedResources[node.name].volume}</td>
+                <td align="center">${job.nodeName2reservedResources[node.name].cpus}</td>
                 <td>${job.jobName}</td>
                 <td align="center" class="${job.state}">${job.state} - <f:message key='jobs_${job.state}'/></td>
                     <td align="right"><f:formatDate value="${job.timeStarted}" pattern="d.M."/></td>
@@ -192,10 +217,10 @@
                     <tr>
                         <td><s:link href="/job/${job.id}">${job.id}</s:link>
                         <td align="right"><s:link href="/user/${job.user}">${job.user}</s:link></td>
-                        <td align="right">${job.reservedMemoryTotal}</td>
-                        <td>${job.nodeName2reservedScratchMap[node.name].type} </td>
-                        <td>${job.nodeName2reservedScratchMap[node.name].volume}</td>
-                        <td align="center">${job.noOfUsedCPU} CPU</td>
+                        <td align="right">${job.nodeName2reservedResources[node.name].mem}</td>
+                        <td>${job.nodeName2reservedResources[node.name].scratchType} </td>
+                        <td>${job.nodeName2reservedResources[node.name].volume}</td>
+                        <td align="center">${job.nodeName2reservedResources[node.name].cpus}</td>
                         <td>${job.jobName}</td>
                         <td align="center" class="${job.state}">${job.state} - <f:message key='jobs_${job.state}'/></td>
                         <c:choose>
@@ -226,6 +251,7 @@
             </c:if>
         </c:if>
 
+        <!-- fronty -->
         <br>
         <f:message key="node_detail_fronty"/> <s:link href="/queues/list" anchor="${node.pbs.server.name}"><c:out
             value="${node.pbs.server.shortName}"/></s:link>:
@@ -242,6 +268,9 @@
             </div>
         </c:if>
 
+
+
+        <!-- atributy -->
         <br>
         <table class="attributes">
             <c:forEach items="${node.attributes}" var="met">
@@ -288,5 +317,3 @@
                 <f:message key="node_detail_tag_none_found"/>
             </c:otherwise>
         </c:choose>
-    </c:otherwise>
-</c:choose>

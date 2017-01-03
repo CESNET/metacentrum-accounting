@@ -49,21 +49,28 @@ public class NodeActionBean extends BaseActionBean {
             log.warn("Node {} not found.",nodeName);
             return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND,"Node "+nodeName+" not found.");
         }
-        virtual = perun.isNodeVirtual(nodeName);
+        log.debug("testing node virtual {}",nodeName);
+        String nodeFQDN = node.getFQDN();
+        virtual = perun.isNodeVirtual(nodeFQDN);
+        log.debug("node virtual={}",virtual);
         if(virtual) {
-            //try pbs_cache with Magrathea mappings
-            physicalMachineName = pbsCache.getMapping().getVirtual2physical().get(nodeName);
+            //try pbs_cache with mappings
+            physicalMachineName = pbsCache.getMapping().getVirtual2physical().get(nodeFQDN);
             //try cloud if not found in previous step
             if(physicalMachineName==null) {
-                CloudPhysicalHost physicalHost = cloud.getVmFqdn2HostMap().get(nodeName);
+                CloudPhysicalHost physicalHost = cloud.getVmFqdn2HostMap().get(nodeFQDN);
                 if(physicalHost!=null) {
                     physicalMachineName = physicalHost.getHostname();
                 }
             }
         } else {
-            physicalMachineName = nodeName;
+            physicalMachineName = nodeFQDN;
         }
         node.setOutages(accounting.getOutagesForNode(node));
+
+        if(log.isDebugEnabled()) {
+            log.debug("scratch={}",node.getScratch());
+        }
         return new ForwardResolution("/nodes/node.jsp");
     }
 

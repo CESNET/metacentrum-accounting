@@ -9,9 +9,13 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 ">
 
-    <!--<context:component-scan base-package="cz.muni.ics.cerit.stats"/>-->
-    <!--<context:annotation-config/>-->
     <bean id="pbs" class="cz.muni.ics.cerit.stats.PbsImpl" >
+
+        <property name="pbsURLs">
+            <list>
+                <value>https://metavo.metacentrum.cz/pbsmon2/api/nodes?serverName=wagap.cerit-sc.cz</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="nebula" class="cz.muni.ics.cerit.stats.OpenNebulaImpl" >
@@ -27,7 +31,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="perun" class="cz.cesnet.meta.perun.impl.PerunJsonImpl" scope="singleton">
+    <bean id="perun" class="cz.cesnet.meta.perun.impl.PerunJsonImpl">
         <constructor-arg>
             <list value-type="java.lang.String">
                 <value>/etc/pbsmon/pbsmon_machines.json</value>

@@ -63,6 +63,7 @@ public class PbsConnectorJNI implements PbsConnector {
         PbsConnectorJNI p = new PbsConnectorJNI();
         call(p, new PbsServerConfig("arien-pro.ics.muni.cz",false,false, true,Collections.<FairshareConfig>emptyList()));
         call(p, new PbsServerConfig("arien.ics.muni.cz",false,true,true,Collections.<FairshareConfig>emptyList()));
+        call(p, new PbsServerConfig("wagap.cerit-sc.cz",false,true,true,Collections.<FairshareConfig>emptyList()));
 
     }
 

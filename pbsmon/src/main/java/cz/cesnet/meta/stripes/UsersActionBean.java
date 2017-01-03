@@ -36,7 +36,7 @@ public class UsersActionBean extends BaseActionBean {
         users = pbsky.getSortedUsers(UsersSortOrder.valueOf(trideni));
         //collect user names
 
-        List <PBS> pbsServers = pbsky.getPbsky();
+        List <PBS> pbsServers = pbsky.getListOfPBS();
         Set<String> userNames = pbsky.getUserNames();
 
         //prepare fairshare

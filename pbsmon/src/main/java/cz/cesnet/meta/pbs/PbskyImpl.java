@@ -13,6 +13,7 @@ import java.util.*;
  * @author Martin Kuba makub@ics.muni.cz
  * @version $Id: PbskyImpl.java,v 1.30 2014/04/11 08:38:08 makub Exp $
  */
+@SuppressWarnings("Convert2streamapi")
 public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     final static Logger log = LoggerFactory.getLogger(PbskyImpl.class);
@@ -30,6 +31,11 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
         this.pbsServers = pbsServers;
     }
 
+    @Override
+    public List<PbsServerConfig> getPbsServerConfigs() {
+        return pbsServers;
+    }
+
     public void setPbsCache(PbsCache pbsCache) {
         this.pbsCache = pbsCache;
     }
@@ -42,8 +48,8 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     }
 
     @Override
-    public List<PBS> getPbsky() {
-        //obsahuje checkLoad(), takze neni potreba tam, kde se volaji getPbsky()
+    public List<PBS> getListOfPBS() {
+        //obsahuje checkLoad(), takze neni potreba tam, kde se volaji getListOfPBS()
         checkLoad();
         return pbsky;
     }
@@ -61,9 +67,9 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     @Override
     protected void load() {
         try {
-            List<PBS> pbskyNew = new ArrayList<PBS>();
-            Map<String, Queue> queuesMapNew = new HashMap<String, Queue>();
-            List<PBS> oldPbsky = new ArrayList<PBS>();
+            List<PBS> pbskyNew = new ArrayList<>();
+            Map<String, Queue> queuesMapNew = new HashMap<>();
+            List<PBS> oldPbsky = new ArrayList<>();
             //nacti vsechno cerstve. pokud to jde, jinak si nech stara data
             for (PbsServerConfig server : pbsServers) {
                 PBS oldData = findPBSForServer(server, pbsky);
@@ -94,8 +100,11 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
                     queuesMapNew.put(q.getName(), q);
                 }
                 for (Node node : pbs.getNodesByName()) {
-                    node.setMagratheaStatus(pbsCache.getMagratheaStateForNode(node));
-                    node.setScratch(pbsCache.getScratchForNode(node));
+                    if(node.getPbs().isTorque()) {
+                        node.setScratch(pbsCache.getScratchForNode(node));
+                    } else {
+                        node.setScratchPBSPro();
+                    }
                     node.setGpuJobMap(pbsCache.getGpuAlloc(node));
                 }
             }
@@ -129,13 +138,13 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     }
 
     private synchronized List<Job> getAllJobs() {
-        List<PBS> list = getPbsky();
+        List<PBS> list = getListOfPBS();
         if (allJobs == null) {
             int jobCount = 0;
             for (PBS pbs : list) {
                 jobCount += pbs.getJobsById().size();
             }
-            ArrayList<Job> jobs = new ArrayList<Job>(jobCount);
+            ArrayList<Job> jobs = new ArrayList<>(jobCount);
             for (PBS pbs : list) {
                 jobs.addAll(pbs.getJobsById());
             }
@@ -152,7 +161,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     @Override
     public Job getJobByName(String jobName) {
-        for (PBS pbs : getPbsky()) {
+        for (PBS pbs : getListOfPBS()) {
             Job job = pbs.getJobs().get(jobName);
             if (job != null) return job;
         }
@@ -164,37 +173,37 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
         checkLoad();
         List<Job> jobs = getAllJobs();
         if (poradi != JobsSortOrder.Id) {
-            jobs = new ArrayList<Job>(jobs);
+            jobs = new ArrayList<>(jobs);
             switch (poradi) {
                 case CPU:
-                    Collections.sort(jobs, jobCPUComparator);
+                    jobs.sort(jobCPUComparator);
                     break;
                 case CPUTime:
-                    Collections.sort(jobs, jobCPUTimeUsedComparator);
+                    jobs.sort(jobCPUTimeUsedComparator);
                     break;
                 case Name:
-                    Collections.sort(jobs, jobNameComparator);
+                    jobs.sort(jobNameComparator);
                     break;
                 case Queue:
-                    Collections.sort(jobs, jobQueueComparator);
+                    jobs.sort(jobQueueComparator);
                     break;
                 case Ctime:
-                    Collections.sort(jobs, jobCtimeComparator);
+                    jobs.sort(jobCtimeComparator);
                     break;
                 case ReservedMemTotal:
-                    Collections.sort(jobs, jobReservedMemTotalComparator);
+                    jobs.sort(jobReservedMemTotalComparator);
                     break;
                 case UsedMem:
-                    Collections.sort(jobs, jobUsedMemComparator);
+                    jobs.sort(jobUsedMemComparator);
                     break;
                 case User:
-                    Collections.sort(jobs, jobUserComparator);
+                    jobs.sort(jobUserComparator);
                     break;
                 case WallTime:
-                    Collections.sort(jobs, jobWallTimeUsedComparator);
+                    jobs.sort(jobWallTimeUsedComparator);
                     break;
                 case State:
-                    Collections.sort(jobs, jobStateComparator);
+                    jobs.sort(jobStateComparator);
                     break;
             }
         }
@@ -204,15 +213,15 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     @Override
     public List<Node> getAllNodes() {
         int nodeCount = 0;
-        List<PBS> list = getPbsky();
+        List<PBS> list = getListOfPBS();
         for (PBS pbs : list) {
             nodeCount += pbs.getNodesByName().size();
         }
-        ArrayList<Node> nodes = new ArrayList<Node>(nodeCount);
+        ArrayList<Node> nodes = new ArrayList<>(nodeCount);
         for (PBS pbs : list) {
             nodes.addAll(pbs.getNodesByName());
         }
-        Collections.sort(nodes, nodesNameComparator);
+        nodes.sort(nodesNameComparator);
         return nodes;
     }
 
@@ -228,12 +237,12 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     }
 
     public User getUserByName(String userName) {
-        return getUserByName(userName, getPbsky());
+        return getUserByName(userName, getListOfPBS());
     }
 
     @Override
     public List<Job> getUserJobs(String userName, JobsSortOrder sort) {
-        ArrayList<Job> jobs = new ArrayList<Job>();
+        ArrayList<Job> jobs = new ArrayList<>();
         for (Job job : this.getSortedJobs(sort)) {
             if (job.getUser().equals(userName)) {
                 jobs.add(job);
@@ -244,8 +253,17 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     @Override
     public Node getNodeByName(String nodeName) {
-        for (PBS pbs : getPbsky()) {
+        for (PBS pbs : getListOfPBS()) {
             Node node = pbs.getNodes().get(nodeName);
+            if (node != null) return node;
+        }
+        return null;
+    }
+
+    @Override
+    public Node getNodeByFQDN(String fqdn) {
+        for (PBS pbs : getListOfPBS()) {
+            Node node = pbs.getFqdnToNodeMap().get(fqdn);
             if (node != null) return node;
         }
         return null;
@@ -254,14 +272,14 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     @Override
     public int getJobsQueuedCount() {
         int total = 0;
-        for (PBS pbs : getPbsky()) {
+        for (PBS pbs : getListOfPBS()) {
             total += pbs.getJobsQueuedCount();
         }
         return total;
     }
 
     private static Set<String> getUserNames(List<PBS> list) {
-        Set<String> userNames = new TreeSet<String>();
+        Set<String> userNames = new TreeSet<>();
         for (PBS pbs : list) {
             userNames.addAll(pbs.getUsersMap().keySet());
         }
@@ -270,52 +288,52 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     @Override
     public Set<String> getUserNames() {
-        return getUserNames(getPbsky());
+        return getUserNames(getListOfPBS());
     }
 
 
     @Override
     public List<User> getSortedUsers(UsersSortOrder usersSortOrder) {
         //spojit udaje ze vsech PBSek
-        List<PBS> list = getPbsky();
-        List<User> users = new ArrayList<User>();
+        List<PBS> list = getListOfPBS();
+        List<User> users = new ArrayList<>();
         for (String userName : getUserNames(list)) {
             users.add(getUserByName(userName, list));
         }
         //seradit
         switch (usersSortOrder) {
             case name:
-                Collections.sort(users, userNameComparator);
+                users.sort(userNameComparator);
                 break;
             case jobsTotal:
-                Collections.sort(users, userJobsTotalComparator);
+                users.sort(userJobsTotalComparator);
                 break;
             case jobsStateQ:
-                Collections.sort(users, userJobsStateQComparator);
+                users.sort(userJobsStateQComparator);
                 break;
             case jobsStateR:
-                Collections.sort(users, userJobsStateRComparator);
+                users.sort(userJobsStateRComparator);
                 break;
             case jobsStateC:
-                Collections.sort(users, userJobsStateCComparator);
+                users.sort(userJobsStateCComparator);
                 break;
             case jobsOther:
-                Collections.sort(users, userJobsOtherComparator);
+                users.sort(userJobsOtherComparator);
                 break;
             case cpusTotal:
-                Collections.sort(users, userCpusTotalComparator);
+                users.sort(userCpusTotalComparator);
                 break;
             case cpusStateQ:
-                Collections.sort(users, userCpusStateQComparator);
+                users.sort(userCpusStateQComparator);
                 break;
             case cpusStateR:
-                Collections.sort(users, userCpusStateRComparator);
+                users.sort(userCpusStateRComparator);
                 break;
             case cpusStateC:
-                Collections.sort(users, userCpusStateCComparator);
+                users.sort(userCpusStateCComparator);
                 break;
             case cpusOther:
-                Collections.sort(users, userCpusOtherComparator);
+                users.sort(userCpusOtherComparator);
                 break;
             case fairshare:
                 //neni zatim podle ceho tridit
@@ -326,24 +344,23 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
         return users;
     }
 
+    @SuppressWarnings("Convert2streamapi")
     @Override
-    public List<TextWithCount> getReasonsForJobsQueued() {
-        HashMap<String, Integer> pocitadla = new HashMap<String, Integer>();
-        for (PBS pbs : getPbsky()) {
+    public List<TextWithCount> getReasonsForJobsQueued(PBS pbs) {
+        HashMap<String, Integer> counters = new HashMap<>();
             for (Job job : pbs.getJobsById()) {
                 if ("Q".equals(job.getState())) {
-                    String duvod = job.getComment();
-                    Integer count = pocitadla.get(duvod);
+                    String comment = job.getComment();
+                    Integer count = counters.get(comment);
                     if (count == null) {
                         count = 0;
                     }
-                    pocitadla.put(duvod, count + 1);
+                    counters.put(comment, count + 1);
                 }
             }
-        }
-        List<TextWithCount> duvody = new ArrayList<TextWithCount>(pocitadla.size());
-        for (String duvod : pocitadla.keySet()) {
-            duvody.add(new TextWithCount(duvod, pocitadla.get(duvod)));
+        List<TextWithCount> duvody = new ArrayList<>(counters.size());
+        for (String duvod : counters.keySet()) {
+            duvody.add(new TextWithCount(duvod, counters.get(duvod)));
         }
         Collections.sort(duvody);
         return duvody;
@@ -373,170 +390,78 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
 
     //comparators for array sorting
-    static final Comparator<Queue> queuesPriorityComparator = new Comparator<Queue>() {
-        public int compare(Queue o1, Queue o2) {
-            return o2.getPriority() - o1.getPriority();
-        }
-    };
+    static final Comparator<Queue> queuesPriorityComparator = (o1, o2) -> o2.getPriority() - o1.getPriority();
 
-    static Comparator<Node> nodesNameComparator = new Comparator<Node>() {
-        public int compare(Node h1, Node h2) {
-            String h1clustName = h1.getClusterName();
-            if (h1clustName == null) {
-                log.error("Node h1=" + h1 + " has no clusterName");
-                throw new IllegalArgumentException("node " + h1.getName() + " has no clusterName");
-            }
-            if (!h1clustName.equals(h2.getClusterName())) {
-                return h1.getClusterName().compareTo(h2.getClusterName());
+    static Comparator<Node> nodesNameComparator = (h1, h2) -> {
+        String h1clustName = h1.getClusterName();
+        if (h1clustName == null) {
+            log.error("Node h1=" + h1 + " has no clusterName");
+            throw new IllegalArgumentException("node " + h1.getName() + " has no clusterName");
+        }
+        if (!h1clustName.equals(h2.getClusterName())) {
+            return h1.getClusterName().compareTo(h2.getClusterName());
+        } else {
+            int diffNumInCluster = h1.getNumInCluster() - h2.getNumInCluster();
+            if (diffNumInCluster != 0) {
+                return diffNumInCluster;
             } else {
-                int diffNumInCluster = h1.getNumInCluster() - h2.getNumInCluster();
-                if (diffNumInCluster != 0) {
-                    return diffNumInCluster;
-                } else {
-                    return h1.getVirtNum() - h2.getVirtNum();
-                }
+                return h1.getVirtNum() - h2.getVirtNum();
             }
         }
     };
 
-    static final Comparator<Job> jobsIdComparator = new Comparator<Job>() {
-        public int compare(Job j1, Job j2) {
-            int diff = j1.getIdNum() - j2.getIdNum();
-            if (diff == 0) {
-                return j1.getIdSubNum() - j2.getIdSubNum();
-            } else {
-                return diff;
-            }
-        }
+    static final Comparator<Job> jobsIdComparator = (j1, j2) -> {
+        int diff = j1.getIdNum() - j2.getIdNum();
+        return (diff == 0) ? j1.getIdSubNum() - j2.getIdSubNum() : diff;
     };
 
 
-    private static Comparator<Job> jobCPUComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return o2.getNoOfUsedCPU() - o1.getNoOfUsedCPU();
-        }
+    private static Comparator<Job> jobCPUComparator = (o1, o2) -> o2.getNoOfUsedCPU() - o1.getNoOfUsedCPU();
+
+    private static Comparator<Job> jobNameComparator = Comparator.comparing(Job::getJobName);
+
+    private static Comparator<Job> jobUserComparator = Comparator.comparing(Job::getUser);
+
+    private static Comparator<Job> jobCPUTimeUsedComparator = (o1, o2) -> (int) (o2.getCPUTimeUsedSec() - o1.getCPUTimeUsedSec());
+
+    private static Comparator<Job> jobWallTimeUsedComparator = Comparator.comparing(Job::getWalltimeUsed);
+
+    private static Comparator<Job> jobStateComparator = Comparator.comparing(o -> JobState.valueOf(o.getState()));
+
+    private static Comparator<Job> jobQueueComparator = Comparator.comparing(Job::getQueueName);
+
+    private static Comparator<Job> jobCtimeComparator = Comparator.comparing(Job::getTimeCreated);
+
+    private static Comparator<Job> jobUsedMemComparator = (o1, o2) -> {
+        long l = o2.getUsedMemoryNum() - o1.getUsedMemoryNum();
+        return (l > 0 ? 1 : (l < 0 ? -1 : 0));
+    };
+    private static Comparator<Job> jobReservedMemTotalComparator = (o1, o2) -> {
+        long l = o2.getReservedMemoryTotalNum() - o1.getReservedMemoryTotalNum();
+        return (l > 0 ? 1 : (l < 0 ? -1 : 0));
     };
 
-    private static Comparator<Job> jobNameComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return o1.getJobName().compareTo(o2.getJobName());
-        }
-    };
+    private static Comparator<User> userNameComparator = Comparator.comparing(User::getName);
 
-    private static Comparator<Job> jobUserComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return o1.getUser().compareTo(o2.getUser());
-        }
-    };
+    private static Comparator<User> userJobsTotalComparator = (u1, u2) -> u2.getJobsTotal() - u1.getJobsTotal();
 
-    private static Comparator<Job> jobCPUTimeUsedComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return (int) (o2.getCPUTimeUsedSec() - o1.getCPUTimeUsedSec());
-        }
-    };
+    private static Comparator<User> userJobsStateQComparator = (u1, u2) -> u2.getJobsStateQ() - u1.getJobsStateQ();
 
-    private static Comparator<Job> jobWallTimeUsedComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return (int) (o2.getWallTimeUsedSec() - o1.getWallTimeUsedSec());
-        }
-    };
+    private static Comparator<User> userJobsStateRComparator = (u1, u2) -> u2.getJobsStateR() - u1.getJobsStateR();
 
-    private static Comparator<Job> jobStateComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return JobState.valueOf(o1.getState()).compareTo(JobState.valueOf(o2.getState()));
-        }
-    };
+    private static Comparator<User> userJobsStateCComparator = (u1, u2) -> u2.getJobsStateC() - u1.getJobsStateC();
 
-    private static Comparator<Job> jobQueueComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return o1.getQueueName().compareTo(o2.getQueueName());
-        }
-    };
+    private static Comparator<User> userJobsOtherComparator = (u1, u2) -> u2.getJobsOther() - u1.getJobsOther();
 
-    private static Comparator<Job> jobCtimeComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            return o1.getTimeCreated().compareTo(o2.getTimeCreated());
-        }
-    };
+    private static Comparator<User> userCpusTotalComparator = (u1, u2) -> u2.getCpusTotal() - u1.getCpusTotal();
 
-    private static Comparator<Job> jobUsedMemComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            long l = o2.getUsedMemoryNum() - o1.getUsedMemoryNum();
-            return (l > 0 ? 1 : (l < 0 ? -1 : 0));
-        }
-    };
-    private static Comparator<Job> jobReservedMemTotalComparator = new Comparator<Job>() {
-        public int compare(Job o1, Job o2) {
-            long l = o2.getReservedMemoryTotalNum() - o1.getReservedMemoryTotalNum();
-            return (l > 0 ? 1 : (l < 0 ? -1 : 0));
-        }
-    };
+    private static Comparator<User> userCpusStateQComparator = (u1, u2) -> u2.getCpusStateQ() - u1.getCpusStateQ();
 
-    private static Comparator<User> userNameComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u1.getName().compareTo(u2.getName());
-        }
-    };
+    private static Comparator<User> userCpusStateRComparator = (u1, u2) -> u2.getCpusStateR() - u1.getCpusStateR();
 
-    private static Comparator<User> userJobsTotalComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getJobsTotal() - u1.getJobsTotal();
-        }
-    };
+    private static Comparator<User> userCpusStateCComparator = (u1, u2) -> u2.getCpusStateC() - u1.getCpusStateC();
 
-    private static Comparator<User> userJobsStateQComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getJobsStateQ() - u1.getJobsStateQ();
-        }
-    };
-
-    private static Comparator<User> userJobsStateRComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getJobsStateR() - u1.getJobsStateR();
-        }
-    };
-
-    private static Comparator<User> userJobsStateCComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getJobsStateC() - u1.getJobsStateC();
-        }
-    };
-
-    private static Comparator<User> userJobsOtherComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getJobsOther() - u1.getJobsOther();
-        }
-    };
-
-    private static Comparator<User> userCpusTotalComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getCpusTotal() - u1.getCpusTotal();
-        }
-    };
-
-    private static Comparator<User> userCpusStateQComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getCpusStateQ() - u1.getCpusStateQ();
-        }
-    };
-
-    private static Comparator<User> userCpusStateRComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getCpusStateR() - u1.getCpusStateR();
-        }
-    };
-
-    private static Comparator<User> userCpusStateCComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getCpusStateC() - u1.getCpusStateC();
-        }
-    };
-
-    private static Comparator<User> userCpusOtherComparator = new Comparator<User>() {
-        public int compare(User u1, User u2) {
-            return u2.getCpusOther() - u1.getCpusOther();
-        }
-    };
+    private static Comparator<User> userCpusOtherComparator = (u1, u2) -> u2.getCpusOther() - u1.getCpusOther();
 
 
 }

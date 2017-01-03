@@ -23,7 +23,7 @@
         </else>
     </if>
 
-    <root level="debug">
+    <root level="info">
         <appender-ref ref="APP"/>
     </root>
 
@@ -32,28 +32,37 @@
     <logger name="net.sourceforge.stripes" level="info"/>
     <logger name="org.springframework" level="warn"/>
     <logger name="org.springframework.web.context.ContextLoader" level="info"/>
-    <logger name="cz" level="info"/>
+
     <logger name="cz.cesnet.meta.perun.api.FyzickeStroje" level="info"/>
+
     <logger name="cz.cesnet.meta.perun.impl" level="info"/>
     <logger name="cz.cesnet.meta.perun.impl.PerunResourceBundle" level="info"/>
     <logger name="cz.cesnet.meta.perun.impl.Texty" level="info"/>
-    <logger name="cz.cesnet.meta.pbs" level="info"/>
-    <logger name="cz.cesnet.meta.stripes.PersonActionBean" level="info"/>
-    <logger name="cz.cesnet.meta.perun.api.FyzickeStroje" level="info"/>
     <logger name="cz.cesnet.meta.perun.impl.PerunJsonImpl" level="info"/>
-    <logger name="cz.cesnet.meta.pbsmon.RozhodovacStavuStroju" level="info"/>
+
     <logger name="cz.cesnet.meta.cloud.CloudPhysicalHost" level="error"/>
     <logger name="cz.cesnet.meta.cloud.CloudImpl" level="info"/>
     <logger name="cz.cesnet.meta.cloud.CloudLoader" level="info"/>
 
+    <logger name="cz.cesnet.meta.pbsmon.RozhodovacStavuStroju" level="info"/>
+
+    <logger name="cz.cesnet.meta.pbs" level="info"/>
+    <logger name="cz.cesnet.meta.pbs.PBS" level="info"/>
+    <logger name="cz.cesnet.meta.pbs.Node" level="info"/>
     <logger name="cz.cesnet.meta.pbs.PbskyImpl" level="info"/>
     <logger name="cz.cesnet.meta.pbs.PbsConnectorJNI" level="info"/>
-    <logger name="cz.cesnet.meta.pbs" level="info"/>
+    <logger name="cz.cesnet.meta.pbs.Queue" level="info"/>
+    <logger name="cz.cesnet.meta.pbs.UserAccessImpl" level="info"/>
 
     <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl" level="info"/>
     <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl.gpu" level="info"/>
-    <logger name="cz.cesnet.meta.pbs.Queue" level="info"/>
+    <logger name="cz.cesnet.meta.pbscache.Scratch" level="info"/>
+
+    <logger name="cz.cesnet.meta.stripes.PersonActionBean" level="info"/>
+    <logger name="cz.cesnet.meta.stripes.QsubPbsproActionBean" level="info"/>
     <logger name="cz.cesnet.meta.stripes.QueuesActionBean" level="info"/>
+    <logger name="cz.cesnet.meta.stripes.NodeActionBean" level="info"/>
+
     <logger name="cz.cesnet.meta.storages.StoragesHsmImpl" level="info"/>
 
 </configuration>

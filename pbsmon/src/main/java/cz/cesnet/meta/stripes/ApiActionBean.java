@@ -2,7 +2,9 @@ package cz.cesnet.meta.stripes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import cz.cesnet.meta.pbs.Job;
 import cz.cesnet.meta.pbs.Node;
+import cz.cesnet.meta.pbs.PBS;
 import cz.cesnet.meta.pbs.User;
 import cz.cesnet.meta.pbscache.Mapping;
 import cz.cesnet.meta.perun.api.FyzickeStroje;
@@ -38,24 +40,74 @@ public class ApiActionBean extends BaseActionBean {
 
     private List<String> users;
     private boolean pretty = false;
+    private String serverName;
 
+    /**
+     * Used by cerit-stats to get state of pbs nodes in wagap
+     * @return json
+     */
+    public Resolution nodes() {
+        List<PBS> listOfPBS = pbsky.getListOfPBS();
+        List<Node> nodes=null;
+        for (PBS pbs : listOfPBS) {
+            if(pbs.getHost().equals(serverName)) {
+                 nodes = pbs.getNodesByName();
+            }
+        }
+        if(nodes==null) return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND,"server "+serverName+" not found");
+        final Map<String,Object> data = new TreeMap<>();
+        Map<String,Object> nodesData = new LinkedHashMap<>();
+        data.put("nodes",nodesData);
+        for (Node node : nodes) {
+            Map<String,Object> nodeData = new LinkedHashMap<>();
+            String nodeName = node.getName();
+            nodesData.put(nodeName,nodeData);
+            nodeData.put("name", nodeName);
+            nodeData.put("attributes", node.getAttributes());
+        }
+        return sendJSON(data);
+    }
+
+    public Resolution jobs() {
+        List<PBS> listOfPBS = pbsky.getListOfPBS();
+        List<Job> jobs=null;
+        for (PBS pbs : listOfPBS) {
+            if(pbs.getHost().equals(serverName)) {
+                jobs = pbs.getJobsById();
+            }
+        }
+        if(jobs==null) return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND,"server "+serverName+" not found");
+        final Map<String,Object> data = new TreeMap<>();
+        Map<String,Object> jobsData = new LinkedHashMap<>();
+        data.put("jobs",jobsData);
+        for (Job job : jobs) {
+            Map<String,Object> nodeData = new LinkedHashMap<>();
+            String nodeName = job.getName();
+            jobsData.put(nodeName,nodeData);
+            nodeData.put("name", nodeName);
+            nodeData.put("attributes", job.getAttributes());
+        }
+        return sendJSON(data);
+    }
+
+    @SuppressWarnings("unused")
     public Resolution machines() {
         List<Stroj> vsechnyStroje = perun.getMetacentroveStroje();
         List<String> pbsNodeNames = new ArrayList<>(vsechnyStroje.size()*2);
         Mapping mapping  = NodesActionBean.makeUnifiedMapping(this.pbsCache, this.cloud);
         for (Stroj s : vsechnyStroje) {
             String strojName = s.getName();
-            //PBs uzel primo na fyzickem - nevirtualizovane nebo Magratea-cloudove
-            Node pbsNode = pbsky.getNodeByName(strojName);
-            if (pbsNode != null && pbsNode.isComputingNode() && !pbsNode.isDown()) {
+            //PBs uzel primo na fyzickem - nevirtualizovane
+            Node pbsNode = pbsky.getNodeByFQDN(strojName);
+            if (pbsNode != null && !pbsNode.isDown()) {
                 pbsNodeNames.add(strojName);
             }
-            //virtualni podle Magrathea
+            //virtualni podle mappingu
             List<String> virtNames = mapping.getPhysical2virtual().get(strojName);
             if (virtNames != null) {
                 for (String virtName : virtNames) {
-                    Node vn = pbsky.getNodeByName(virtName);
-                    if (vn != null && vn.isComputingNode() && !vn.isDown()) {
+                    Node vn = pbsky.getNodeByFQDN(virtName);
+                    if (vn != null && !vn.isDown()) {
                         pbsNodeNames.add(virtName);
                     }
                 }
@@ -78,10 +130,10 @@ public class ApiActionBean extends BaseActionBean {
         if (users == null || users.isEmpty()) {
             return new ErrorResolution(HttpServletResponse.SC_BAD_REQUEST, "Specify users parameter (multivalued, i.e. users=joe&users=john");
         }
-        final Map<String,Map<String,Object>> usersData = new HashMap<String, Map<String, Object>>();
+        final Map<String,Map<String,Object>> usersData = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         for (String userName : users) {
-            Map<String, Object> userData = new HashMap<String, Object>();
+            Map<String, Object> userData = new HashMap<>();
             try {
                 PerunUser perunUser = perun.getUserByName(userName);
                 usersData.put(perunUser.getLogname(), userData);
@@ -94,7 +146,7 @@ public class ApiActionBean extends BaseActionBean {
             }
             User user = pbsky.getUserByName(userName);
             if (user != null) {
-                Map<String,Object> jobs = new HashMap<String,Object>();
+                Map<String,Object> jobs = new HashMap<>();
                 userData.put("jobs", jobs);
                 jobs.put("total", user.getJobsTotal());
                 jobs.put("stateQ", user.getJobsStateQ());
@@ -103,7 +155,7 @@ public class ApiActionBean extends BaseActionBean {
                 jobs.put("stateOther", user.getJobsOther());
                 //List<Job> userJobs = pbsky.getUserJobs(userName);
             } else {
-                Map<String,Object> jobs = new HashMap<String,Object>();
+                Map<String,Object> jobs = new HashMap<>();
                 userData.put("jobs", jobs);
                 jobs.put("total", 0);
                 jobs.put("stateQ", 0);
@@ -112,16 +164,20 @@ public class ApiActionBean extends BaseActionBean {
                 jobs.put("stateOther", 0);
             }
         }
+        return sendJSON(usersData);
+
+    }
+
+    private Resolution sendJSON(final Map<String, ?> data) {
         return new Resolution() {
             @Override
             public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 response.setContentType("application/json");
                 ObjectMapper objectMapper = new ObjectMapper();
                 if (pretty) objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-                objectMapper.writeValue(response.getOutputStream(), usersData);
+                objectMapper.writeValue(response.getOutputStream(), data);
             }
         };
-
     }
 
     public List<String> getUsers() {
@@ -138,5 +194,13 @@ public class ApiActionBean extends BaseActionBean {
 
     public void setPretty(boolean pretty) {
         this.pretty = pretty;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
     }
 }

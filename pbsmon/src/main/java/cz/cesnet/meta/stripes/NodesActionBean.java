@@ -55,6 +55,7 @@ public class NodesActionBean extends BaseActionBean {
      *
      * @return stránka nodes.jsp
      */
+    @SuppressWarnings("unused")
     @DefaultHandler
     public Resolution physical() {
         log.debug("physical({})", ctx.getRequest().getRemoteHost());
@@ -111,13 +112,14 @@ public class NodesActionBean extends BaseActionBean {
         return gpuNodes;
     }
 
+    @SuppressWarnings("unused")
     public Resolution virtual() {
         log.debug("virtual()");
         List<Stroj> vsechnyStroje = this.perun.getMetacentroveStroje();
         fyzicke = new ArrayList<>(vsechnyStroje.size());
         //mapa z hostname PBS uzlu na PBS uzel
         nodeMap = new HashMap<>(vsechnyStroje.size());
-        //mapovani z jmen virtualnich na jmena fyzickych a naopak
+        //mapovani z jmen virtualnich stroju na jmena fyzickych stroju a naopak
         mapping = makeUnifiedMapping(this.pbsCache, this.cloud);
         //mapa VM z cloudu
         List<CloudVirtualHost> virtualHosts = cloud.getVirtualHosts();
@@ -128,8 +130,8 @@ public class NodesActionBean extends BaseActionBean {
         //pripravit
         for (Stroj s : vsechnyStroje) {
             String strojName = s.getName();
-            //PBs uzel primo na fyzickem - nevirtualizovane nebo Magratea-cloudove
-            Node pbsNode = pbsky.getNodeByName(strojName);
+            //PBs uzel primo na fyzickem - nevirtualizovane
+            Node pbsNode = pbsky.getNodeByFQDN(strojName);
             if (pbsNode != null) nodeMap.put(strojName, pbsNode);
             // pro vsechny fyzicke vytahat virtualni s PBS uzly
             if (!s.isVirtual()) {
@@ -137,7 +139,7 @@ public class NodesActionBean extends BaseActionBean {
                 List<String> virtNames = mapping.getPhysical2virtual().get(s.getName());
                 if (virtNames != null) {
                     for (String virtName : virtNames) {
-                        Node vn = pbsky.getNodeByName(virtName);
+                        Node vn = pbsky.getNodeByFQDN(virtName);
                         if (vn != null) {
                             nodeMap.put(vn.getName(), vn);
                         }
@@ -156,10 +158,8 @@ public class NodesActionBean extends BaseActionBean {
         }
 
         //rozhodni stav podle virtualnich
-        VyhledavacFrontendu frontendy = perun.getVyhledavacFrontendu();
-        VyhledavacVyhrazenychStroju vyhrazene = perun.getVyhledavacVyhrazenychStroju();
         for (Stroj stroj : fyzicke) {
-            RozhodovacStavuStroju.rozhodniStav(stroj, pbsky, pbsCache.getMapping(), frontendy, vyhrazene, cloud);
+            RozhodovacStavuStroju.rozhodniStav(stroj, pbsky, pbsCache.getMapping(), perun.getVyhledavacFrontendu(), perun.getVyhledavacVyhrazenychStroju(), cloud);
         }
 
         return new ForwardResolution("/nodes/mapping.jsp");
@@ -171,10 +171,10 @@ public class NodesActionBean extends BaseActionBean {
         Map<String, String> virtual2physical = new HashMap<>();
         m.setPhysical2virtual(physical2virtual);
         m.setVirtual2physical(virtual2physical);
-        //Magrathea
-        Mapping magratheaMapping = pbsCache.getMapping();
-        physical2virtual.putAll(magratheaMapping.getPhysical2virtual());
-        virtual2physical.putAll(magratheaMapping.getVirtual2physical());
+        //Mapping of ungu and urga partitions
+        Mapping unguMapping = pbsCache.getMapping();
+        physical2virtual.putAll(unguMapping.getPhysical2virtual());
+        virtual2physical.putAll(unguMapping.getVirtual2physical());
         //OpenNebula
         Map<String, List<CloudVirtualHost>> hostName2VirtualHostsMap = cloud.getHostName2VirtualHostsMap();
         for (CloudPhysicalHost host : cloud.getPhysicalHosts()) {

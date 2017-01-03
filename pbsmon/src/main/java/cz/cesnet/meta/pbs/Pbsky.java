@@ -14,7 +14,9 @@ import java.util.Set;
  */
 public interface Pbsky extends TimeStamped {
 
-    List<PBS> getPbsky();
+    List<PbsServerConfig> getPbsServerConfigs();
+
+    List<PBS> getListOfPBS();
 
     Queue getQueueByName(String queueName);
 
@@ -26,13 +28,17 @@ public interface Pbsky extends TimeStamped {
 
     List<User> getSortedUsers(UsersSortOrder usersSortOrder);
 
-    List<TextWithCount> getReasonsForJobsQueued();
+    List<TextWithCount> getReasonsForJobsQueued(PBS pbs);
 
     User getUserByName(String userName);
 
     List<Job> getUserJobs(String userName, JobsSortOrder sort);
 
+
+
     Node getNodeByName(String nodeName);
+
+    Node getNodeByFQDN(String fqdn);
 
     int getJobsQueuedCount();
 

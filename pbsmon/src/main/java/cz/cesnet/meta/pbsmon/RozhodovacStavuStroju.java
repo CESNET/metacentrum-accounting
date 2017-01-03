@@ -62,7 +62,7 @@ public class RozhodovacStavuStroju {
             return;
         }
 
-        Node physNode = pbsky.getNodeByName(jmenoStroje);
+        Node physNode = pbsky.getNodeByFQDN(jmenoStroje);
         //nevirtualizovane stroje v PBS pouziji svuj stav
         if (physNode != null && !physNode.getState().equals(Node.STATE_CLOUD)) {
             String state = physNode.getState();
@@ -83,8 +83,7 @@ public class RozhodovacStavuStroju {
             String stav = Node.STATE_UNKNOWN;
             List<String> virtNames = mapping.getPhysical2virtual().get(jmenoStroje);
             if (virtNames != null) {
-                stroj.setMagratheaManaged(true);
-                //v pbsCache jsou z Magrathey udaje o virtualich strojich
+                //v pbsCache jsou udaje o virtualich strojich (urga)
                 List<Node> virtNodes = new ArrayList<Node>(virtNames.size());
                 for (String virtName : virtNames) {
                     if (frontendy.jeStrojFrontend(virtName)) {
@@ -92,7 +91,7 @@ public class RozhodovacStavuStroju {
                         stroj.setState(Node.STATE_JOB_BUSY);
                         return;
                     }
-                    Node node = pbsky.getNodeByName(virtName);
+                    Node node = pbsky.getNodeByFQDN(virtName);
                     if (node != null) virtNodes.add(node);
                 }
                 stav = rozhodniStavFyzickehoPodleVirtualnich(stroj, virtNodes);
@@ -111,6 +110,10 @@ public class RozhodovacStavuStroju {
             return Node.STATE_UNKNOWN;
         }
         stroj.setOpenNebulaManaged(true);
+        //http://docs.opennebula.org/4.14/administration/hosts_and_clusters/host_guide.html#host-life-cycle
+        if(!cloudHost.getState().endsWith("MONITORED")) {
+            return Node.STATE_UNKNOWN;
+        }
         List<CloudVirtualHost> cloudVirtualHosts = cloud.getHostName2VirtualHostsMap().get(cloudHost.getName());
         if (cloudVirtualHosts != null) {
             int cpusAvailable = stroj.getCpuNum();
@@ -119,7 +122,7 @@ public class RozhodovacStavuStroju {
                 //podle značky z OpenNebula je to PBS node
                 if (cloudVM.isPbsNode()) {
                     stroj.setNebulaPbsHost(true);
-                    Node node = pbsky.getNodeByName(cloudVM.getFqdn());
+                    Node node = pbsky.getNodeByFQDN(cloudVM.getFqdn());
                     if (node != null) {
                         //PBSka ho zná
                         stroj.setPbsName(node.getShortName());

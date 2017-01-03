@@ -21,6 +21,7 @@ public class PBS implements TimeStamped {
         this.torque = serverConfig.isTorque();
         this.mainServer = serverConfig.isMain();
     }
+    public static final String QUEUE_LIST = "queue_list";
 
     final static Logger log = LoggerFactory.getLogger(PBS.class);
 
@@ -39,6 +40,7 @@ public class PBS implements TimeStamped {
     private List<Job> jobsById;
     private Map<String, List<Node>> queueToNodesMap;
     private Map<String, List<Job>> queueToJobsMap;
+    private Map<String,Node> fqdnToNodeMap;
     private int jobsQueuedCount;
     private Map<String, User> usersMap;
     private String suffix;
@@ -72,6 +74,9 @@ public class PBS implements TimeStamped {
             }
             queueToNodesMap.clear();
             queueToNodesMap = null;
+
+            fqdnToNodeMap.clear();
+            fqdnToNodeMap = null;
 
             for (List<Job> ljobs : queueToJobsMap.values()) {
                 ljobs.clear();
@@ -123,7 +128,7 @@ public class PBS implements TimeStamped {
         return server;
     }
 
-    public String getPbsServerHost() {
+    public String getHost() {
         return serverConfig.getHost();
     }
 
@@ -182,6 +187,10 @@ public class PBS implements TimeStamped {
         return queueToJobsMap;
     }
 
+    public Map<String, Node> getFqdnToNodeMap() {
+        return fqdnToNodeMap;
+    }
+
     public int getJobsQueuedCount() {
         return jobsQueuedCount;
     }
@@ -202,6 +211,7 @@ public class PBS implements TimeStamped {
      * Provede úpravy po prostém načtení dat.
      */
     public void uprav() {
+
         //ukazatele nahoru
         for (Queue queue : queues.values()) {
             queue.setPbs(this);
@@ -209,21 +219,24 @@ public class PBS implements TimeStamped {
         for (Job job : jobs.values()) {
             job.setPbs(this);
         }
+
+        fqdnToNodeMap = new HashMap<>(nodes.size());
         for (Node node : nodes.values()) {
             node.setPbs(this);
+            fqdnToNodeMap.put(node.getFQDN(),node);
         }
         //suffix
         suffix = mainServer ? "" : "@" + server.getHost();
 
         //serazena pole
-        queuesByPriority = new ArrayList<Queue>(queues.values());
-        Collections.sort(queuesByPriority, PbskyImpl.queuesPriorityComparator);
+        queuesByPriority = new ArrayList<>(queues.values());
+        queuesByPriority.sort(PbskyImpl.queuesPriorityComparator);
 
-        nodesByName = new ArrayList<Node>(nodes.values());
-        Collections.sort(nodesByName, PbskyImpl.nodesNameComparator);
+        nodesByName = new ArrayList<>(nodes.values());
+        nodesByName.sort(PbskyImpl.nodesNameComparator);
 
-        jobsById = new ArrayList<Job>(jobs.values());
-        Collections.sort(jobsById, PbskyImpl.jobsIdComparator);
+        jobsById = new ArrayList<>(jobs.values());
+        jobsById.sort(PbskyImpl.jobsIdComparator);
 
         //mapy
         queueToNodesMap = makeQueuesToNodeMap(queuesByPriority, nodesByName);
@@ -234,7 +247,7 @@ public class PBS implements TimeStamped {
         //spocitej uzivatele
         makeUsers();
         //zjisti fairshare_tree u front
-        fairshareTrees = new HashSet<String>();
+        fairshareTrees = new HashSet<>();
         for (Queue q : queuesByPriority) {
             fairshareTrees.add(q.getFairshareTree());
         }
@@ -242,26 +255,31 @@ public class PBS implements TimeStamped {
 
 
     private void makeUsers() {
-        usersMap = new HashMap<String, User>(100);
+        usersMap = new HashMap<>(100);
         for (Job job : jobsById) {
             User user = usersMap.get(job.getUser());
             if (user == null) {
                 user = new User(job.getUser());
                 usersMap.put(user.getName(), user);
             }
-            String state = job.getState();
-            if (state.equals("Q")) {
-                user.incJobsStateQ();
-                user.addCpusStateQ(job.getNoOfUsedCPU());
-            } else if (state.equals("R")) {
-                user.incJobsStateR();
-                user.addCpusStateR(job.getNoOfUsedCPU());
-            } else if (state.equals("C")) {
-                user.incJobsStateC();
-                user.addCpusStateC(job.getNoOfUsedCPU());
-            } else {
-                user.incJobsOther();
-                user.addCpusOther(job.getNoOfUsedCPU());
+            switch (job.getState()) {
+                case "Q":
+                    user.incJobsStateQ();
+                    user.addCpusStateQ(job.getNoOfUsedCPU());
+                    break;
+                case "R":
+                    user.incJobsStateR();
+                    user.addCpusStateR(job.getNoOfUsedCPU());
+                    break;
+                case "C":
+                case "F":
+                    user.incJobsStateC();
+                    user.addCpusStateC(job.getNoOfUsedCPU());
+                    break;
+                default:
+                    user.incJobsOther();
+                    user.addCpusOther(job.getNoOfUsedCPU());
+                    break;
             }
         }
     }
@@ -277,7 +295,7 @@ public class PBS implements TimeStamped {
             for (Job job : queueToJobsMap.get(queue.getName())) {
                 total++;
                 String state = job.getState();
-                if ("C".equals(state)) {
+                if ("C".equals(state)||"F".equals(state)) {
                     completed++;
                 } else if ("R".equals(state)) {
                     running++;
@@ -294,17 +312,29 @@ public class PBS implements TimeStamped {
 
     /**
      * For each queue creates a list of nodes that can be used.
-     * A node can be used when it has a required property for queues that require a property,
+     * The rules for assigning nodes to queues differ for each planner.
+     * For vanilla Torque:
+     * <ul>
+     *  <li>A node can be used when it has a required property for queues that require a property,
      * and is not reserved for another queue.
-     * If a queue has at least one node that is assigned to it, it can use only nodes
-     * that are assigned to it. Otherwise it can use any host that is not assigned to any queue.
+     *  <li>If a queue has at least one node that is assigned to it, it can use only nodes
+     * that are assigned to it. Otherwise it can use any host that is not assigned to any queue.</li>
+     * </ul>
+     * For PBS-Pro:
+     * <ul>
+     *     <li>If a queue has at least one node that is assigned to it, it can use only nodes
+     * that are assigned to it. Otherwise it can use any host that is not assigned to any queue. Nodes are assigned
+     * to a queue by node's attribute "queue"</li>
+     *     <li>A queue has attribute default_chunk.queue_list, its value may be used in node's attribute resources_available.queue_list
+     *     then node accepts only from such queues</li>
+     * </ul>
      *
      * @param queues queues
      * @param nodes  nodes
      * @return map
      */
     private static Map<String, List<Node>> makeQueuesToNodeMap(List<Queue> queues, List<Node> nodes) {
-        Map<String, List<Node>> queuesToNodesMap = new HashMap<String, List<Node>>((int) (queues.size() * 1.5));
+        Map<String, List<Node>> queuesToNodesMap = new HashMap<>((int) (queues.size() * 1.5));
         for (Queue q : queues) {
             List<Node> nodeList = new ArrayList<>();
             String queueName = q.getName();
@@ -317,7 +347,6 @@ public class PBS implements TimeStamped {
                 //TORQUE
                 //naprogramovano podle udaju od Simona v https://rt3.cesnet.cz/rt/Ticket/Display.html?id=28959
                 for (Node node : nodes) {
-                    if (node.isCloud()) continue; //dom0 nejsou ve frontach
                     String nrq = node.getRequiredQueue();//jmeno fronty vcetne pripony @server
                     if (nrq != null) {
                         if (nrq.equals(queueName)) {
@@ -343,8 +372,7 @@ public class PBS implements TimeStamped {
                 }
             } else {
                 //PBSPRO
-                //kod je nejspis v poradku, pokud uzel neni ve fronte,
-                // asi ma fronta required property a uzel ji nema
+                //is any host assigned to the queue?
                 boolean assignedHostsExist = false;
                 for (Node node : nodes) {
                     String nrq = node.getRequiredQueue();
@@ -353,35 +381,37 @@ public class PBS implements TimeStamped {
                         break;
                     }
                 }
-
+                //what jobs in the queue require
+                String rql = q.getDefaultChunkQueuesList();
+                //for each node, decide whether it belongs to the queue
                 for (Node node : nodes) {
-                    String nrq = node.getRequiredQueue();//s priponou
-                    //if some nodes are assigned, a queue cannot use unassigned nodes
-                    if (assignedHostsExist && nrq == null) continue;
-
-                    if (nrq != null && !nrq.equals(queueName)) {
-                        //node is reserved for another queue
-                        continue;
+                    String nodeRequiredQueue = node.getRequiredQueue();
+                    boolean assign;
+                    if(nodeRequiredQueue!=null) {
+                        //node assigned to a specific queue, so use it if it is this queue
+                        assign = nodeRequiredQueue.equals(queueName);
+                    } else {
+                        //node not assigned to any queue, so use it only if no other node is assigned
+                        // and the node has a required value of resource queue_list
+                        assign = !assignedHostsExist && (rql == null || node.getResourceQueueList().contains(rql));
                     }
-                    String qrp = q.getRequiredProperty();
-                    if (qrp != null && !node.hasProperty(qrp)) {
-                        //queue requires a node property that the node does not have
-                        continue;
+                    if(assign) {
+                        //node is accessible by the queue
+                        nodeList.add(node);
+                        node.getQueues().add(q);
                     }
-                    //node is accessible by the queue
-                    nodeList.add(node);
-                    node.getQueues().add(q);
                 }
             }
+
             queuesToNodesMap.put(queueName, nodeList);
         }
         return queuesToNodesMap;
     }
 
     private static Map<String, List<Job>> makeQueueToJobsMap(List<Queue> queues, List<Job> jobs) {
-        Map<String, List<Job>> map = new HashMap<String, List<Job>>((int) (queues.size() * 1.5));
+        Map<String, List<Job>> map = new HashMap<>((int) (queues.size() * 1.5));
         for (Queue q : queues) {
-            List<Job> jobList = new ArrayList<Job>();
+            List<Job> jobList = new ArrayList<>();
             for (Job job : jobs) {
                 if (job.getQueueName().equals(q.getName())) {
                     jobList.add(job);
@@ -394,6 +424,10 @@ public class PBS implements TimeStamped {
 
     public boolean isTorque() {
         return torque;
+    }
+
+    public boolean isPBSPro() {
+        return ! isTorque();
     }
 
     @Override

@@ -1,5 +1,7 @@
 package cz.cesnet.meta.pbs;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
@@ -12,6 +14,7 @@ import java.util.regex.Pattern;
  * @author Martin Kuba makub@ics.muni.cz
  * @version $Id: PbsUtils.java,v 1.12 2014/12/10 15:42:37 makub Exp $
  */
+@SuppressWarnings("Duplicates")
 public class PbsUtils {
     public static final String MAINTENANCE = "maintenance";
     public static final String RESERVED = "reserved";
@@ -49,6 +52,8 @@ public class PbsUtils {
         time *= 1000L;
         return new Date(time);
     }
+
+
 
     //velikost
     static final long KIBI = 1024L;
@@ -119,13 +124,13 @@ public class PbsUtils {
             return Long.toString(bytes / MEBI) + "mb";
             //pak zaokrouhlování
         } else if (bytes > PEBI) {
-            return Long.toString((bytes + PEBI / 2l) / PEBI) + "pb";
+            return Long.toString((bytes + PEBI / 2L) / PEBI) + "pb";
         } else if (bytes > TEBI) {
-            return Long.toString((bytes + TEBI / 2l) / TEBI) + "tb";
+            return Long.toString((bytes + TEBI / 2L) / TEBI) + "tb";
         } else if (bytes > GIBI) {
-            return Long.toString((bytes + GIBI / 2l) / GIBI) + "gb";
+            return Long.toString((bytes + GIBI / 2L) / GIBI) + "gb";
         } else if (bytes > MEBI) {
-            return Long.toString((bytes + MEBI / 2l) / MEBI) + "mb";
+            return Long.toString((bytes + MEBI / 2L) / MEBI) + "mb";
         } else {
             return Long.toString(bytes) + "b";
         }
@@ -212,5 +217,16 @@ public class PbsUtils {
             }
         }
         return seconds;
+    }
+
+    /**
+     * Parses time to seconds.
+     * @param time in format hours:minutes:seconds
+     * @return number of seconds
+     */
+    public static Duration parseTime(String time) {
+        if(time==null) return null;
+        String[] c = time.split(":");
+        return Duration.of(Long.parseLong(c[0]) * 3600 + Long.parseLong(c[1]) * 60 + Long.parseLong(c[2]), ChronoUnit.SECONDS);
     }
 }

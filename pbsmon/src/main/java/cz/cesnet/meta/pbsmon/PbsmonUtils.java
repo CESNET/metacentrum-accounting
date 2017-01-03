@@ -29,16 +29,16 @@ public class PbsmonUtils {
     public static List<Node> getPbsNodesForPhysicalMachine(Stroj perunMachine, Pbsky pbsky, PbsCache pbsCache, Cloud cloud) {
         String machineName = perunMachine.getName();
         List<Node> pbsNodes = new ArrayList<>();
-        //PBS uzel odpovídající jménu fyzického stroje (bez virtualizace nebo dom0)
-        Node node = pbsky.getNodeByName(machineName);
-        if (node != null && node.isComputingNode()) {
+        //PBS uzel odpovídající jménu fyzického stroje (bez virtualizace)
+        Node node = pbsky.getNodeByFQDN(machineName);
+        if (node != null) {
             pbsNodes.add(node);
         }
-        //PBS uzly podle pbs_cache (virtualizace přes Magratheu)
+        //PBS uzly podle pbs_cache (virtualizace přes něco jiného než cloud)
         List<String> virtNames = pbsCache.getMapping().getPhysical2virtual().get(machineName);
         if (virtNames != null) {
             for (String virtName : virtNames) {
-                Node pbsNode = pbsky.getNodeByName(virtName);
+                Node pbsNode = pbsky.getNodeByFQDN(virtName);
                 if (pbsNode != null) {
                     pbsNodes.add(pbsNode);
                 }
@@ -51,7 +51,7 @@ public class PbsmonUtils {
             //do cloudVirtualHosts seznam virtuálů v OpenNebule
             if ((cloudVirtualHosts = cloud.getHostName2VirtualHostsMap().get(cloudPhysicalHost.getName())) != null) {
                 for (CloudVirtualHost cloudVirtualHost : cloudVirtualHosts) {
-                    Node pbsNode = pbsky.getNodeByName(cloudVirtualHost.getFqdn());
+                    Node pbsNode = pbsky.getNodeByFQDN(cloudVirtualHost.getFqdn());
                     if (pbsNode != null) {
                         //virtuál obsahuje PBS Node
                         pbsNodes.add(pbsNode);

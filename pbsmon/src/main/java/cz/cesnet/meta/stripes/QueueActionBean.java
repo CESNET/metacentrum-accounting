@@ -4,6 +4,7 @@ import cz.cesnet.meta.cloud.CloudPhysicalHost;
 import cz.cesnet.meta.pbs.Job;
 import cz.cesnet.meta.pbs.Node;
 import cz.cesnet.meta.pbs.Queue;
+import cz.cesnet.meta.pbsmon.RozhodovacStavuStroju;
 import cz.cesnet.meta.perun.api.Perun;
 import cz.cesnet.meta.perun.api.Stroj;
 import net.sourceforge.stripes.action.*;
@@ -63,20 +64,20 @@ public class QueueActionBean extends BaseActionBean {
 
     private void findMachinesForNodes() {
         Set<String> machineNames = new HashSet<String>(nodes.size());
-        machines = new ArrayList<Stroj>(nodes.size());
+        machines = new ArrayList<>(nodes.size());
         for (Node node : nodes) {
-            String nodeName = node.getName();
-            //try Magrathea
-            String machineName = pbsCache.getMapping().getVirtual2physical().get(nodeName);
+            String nodeFQDN = node.getFQDN();
+            //try mapping
+            String machineName = pbsCache.getMapping().getVirtual2physical().get(nodeFQDN);
             //try OpenNebula
             if (machineName == null) {
-                CloudPhysicalHost physicalHost = cloud.getVmFqdn2HostMap().get(nodeName);
+                CloudPhysicalHost physicalHost = cloud.getVmFqdn2HostMap().get(nodeFQDN);
                 if (physicalHost != null) {
                     machineName = physicalHost.getHostname();
                 }
             }
             //assume non-virtualised host
-            if (machineName == null) machineName = nodeName;
+            if (machineName == null) machineName = nodeFQDN;
             machineNames.add(machineName);
         }
         cpus = 0;
@@ -89,7 +90,12 @@ public class QueueActionBean extends BaseActionBean {
                 log.warn("findMachinesForNodes() no machine for machineName {}", machineName);
             }
         }
+        //sort physical machines by name
         Collections.sort(machines);
+        //update their state
+        for (Stroj stroj : machines) {
+            RozhodovacStavuStroju.rozhodniStav(stroj, pbsky, pbsCache.getMapping(), perun.getVyhledavacFrontendu(), perun.getVyhledavacVyhrazenychStroju(), cloud);
+        }
     }
 
     public List<Queue> getDestinations() {

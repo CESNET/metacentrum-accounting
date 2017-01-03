@@ -11,21 +11,6 @@
 <f:message var="titlestring" key="machine.titul" scope="request"><f:param
         value="${actionBean.machineName}"/></f:message>
 <s:layout-render name="/layout.jsp">
-    <s:layout-component name="hlava">
-        <style type="text/css">
-            td.ACTIVE {
-                background-color: #6060FF;
-            }
-
-            td.POWEROFF, td.SUSPENDED {
-                background-color: #C0C0C0;
-            }
-
-            td.cloud-virt {
-                font-weight: bold;
-            }
-        </style>
-    </s:layout-component>
     <s:layout-component name="telo">
 
         <%-- variantní hláška o clusteru nebo SMP stroji --%>
@@ -53,6 +38,10 @@
                 value="${actionBean.cloudPhysicalHost.hostname}"/></f:message></p>
         <table class="zakladni">
             <tr>
+                <th>Stav v OpenNebule</th>
+                <td>${actionBean.cloudPhysicalHost.state}</td>
+            </tr>
+            <tr>
                 <th>CPU v Perunovi</th>
                 <td>${actionBean.perunMachine.cpuNum} CPU</td>
             </tr>
@@ -64,11 +53,17 @@
                 <th>Rezervovaných CPU</th>
                 <td>${actionBean.cloudPhysicalHost.cpuReservedString} CPU</td>
             </tr>
+            <tr>
+                <th>CPU info</th>
+                <td>${actionBean.cloudPhysicalHost.cpu_info}</td>
+            </tr>
         </table>
+
+
         <% if (actionBean.getCloudVirtualHosts() != null && !actionBean.getCloudVirtualHosts().isEmpty()) { %>
 
         <p><f:message key="machine_jsp_cloud_vms"/></p>
-        <table>
+        <table class="vms">
             <c:forEach items="${actionBean.cloudVirtualHosts}" var="vm">
                 <tr>
                     <c:choose>

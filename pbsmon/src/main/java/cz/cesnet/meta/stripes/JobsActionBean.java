@@ -2,7 +2,6 @@ package cz.cesnet.meta.stripes;
 
 import cz.cesnet.meta.acct.Accounting;
 import cz.cesnet.meta.pbs.*;
-import cz.cesnet.meta.pbscache.PbsAccess;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 import org.slf4j.Logger;
@@ -14,6 +13,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -77,7 +77,7 @@ public class JobsActionBean extends BaseActionBean {
         warnings = new LinkedHashMap<>(40);
         suspiciousJobs = new HashMap<>(40);
         //ziskame ulohy
-        for (PBS pbs : pbsky.getPbsky()) {
+        for (PBS pbs : pbsky.getListOfPBS()) {
             for (Job job : pbs.getJobsById()) {
                 //pocty CPU uloh
                 PbsUtils.updateCount(jobsCPU, job.getNoOfUsedCPU(), 1);
@@ -126,7 +126,7 @@ public class JobsActionBean extends BaseActionBean {
 
                 //dokoncene ulohy
                 Date comp = null;
-                if ("C".equals(jobState)) {
+                if ("C".equals(jobState)||"F".equals(jobState)) {
                     comp = job.getTimeCompleted();
                     if (comp != null) {
                         //ulohy ve stavu C bez casu dokonceni nebyly ani spusteny
@@ -159,12 +159,12 @@ public class JobsActionBean extends BaseActionBean {
                 }
                 //kontrola na walltime remaining
                 if ("R".equals(jobState) || "E".equals(jobState)) {
-                    Long walltimeRemaining = job.getWalltimeRemaining();
+                    Duration walltimeRemaining = job.getWalltimeRemaining();
                     if (walltimeRemaining == null) {
                         String w = "Úloha je ve stavu " + jobState + " a nemá atribut Walltime.Remaining ";
                         warnings.put(job.getId(), w);
                         suspiciousJobs.put(job.getId(), job);
-                    } else if (walltimeRemaining < 0) {
+                    } else if (walltimeRemaining.isNegative()) {
                         Date expectedEnd = job.getTimeExpectedEnd();
                         String w = "Úloha je ve stavu " + jobState + " a má zápornou hodnotu atributu Walltime.Remaining, měla skončit "
                                 + (expectedEnd != null ? sdf.format(expectedEnd) : "???");
@@ -175,8 +175,8 @@ public class JobsActionBean extends BaseActionBean {
                 //kontroly na stav neodpovidajici nastavenym casum
                 if (comp != null && comp.getTime() < nowtime) {
                     //má čas dokončení, měla by být ve stavu C
-                    if (!"C".equals(jobState)) {
-                        String w = "Úloha má být ve stavu C (protože má comp_time), ale je ve stavu " + jobState + ".";
+                    if (!("C".equals(jobState)||"F".equals(jobState))) {
+                        String w = "Úloha má být ve stavu C/F (protože má comp_time), ale je ve stavu " + jobState + ".";
                         warnings.put(job.getId(), w);
                         suspiciousJobs.put(job.getId(), job);
                     }
@@ -205,7 +205,7 @@ public class JobsActionBean extends BaseActionBean {
                         queuedJobs++;
                         queuedCPUs += job.getNoOfUsedCPU();
                     } else {
-                        if ("C".equals(jobState)) {
+                        if ("C".equals(jobState)||"F".equals(jobState)) {
                             //byla deleted, t je v pořádku
                         } else {
                             String cas = "";
@@ -306,16 +306,12 @@ public class JobsActionBean extends BaseActionBean {
     public Resolution my() throws UnsupportedEncodingException {
         HttpServletRequest request = ctx.getRequest();
         HttpSession session = request.getSession(true);
-        PbsAccess pbsAccess;
         if (user != null) {
             //prichazime z Osobniho, nastavit
-            pbsAccess = pbsCache.getUserAccess(user);
             session.setAttribute(PersonActionBean.PERSON, user);
-            session.setAttribute(PersonActionBean.ACCESS, pbsAccess);
         } else {
-            pbsAccess = (PbsAccess) session.getAttribute(PersonActionBean.ACCESS);
             user = (String) session.getAttribute(PersonActionBean.PERSON);
-            if (pbsAccess == null) {
+            if (user == null) {
                 //nic nevime, poslat na Osobni, at nam povi, kdo to je
                 String backurl = request.getScheme() + "://" + request.getServerName()
                         + ":" + request.getServerPort() + request.getContextPath() + "/jobs/my";
@@ -336,7 +332,7 @@ public class JobsActionBean extends BaseActionBean {
 
     public Resolution missingStarted() {
         HashSet<String> startedJobIdsSet = new HashSet<>(accounting.getStartedJobIds());
-        for (PBS pbs : pbsky.getPbsky()) {
+        for (PBS pbs : pbsky.getListOfPBS()) {
             for (Job job : pbs.getJobsById()) {
                 startedJobIdsSet.remove(job.getId());
             }

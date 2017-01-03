@@ -5,7 +5,6 @@
    <th rowspan="2"> &nbsp; </th>
    <th rowspan="2"> <f:message key="queues_priority"/> </th>
    <th rowspan="2"> <f:message key="queues_timelimit"/> </th>
-   <th rowspan="2"> <f:message key="queues_rprop"/> </th>
    <th colspan="5"> <f:message key="queues_jobs"/> </th>
    <th rowspan="2"> <f:message key="queues_max_user_cpus"/> </th>
    <th rowspan="2"> fairshare </th>

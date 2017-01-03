@@ -5,5 +5,5 @@ package cz.cesnet.meta.pbs;
 *
 * @author Martin Kuba makub@ics.muni.cz
 */
-public enum JobState { Q, R, E, C, W, H ,T, S, X }
+public enum JobState { Q, R, E, C, W, H ,T, S, X, F }
 

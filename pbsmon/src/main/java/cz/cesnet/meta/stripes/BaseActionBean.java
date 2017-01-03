@@ -39,7 +39,7 @@ public abstract class BaseActionBean implements ActionBean {
     public List<TimeLoaded> getTimesLoaded() {
         Date oldTime = new Date(System.currentTimeMillis() - (6l * 60000l)); //hranice zastaralych dat, pro zvyrazneni
         //pbs servers
-        List<PBS> pbsList = pbsky.getPbsky();
+        List<PBS> pbsList = pbsky.getListOfPBS();
         List<TimeLoaded> tl = new ArrayList<TimeLoaded>(pbsList.size() + 1);
         for (PBS pbs : pbsList) {
             Date createdTime = pbs.getTimeLoaded();

@@ -38,9 +38,20 @@
                             <c:otherwise><f:message key="q_${q.shortName}_txt" /><!-- from ResourceBundle --></c:otherwise>
                         </c:choose>
                     </td>
-                    <td style="text-align: left;"><c:if test="${! empty q.lockedForKey}">
-                        <f:message key="queues_list_locked_for_${q.lockedForKey}"/>: <c:out value="${q.lockedFor}"/>
-                    </c:if></td>
+                    <td style="text-align: left;">
+                        <c:if test="${q.aclUsersEnabled}">
+                            <f:message key="queues_list_locked_for_users"/>:
+                            <c:forEach items="${q.aclUsersArray}" var="user"><s:link href="/user/${user}">${user}</s:link> </c:forEach>
+                        </c:if>
+                        <c:if test="${q.aclGroupsEnabled}">
+                            <f:message key="queues_list_locked_for_groups"/>:
+                            <c:forEach items="${q.aclGroupsArray}" var="group"><s:link href="/group/${pbs.host}/${group}">${group}</s:link> </c:forEach>
+                        </c:if>
+                        <c:if test="${q.aclHostsEnabled}">
+                            <f:message key="queues_list_locked_for_hosts"/>:
+                            <c:forEach items="${q.aclHostsArray}" var="host">${host} </c:forEach>
+                        </c:if>
+                    </td>
                 </tr>
             </c:forEach>
         </c:forEach>
@@ -60,7 +71,27 @@
                 </c:forEach>
             </table>
              <br>
+
            <t:node_table nodes="${pbs.nodesByName}"/>
+
+        </c:forEach>
+
+        <h2 id="queue_nodes"><f:message key="queues_list_queueus_nodes_headline"/></h2>
+        <c:forEach items="${actionBean.pbs}" var="pbs">
+            <c:forEach items="${pbs.queuesByPriority}" var="q">
+                <table class="queue">
+                    <tr><td><s:link href="/queue/${q.name}">${q.name}</s:link></td></tr>
+                </table>
+                <c:choose>
+                    <c:when test="${not empty q.nodes}">
+                        <t:node_table nodes="${q.nodes}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <f:message key="queues_list_no_nodes_in_queue"/><br>
+                    </c:otherwise>
+                </c:choose>
+                <br>
+            </c:forEach>
         </c:forEach>
 
     </s:layout-component>
