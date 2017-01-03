@@ -13,7 +13,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 
         <property name="pbsURLs">
             <list>
-                <value>https://wiki.metacentrum.cz/pbsmon2/api/nodes?serverName=wagap.cerit-sc.cz</value>
+                <value>https://metavo.metacentrum.cz/pbsmon2/api/nodes?serverName=wagap.cerit-sc.cz</value>
             </list>
         </property>
     </bean>
