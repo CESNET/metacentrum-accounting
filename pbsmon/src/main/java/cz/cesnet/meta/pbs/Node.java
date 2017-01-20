@@ -551,6 +551,12 @@ public class Node extends PbsInfoObject {
         return (maxend == 0L) ? null : new Date(maxend);
     }
 
+    public int getLastJobEndInMinutes() {
+        Date time =  getLastJobEndTime();
+        if(time==null) return 0;
+        return (int)((time.getTime() - System.currentTimeMillis()) / 60000L);
+    }
+
     private Date availableBefore;
 
     public Date getAvailableBefore() {

@@ -247,7 +247,9 @@
             </table>
             <c:if test="${not empty node.lastJobEndTime}">
             <br>
-            <p><f:message key="jobs_last_job_ends_time"><f:param value="${node.lastJobEndTime}"/></f:message> </p>
+            <p>
+                <f:message key="jobs_last_job_ends_time"><f:param value="${node.lastJobEndTime}"/><f:param value="${node.lastJobEndInMinutes}"/></f:message>
+            </p>
             </c:if>
         </c:if>
 
