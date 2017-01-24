@@ -487,7 +487,6 @@ public class Job extends PbsInfoObject {
         if (!("R".equals(state) || "C".equals(state)|| "F".equals(state))) return false;
         Duration walltimeUsed = getWalltimeUsed();
         if(walltimeUsed==null) {
-            log.warn("Job {} has no walltime in state {}",this.getId(),this.getState());
             return false;
         }
         if (walltimeUsed.compareTo(Duration.ofMinutes(5)) < 0) return false;
@@ -499,7 +498,6 @@ public class Job extends PbsInfoObject {
         if (!("R".equals(state) || "C".equals(state)|| "F".equals(state))) return false;
         Duration walltimeUsed = getWalltimeUsed();
         if(walltimeUsed==null) {
-            log.warn("Job {} has no walltime in state {}",this.getId(),this.getState());
             return false;
         }
         return getCPUTimeUsedSec() > getNoOfUsedCPU() * walltimeUsed.getSeconds();

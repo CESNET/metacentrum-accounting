@@ -71,6 +71,11 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                     <property name="planbased" value="true"/>
                     <property name="fairshares">
                         <list>
+                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
+                                <constructor-arg name="tree" value="default" />
+                                <constructor-arg name="metrics" value="fairshare" />
+                                <constructor-arg name="id" value="arien-pro" />
+                            </bean>
                         </list>
                     </property>
                     <property name="groupFile" value="/etc/pbsmon/group/arien-pro"/>
@@ -107,7 +112,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
         <property name="pbsConnector" ref="pbsConnector"/>
         <property name="pbsServers" ref="servers"/>
         <property name="pbsCache" ref="pbsCache"/>
-        <property name="loadRunTimeInMilliseconds" value="25000"/>
+        <property name="loadRunTimeInMilliseconds" value="40000"/>
     </bean>
 
     <bean id="perun" class="cz.cesnet.meta.perun.impl.PerunJsonImpl">
@@ -134,7 +139,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
 
     <bean id="cloud" class="cz.cesnet.meta.cloud.CloudImpl" >
         <property name="dataMaxAgeInMilliseconds" value="300000"/>
-        <property name="loadRunTimeInMilliseconds" value="17000"/>
+        <property name="loadRunTimeInMilliseconds" value="30000"/>
     </bean>
 
     <bean id="diskArrays" class="cz.cesnet.meta.storages.StoragesDiskArrayMotdImpl">

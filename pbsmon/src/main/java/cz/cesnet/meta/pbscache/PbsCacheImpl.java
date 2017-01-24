@@ -175,9 +175,11 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
                 loadMetrics(server, fairshareConfig.getMetrics(), entries);
                 ArrayList<FairShareTuple> ftups = new ArrayList<>(entries.size());
                 for (PbsCacheEntry entry : entries) {
-                    ftups.add(new FairShareTuple(entry.getKey(), entry.getValue()));
+                    if(entry.getValue().equals("0")) continue;
+                    FairShareTuple ft = new FairShareTuple(entry.getKey(), entry.getValue());
+                    ftups.add(ft);
                 }
-                Collections.sort(ftups, (t1, t2) -> t1.getFairshare().compareTo(t2.getFairshare()));
+                ftups.sort(Comparator.comparing(FairShareTuple::getFairshare));
                 List<String> ranked = new ArrayList<>(ftups.size());
                 for (FairShareTuple ft : ftups) {
                     ranked.add(ft.getUser());
