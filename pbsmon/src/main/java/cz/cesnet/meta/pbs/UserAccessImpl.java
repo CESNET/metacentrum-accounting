@@ -38,9 +38,13 @@ public class UserAccessImpl extends RefreshLoader implements UserAccess {
                     Map<String, Group> groupMap = pbs2groupName2GroupMap.get(pbs.getHost());
                     for (String aclGroup : q.getAclGroupsArray()) {
                         Group group = groupMap.get(aclGroup);
-                        if(group.getUsers().contains(userName)) {
-                            found = true;
-                            break;
+                        if(group==null) {
+                            log.error("aclGroup {} of queue {} not in /etc/group",aclGroup,q.getName());
+                        } else {
+                            if (group.getUsers().contains(userName)) {
+                                found = true;
+                                break;
+                            }
                         }
                     }
                     if(found) {
