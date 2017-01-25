@@ -74,7 +74,17 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                             <bean class="cz.cesnet.meta.pbs.FairshareConfig">
                                 <constructor-arg name="tree" value="default" />
                                 <constructor-arg name="metrics" value="fairshare" />
-                                <constructor-arg name="id" value="arien-pro" />
+                                <constructor-arg name="id" value="pro" />
+                            </bean>
+                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
+                                <constructor-arg name="tree" value="ncbr" />
+                                <constructor-arg name="metrics" value="fairshare.ncbr" />
+                                <constructor-arg name="id" value="pro.ncbr" />
+                            </bean>
+                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
+                                <constructor-arg name="tree" value="elixir" />
+                                <constructor-arg name="metrics" value="fairshare.ncbr" />
+                                <constructor-arg name="id" value="pro.elixir" />
                             </bean>
                         </list>
                     </property>
