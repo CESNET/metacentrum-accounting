@@ -17,6 +17,7 @@
         <f:param value="${actionBean.perunUser.name}"/>
         <f:param value="${actionBean.perunUser.organization}"/>
         <f:param value="${actionBean.perunUser.researchGroup}"/>
+        <f:param value="${actionBean.perunUser.mainVoName}"/>
         <f:param value="${actionBean.perunUser.expires}"/>
     </f:message>
     <f:message key="user_jsp_hlaska_propocital">

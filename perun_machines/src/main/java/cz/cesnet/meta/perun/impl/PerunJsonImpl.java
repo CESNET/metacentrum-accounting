@@ -27,6 +27,17 @@ import java.util.*;
 public class PerunJsonImpl extends PerunAbstractImpl {
 
     final static Logger log = LoggerFactory.getLogger(PerunJsonImpl.class);
+
+    //keys for pbsmon_users.json structure
+    public static final String LOGNAME = "logname";
+    public static final String NAME = "name";
+    public static final String ORG = "org";
+    public static final String STATISTIC_GROUPS = "statistic_groups";
+    public static final String STATUS = "status";
+    public static final String EXPIRES = "expires";
+    public static final String PUBLICATIONS = "publications";
+    public static final String META_CENTRUM_VO_NAME = "MetaCentrum";
+
     static Map<String, Map<String, String>> texty;
     List<File> machineFiles;
     List<File> userFiles;
@@ -38,7 +49,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
     Map<String, VypocetniZdroj> zdrojMap;
     VyhledavacVyhrazenychStroju vyhledavacVyhrazenychStroju;
     VyhledavacFrontendu vyhledavacFrontendu;
-    private long lastCheckTime = 0l;
+    private long lastCheckTime = 0L;
     private String filterVo=null;
 
     public PerunJsonImpl(List<String> machineFiles, List<String> userFiles) {
@@ -62,10 +73,12 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         checkFiles();
     }
 
+    @SuppressWarnings("unused")
     public String getFilterVo() {
         return filterVo;
     }
 
+    @SuppressWarnings("unused")
     public void setFilterVo(String filterVo) {
         this.filterVo = filterVo;
     }
@@ -85,6 +98,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         throw new RuntimeException("value for key " + key + " must be string, it is " + value);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static int getInt(JSONObject jsonObject, String key) {
         JSONValue value = jsonObject.get(key);
         if (value == null || value.isNull()) return 0;
@@ -94,6 +108,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         throw new RuntimeException("value for key " + key + " must be integer, it is " + value);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static boolean getBoolean(JSONObject jsonObject, String key) {
         JSONValue value = jsonObject.get(key);
         if (value == null) {
@@ -125,16 +140,12 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         } else {
             log.warn("for " + pozice + " value for key " + jsonKey + " is not a map of i18n texts, it is " + (jsonValue == null ? "null" : jsonValue.render(false)));
         }
-        if (texty.get("cs").get(bundleKey) == null) texty.get("cs").put(bundleKey, "");
-        if (texty.get("en").get(bundleKey) == null) texty.get("en").put(bundleKey, "");
+        texty.get("cs").putIfAbsent(bundleKey, "");
+        texty.get("en").putIfAbsent(bundleKey, "");
     }
 
     private static <T> Iterable<T> iterable(final Iterator<T> it) {
-        return new Iterable<T>() {
-            public Iterator<T> iterator() {
-                return it;
-            }
-        };
+        return () -> it;
     }
 
     private VypocetniZdroj nactiVypocetniZdroj(Map<String, Map<String, String>> texty, JSONObject jzdroj, List<Stroj> allMachines, HashMap<String, VypocetniZdroj> zdrojMap) {
@@ -169,7 +180,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
 
 
         if (zdroj.isCluster()) {
-            zdroj.setStroje(new ArrayList<Stroj>());
+            zdroj.setStroje(new ArrayList<>());
             for (JSONValue jv2 : ((JSONArray) jzdroj.get("machines")).getValue()) {
                 JSONObject jstroj = (JSONObject) jv2;
                 Stroj stroj = new Stroj(zdroj, getString(jstroj, "name"), false, getInt(jstroj, "cpu"));
@@ -179,7 +190,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         } else {
             Stroj stroj = new Stroj(zdroj, zdroj.getNazev(), false, getInt(jzdroj, "cpu"));
             zdroj.setStroj(stroj);
-            zdroj.setStroje(Arrays.asList(stroj));
+            zdroj.setStroje(Collections.singletonList(stroj));
             allMachines.add(stroj);
         }
         zdrojMap.put(zdroj.getId(), zdroj);
@@ -201,7 +212,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         boolean modified = false;
         for (File f : files) {
             Long time = loadedTimes.get(f);
-            if (time == null) time = 0l;
+            if (time == null) time = 0L;
             if (f.lastModified() > time) modified = true;
         }
         return modified;
@@ -216,24 +227,50 @@ public class PerunJsonImpl extends PerunAbstractImpl {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 for (JsonNode juser : mapper.readValue(f, JsonNode.class).path("users")) {
                     PerunUser perunUser = new PerunUser();
-                    perunUser.setLogname(juser.get("logname").textValue());
-                    perunUser.setName(juser.get("name").textValue());
-                    perunUser.setOrganization(juser.get("org").asText());
-                    perunUser.setResearchGroup(juser.get("researchGroup").asText());
-                    perunUser.setLang(juser.get("lang").asText());
-                    perunUser.setStatus(juser.get("status").asText());
-                    perunUser.setMail(juser.get("mail").asText());
-                    try {
-                        perunUser.setExpires(sdf.parse(juser.path("expires").asText()));
-                    } catch (ParseException ex) {
-                        perunUser.setExpires(new GregorianCalendar(3000, 0, 1).getTime());
-                    }
-                    JsonNode jpubls = juser.path("publications");
+                    //attributes independent of VO
+                    perunUser.setLogname(juser.get(LOGNAME).textValue());
+                    perunUser.setName(juser.get(NAME).textValue());
+                    perunUser.setOrganization(juser.get(ORG).asText());
+                    JsonNode jpubls = juser.path(PUBLICATIONS);
                     if (jpubls.isObject()) {
                         for (String key : iterable(jpubls.fieldNames())) {
                             perunUser.getPublications().put(key, jpubls.get(key).asInt());
                         }
                     }
+                    //VO dependent attributes - expires, status, statistic_groups
+                    JsonNode vos = juser.get("vos");
+                    if(vos!=null&&vos.isObject()) {
+                        for(String voName : iterable(vos.fieldNames())) {
+                            JsonNode jvo = vos.get(voName);
+                            PerunUser.Vo vo = new PerunUser.Vo(voName);
+                            //status
+                            vo.setStatus(jvo.get(STATUS).asText());
+                            //expires
+                            try {
+                                vo.setExpires(sdf.parse(jvo.path(EXPIRES).asText()));
+                            } catch (ParseException ex) {
+                                vo.setExpires(new GregorianCalendar(3000, 0, 1).getTime());
+                            }
+                            //stats groups
+                            JsonNode statistic_groups = jvo.get(STATISTIC_GROUPS);
+                            if(statistic_groups!=null&&statistic_groups.isObject()) {
+                                for (String groupName : iterable(statistic_groups.fieldNames())) {
+                                    int groupWeight = statistic_groups.get(groupName).asInt();
+                                    vo.getStatsGroups().put(groupName,groupWeight);
+                                }
+                            }
+                            if(vo.getStatsGroups().size()>1) {
+                                log.debug("user {} has more than 1 statistics group",perunUser.getLogname());
+                            }
+                            perunUser.getVos().put(voName,vo);
+                        }
+                    }
+                    //choose main Vo, MetaCentrum if available
+                    PerunUser.Vo mainVo = perunUser.getVos().get(META_CENTRUM_VO_NAME);
+                    if(mainVo==null) mainVo = new ArrayList<>(perunUser.getVos().values()).get(0);
+                    perunUser.setMainVo(mainVo);
+
+                    //store into collection
                     users.put(perunUser.getLogname(), perunUser);
                 }
                 loadedTimes.put(f, System.currentTimeMillis());
@@ -251,8 +288,8 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         HashSet<String> frontend_names = new HashSet<>();
         HashMap<String, Map<String, String>> texty = new HashMap<>(2);
         HashMap<String, VypocetniZdroj> zdrojMap = new LinkedHashMap<>(40);
-        texty.put("cs", new HashMap<String, String>(100));
-        texty.put("en", new HashMap<String, String>(100));
+        texty.put("cs", new HashMap<>(100));
+        texty.put("en", new HashMap<>(100));
 
         for (File f : machineFiles) {
             log.info("loading {}", f);
@@ -305,14 +342,14 @@ public class PerunJsonImpl extends PerunAbstractImpl {
             nactiTexty("centrum " + id, texty, jcentrum, centrum.getUrlKey(), "url");
             nactiTexty("centrum " + id, texty, jcentrum, centrum.getSpecKey(), "spec");
 
-            centrum.setZdroje(new ArrayList<VypocetniZdroj>());
+            centrum.setZdroje(new ArrayList<>());
             for (JSONValue jv : ((JSONArray) jcentrum.get("resources")).getValue()) {
                 JSONObject jzdroj = (JSONObject) jv;
                 VypocetniZdroj zdroj = nactiVypocetniZdroj(texty, jzdroj, allMachines, zdrojMap);
                 if(zdroj!=null) {
                     centrum.getZdroje().add(zdroj);
                     if (zdroj.isCluster()) {
-                        zdroj.setPodclustery(new ArrayList<VypocetniZdroj>());
+                        zdroj.setPodclustery(new ArrayList<>());
                         JSONValue subclusters = jzdroj.get("subclusters");
                         if (subclusters != null) {
                             for (JSONValue jv3 : ((JSONArray) subclusters).getValue()) {

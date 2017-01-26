@@ -15,47 +15,84 @@ public class PerunUser {
     private String logname;
     private String name;
     private String organization;
-    private String researchGroup;
-    private String lang;
-    private String status;
-    private String mail;
-    private Date expires;
-    private Map<String,Integer> publications = new HashMap<String, Integer>(3);
-
+    private Map<String,Integer> publications = new HashMap<>(3);
+    private Map<String,Vo> vos = new HashMap<>(3);
+    private Vo mainVo;
 
     public PerunUser() {
     }
 
-    public PerunUser(String logname, String name, String organization, Map<String, Integer> publications, String researchGroup, String lang, String status, String mail, Date expires) {
-        this.logname = logname;
-        this.name = name;
-        this.organization = organization;
-        this.publications = publications;
-        this.researchGroup = researchGroup;
-        this.lang = lang;
-        this.status = status;
-        this.mail = mail;
-        this.expires = expires;
+    public static class Vo {
+        private String voName;
+        private String status;
+        private Date expires;
+        private Map<String,Integer> statsGroups = new HashMap<>(3);
+
+        public Vo(String voName) {
+            this.voName = voName;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public void setExpires(Date expires) {
+            this.expires = expires;
+        }
+
+        public String getVoName() {
+            return voName;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public Date getExpires() {
+            return expires;
+        }
+
+        public Map<String, Integer> getStatsGroups() {
+            return statsGroups;
+        }
+
+        @Override
+        public String toString() {
+            return "Vo{" +
+                    "voName='" + voName + '\'' +
+                    ", status='" + status + '\'' +
+                    ", expires=" + expires +
+                    ", statsGroups=" + statsGroups +
+                    '}';
+        }
+    }
+
+    public void setMainVo(Vo mainVo) {
+        this.mainVo = mainVo;
+    }
+
+    public Map<String, Vo> getVos() {
+        return vos;
     }
 
     public String getLogname() {
         return logname;
     }
 
-    public void setLogname(String logname) {
-        this.logname = logname;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getOrganization() {
         return organization;
+    }
+
+    public void setLogname(String logname) {
+        this.logname = logname;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setOrganization(String organization) {
@@ -66,48 +103,30 @@ public class PerunUser {
         return publications;
     }
 
-    public void setPublications(Map<String, Integer> publications) {
-        this.publications = publications;
-    }
-
     public String getResearchGroup() {
-        return researchGroup;
+        Map<String, Integer> statsGroups = mainVo.getStatsGroups();
+        if(statsGroups !=null&&!statsGroups.isEmpty()) {
+            String groupId = (String) statsGroups.keySet().toArray()[0];
+            return groupId.startsWith("Evidence:")?groupId.substring(9):groupId;
+        } else {
+            return "žádná skupina - no group";
+        }
     }
 
-    public void setResearchGroup(String researchGroup) {
-        this.researchGroup = researchGroup;
-    }
-
-//    public String getLang() {
-//        return lang;
-//    }
-
-    public void setLang(String lang) {
-        this.lang = lang;
+    public Map<String, Integer> getStatsGroups() {
+        return mainVo.getStatsGroups();
     }
 
     public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMail() {
-        return mail;
-    }
-
-    public void setMail(String mail) {
-        this.mail = mail;
+        return mainVo.getStatus();
     }
 
     public Date getExpires() {
-        return expires;
+        return mainVo.getExpires();
     }
 
-    public void setExpires(Date expires) {
-        this.expires = expires;
+    public String getMainVoName() {
+        return mainVo.getVoName();
     }
 
     @Override
@@ -117,11 +136,8 @@ public class PerunUser {
                 ", name='" + name + '\'' +
                 ", organization='" + organization + '\'' +
                 ", publications=" + publications +
-                ", researchGroup='" + researchGroup + '\'' +
-                ", lang='" + lang + '\'' +
-                ", status='" + status + '\'' +
-                ", mail='" + mail + '\'' +
-                ", expires=" + expires +
+                ", vos=" + vos +
+                ", mainVo=" + mainVo +
                 '}';
     }
 }

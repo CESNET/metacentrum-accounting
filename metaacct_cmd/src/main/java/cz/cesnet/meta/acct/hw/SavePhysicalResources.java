@@ -35,8 +35,8 @@ public class SavePhysicalResources {
         }
 
         if (dryRun) {
-            printResources(computingResources);
-            //printUsers(allUsers);
+            //printResources(computingResources);
+            printUsers(allUsers);
         } else {
             Accounting acct = springCtx.getBean("acct", Accounting.class);
             Set<String> frontends = perun.getFrontendNames();
