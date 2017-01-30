@@ -48,10 +48,18 @@ public class ApiActionBean extends BaseActionBean {
      */
     public Resolution nodes() {
         List<PBS> listOfPBS = pbsky.getListOfPBS();
+        if (serverName == null || serverName.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (PBS pbs : listOfPBS) {
+                sb.append(pbs.getHost()).append(" ");
+            }
+            return new ErrorResolution(HttpServletResponse.SC_BAD_REQUEST, "Specify serverName parameter (possible values: "+sb.toString()+" )");
+        }
         List<Node> nodes=null;
         for (PBS pbs : listOfPBS) {
             if(pbs.getHost().equals(serverName)) {
                  nodes = pbs.getNodesByName();
+                 break;
             }
         }
         if(nodes==null) return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND,"server "+serverName+" not found");
@@ -70,10 +78,18 @@ public class ApiActionBean extends BaseActionBean {
 
     public Resolution jobs() {
         List<PBS> listOfPBS = pbsky.getListOfPBS();
+        if (serverName == null || serverName.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (PBS pbs : listOfPBS) {
+                sb.append(pbs.getHost()).append(" ");
+            }
+            return new ErrorResolution(HttpServletResponse.SC_BAD_REQUEST, "Specify serverName parameter (possible values: "+sb.toString()+" )");
+        }
         List<Job> jobs=null;
         for (PBS pbs : listOfPBS) {
             if(pbs.getHost().equals(serverName)) {
                 jobs = pbs.getJobsById();
+                break;
             }
         }
         if(jobs==null) return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND,"server "+serverName+" not found");
