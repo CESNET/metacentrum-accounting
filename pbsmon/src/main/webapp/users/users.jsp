@@ -45,13 +45,18 @@
             </c:forEach>
         </table>
 
-    <p><a name="fairshare"></a><b>fairshare</b> - úlohy jsou v
-plánovači řazeny podle fairshare uživatele, přednost je dávána uživatelům, kteří zatím 
+    <p><a name="fairshare"></a><b>fairshare</b> -
+        <t:i18n cs="úlohy jsou v plánovači řazeny podle fairshare uživatele, přednost je dávána uživatelům, kteří zatím
 propočítali méně, aby se dostalo na všechny. Číslo v této tabulce udává prioritu uživatele
 podle fairshare, tj.  čím vyšší číslo, tím vyšší má uživatel prioritu, protože zatím méně propočítal.
 Uživatel s číslem 1 má nejnižší prioritu při spouštění úloh. 
-Do fairshare se počítají úlohy za posledních 30 dnů, s váhou klesající s postupem času,
-tedy vyšší váhu mají nedávné úlohy. </p>
+Váha úloh ve fairshare se časem snižuje, každé dva dny je hodnota fairhare každého uživatele vydělena dvěma, tedy vyšší váhu mají nedávné úlohy." en="
+jobs ordering for execution is based on fairshare, users who computed recently less are given higher priority. The number
+in this table expresses user priority, i.e. users with higher number have higher priority because they have computed less. The user with
+priority 1 has the smallest priority when starting jobs. Th weight of jobs in fairshare is decayed every two days in half, thus
+recent jobs have higher weight when computing fairshare.
+"/>
+    </p>
 
     <p>Informace z této stránky jsou dostupné i ve formátu JSON, např.
         <s:link beanclass="cz.cesnet.meta.stripes.ApiActionBean" event="users">
