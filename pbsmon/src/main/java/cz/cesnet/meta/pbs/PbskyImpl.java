@@ -5,6 +5,7 @@ import cz.cesnet.meta.pbscache.PbsCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -424,7 +425,13 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
 
     private static Comparator<Job> jobCPUTimeUsedComparator = (o1, o2) -> (int) (o2.getCPUTimeUsedSec() - o1.getCPUTimeUsedSec());
 
-    private static Comparator<Job> jobWallTimeUsedComparator = Comparator.comparing(Job::getWalltimeUsed);
+    private static Comparator<Job> jobWallTimeUsedComparator = (j1,j2) -> {
+        Duration d1 = j1.getWalltimeUsed();
+        if(d1==null) d1 = Duration.ZERO;
+        Duration d2 = j2.getWalltimeUsed();
+        if(d2==null) d2 = Duration.ZERO;
+        return d1.compareTo(d2);
+    };
 
     private static Comparator<Job> jobStateComparator = Comparator.comparing(o -> JobState.valueOf(o.getState()));
 
