@@ -149,7 +149,7 @@ public class Job extends PbsInfoObject {
 
 
     private static final Pattern TORQUE_ARRAY_JOB = Pattern.compile("(\\d+)-(\\d+)");
-    private static final Pattern PBSPRO_ARRAY_JOB = Pattern.compile("(\\d+)\\[(\\d+)\\]");
+    private static final Pattern PBSPRO_ARRAY_JOB = Pattern.compile("(\\d+)\\[(\\d+)?\\]");
 
     public int getIdNum() {
         if (idNum == -1) {
@@ -160,7 +160,8 @@ public class Job extends PbsInfoObject {
                 Matcher m = PBSPRO_ARRAY_JOB.matcher(jobid);
                 if (m.matches()) {
                     idNum = Integer.parseInt(m.group(1));
-                    idSubNum = Integer.parseInt(m.group(2));
+                    String subNum = m.group(2);
+                    idSubNum = (subNum!=null) ? Integer.parseInt(subNum) : 0;
                 } else {
                     Matcher m2 = TORQUE_ARRAY_JOB.matcher(jobid);
                     if (m2.matches()) {
