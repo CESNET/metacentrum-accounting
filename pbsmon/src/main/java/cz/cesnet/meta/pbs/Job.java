@@ -163,8 +163,8 @@ public class Job extends PbsInfoObject {
                     String subNum = m.group(2);
                     idSubNum = (subNum!=null) ? Integer.parseInt(subNum) : 0;
                 } else {
-                    Matcher m2 = TORQUE_ARRAY_JOB.matcher(jobid);
-                    if (m2.matches()) {
+                    m = TORQUE_ARRAY_JOB.matcher(jobid);
+                    if (m.matches()) {
                         idNum = Integer.parseInt(m.group(1));
                         idSubNum = Integer.parseInt(m.group(2));
                     } else {
