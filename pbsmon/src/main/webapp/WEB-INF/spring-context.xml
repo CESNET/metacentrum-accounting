@@ -83,7 +83,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                             </bean>
                             <bean class="cz.cesnet.meta.pbs.FairshareConfig">
                                 <constructor-arg name="tree" value="elixir" />
-                                <constructor-arg name="metrics" value="fairshare.ncbr" />
+                                <constructor-arg name="metrics" value="fairshare.elixir" />
                                 <constructor-arg name="id" value="pro.elixir" />
                             </bean>
                         </list>

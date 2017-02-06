@@ -1,5 +1,6 @@
 package cz.cesnet.meta.pbs;
 
+import cz.cesnet.meta.pbsmon.PbsmonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,17 +147,29 @@ public class Job extends PbsInfoObject {
         return name;
     }
 
+
+    private static final Pattern TORQUE_ARRAY_JOB = Pattern.compile("(\\d+)-(\\d+)");
+    private static final Pattern PBSPRO_ARRAY_JOB = Pattern.compile("(\\d+)\\[(\\d+)\\]");
+
     public int getIdNum() {
         if (idNum == -1) {
-            int tecka = name.indexOf('.');
-            String jobid = name.substring(0, tecka);
-            int pomlcka = jobid.indexOf('-');
-            if (pomlcka >= 0) {
-                //job from job array
-                idNum = Integer.parseInt(jobid.substring(0, pomlcka));
-                idSubNum = Integer.parseInt(jobid.substring(pomlcka + 1));
-            } else {
+            String jobid = PbsUtils.substringBefore(name,'.');
+            if(jobid.matches("\\d+")){
                 idNum = Integer.parseInt(jobid);
+            } else {
+                Matcher m = PBSPRO_ARRAY_JOB.matcher(jobid);
+                if (m.matches()) {
+                    idNum = Integer.parseInt(m.group(1));
+                    idSubNum = Integer.parseInt(m.group(2));
+                } else {
+                    Matcher m2 = TORQUE_ARRAY_JOB.matcher(jobid);
+                    if (m2.matches()) {
+                        idNum = Integer.parseInt(m.group(1));
+                        idSubNum = Integer.parseInt(m.group(2));
+                    } else {
+                        log.warn("job {} has unparseable number",name);
+                    }
+                }
             }
         }
         return idNum;
