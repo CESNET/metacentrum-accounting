@@ -54,7 +54,7 @@
     <logger name="cz.cesnet.meta.pbs.Queue" level="info"/>
     <logger name="cz.cesnet.meta.pbs.UserAccessImpl" level="info"/>
 
-    <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl" level="info"/>
+    <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl" level="error"/>
     <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl.gpu" level="info"/>
     <logger name="cz.cesnet.meta.pbscache.Scratch" level="info"/>
 

@@ -206,7 +206,7 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
                     .start();
             int exit = p.waitFor();
             if(exit!=0) {
-                log.error("list_cache {} {} failed with exit status {}",server,metrics,exit);
+                log.warn("list_cache {} {} failed with exit status {}",server,metrics,exit);
                 return;
             }
 

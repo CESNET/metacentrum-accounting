@@ -74,21 +74,38 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                             <bean class="cz.cesnet.meta.pbs.FairshareConfig">
                                 <constructor-arg name="tree" value="default" />
                                 <constructor-arg name="metrics" value="fairshare" />
-                                <constructor-arg name="id" value="pro" />
+                                <constructor-arg name="id" value="a-pro" />
                             </bean>
                             <bean class="cz.cesnet.meta.pbs.FairshareConfig">
                                 <constructor-arg name="tree" value="ncbr" />
                                 <constructor-arg name="metrics" value="fairshare.ncbr" />
-                                <constructor-arg name="id" value="pro.ncbr" />
+                                <constructor-arg name="id" value="a-pro.ncbr" />
                             </bean>
                             <bean class="cz.cesnet.meta.pbs.FairshareConfig">
                                 <constructor-arg name="tree" value="elixir" />
                                 <constructor-arg name="metrics" value="fairshare.elixir" />
-                                <constructor-arg name="id" value="pro.elixir" />
+                                <constructor-arg name="id" value="a-pro.elixir" />
                             </bean>
                         </list>
                     </property>
                     <property name="groupFile" value="/etc/pbsmon/group/arien-pro"/>
+                </bean>
+                <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
+                    <property name="host" value="wagap-pro.cerit-sc.cz"/>
+                    <property name="main" value="false"/>
+                    <property name="torque" value="false"/>
+                    <property name="by_queue" value="false"/>
+                    <property name="planbased" value="true"/>
+                    <property name="fairshares">
+                        <list>
+                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
+                                <constructor-arg name="tree" value="default" />
+                                <constructor-arg name="metrics" value="fairshare" />
+                                <constructor-arg name="id" value="w-pro" />
+                            </bean>
+                        </list>
+                    </property>
+                    <property name="groupFile" value="/etc/pbsmon/group/wagap-pro"/>
                 </bean>
 
             </list>
