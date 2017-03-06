@@ -79,16 +79,16 @@ public class UserActionBean extends BaseActionBean {
                 }
             }
         }
-        //stats per queue
+        //find user jobs per queue
         Map<String, List<Job>> jobsByQueue = new HashMap<>();
-        jobInfosByQueue = new HashMap<>();
         for(Job job : jobs) {
-            String queueName = job.getQueueName();
-            List<Job> qjobs = jobsByQueue.computeIfAbsent(queueName, k -> new ArrayList<>());
-            qjobs.add(job);
+            jobsByQueue.computeIfAbsent(job.getQueueName(), k -> new ArrayList<>()).add(job);
         }
+        //get sorted list of names of queues with user's jobs
         usedQueueNames = new ArrayList<>(jobsByQueue.keySet());
         Collections.sort(usedQueueNames);
+        //compute numbers of jobs is some states
+        jobInfosByQueue = new HashMap<>();
         for(String queueName : usedQueueNames) {
             jobInfosByQueue.put(queueName,new JobsInfo(jobsByQueue.get(queueName)));
         }

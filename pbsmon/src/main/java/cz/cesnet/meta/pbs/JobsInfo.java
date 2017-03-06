@@ -26,8 +26,8 @@ public class JobsInfo {
     private int cpusInStateOther;
 
     public JobsInfo(List<Job> jobs) {
-        stavy = new HashMap<String, Integer>();
-        poctyCpu = new HashMap<String, Integer>();
+        stavy = new HashMap<>();
+        poctyCpu = new HashMap<>();
         celkemJobs = 0;
         celkemCpu = 0;
         for (Job job : jobs) {
@@ -36,7 +36,9 @@ public class JobsInfo {
             switch (state) {
                 case Q: jobsInStateQ++; break;
                 case R: jobsInStateR++; break;
-                case C: jobsInStateC++; break;
+                case C:
+                case F:
+                    jobsInStateC++; break;
                 default: jobsInStateOther++;
             }
             int cpu = job.getNoOfUsedCPU();
@@ -44,7 +46,9 @@ public class JobsInfo {
             switch (state) {
                 case Q: cpusInStateQ+=cpu; break;
                 case R: cpusInStateR+=cpu; break;
-                case C: cpusInStateC+=cpu; break;
+                case C:
+                case F:
+                    cpusInStateC+=cpu; break;
                 default: cpusInStateOther+=cpu;
             }
             celkemJobs++;
@@ -76,6 +80,10 @@ public class JobsInfo {
         return jobsInStateR;
     }
 
+    /**
+     * C in Torque or F in PBSPro.
+     * @return number of  finished/completed jobs
+     */
     public int getJobsInStateC() {
         return jobsInStateC;
     }
