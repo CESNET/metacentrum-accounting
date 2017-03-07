@@ -5,7 +5,6 @@ import cz.cesnet.meta.accounting.server.util.PBSReader;
 import cz.cesnet.meta.accounting.server.data.PBSRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletException;
@@ -23,76 +22,70 @@ import java.util.Date;
  * Servlet implementation class for Servlet: ProcessKernel
  */
 public class ProcessPbs extends HttpServlet {
-    //private static Logger logger = Logger.getLogger(ProcessPbs.class);
-    final static Logger log = LoggerFactory.getLogger(ProcessPbs.class);
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
-    protected void processRequest(HttpServletRequest request,
-                                  HttpServletResponse response) throws ServletException, IOException {
-        long startTimeNanos = System.nanoTime();
+    private final static Logger log = LoggerFactory.getLogger(ProcessPbs.class);
 
-        log.debug("start: " + startTimeNanos / 1000000);
-
-        PrintWriter out = response.getWriter();
-        log.debug("printing xml:");
-
-
-        WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-        PbsRecordManager pbsRecordManager = (PbsRecordManager) ctx.getBean("pbsRecordManager");
+    public void doPost(HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException {
         String remoteHost = InetAddress.getByName(request.getRemoteAddr()).getHostName();
-
-
-        Date limit = new Date(System.currentTimeMillis()-720*3600000l);
-        List<PBSRecord> records = null;
+        log.info("received request from {}", remoteHost);
         try {
-            records = PBSReader.readPBSFile(request.getInputStream(), limit);
-        } catch (ParseException e) {
-            log.error("cannot parse pbs records",e);
-            throw new ServletException(e);
+            long startTimeNanos = System.nanoTime();
+
+            log.debug("start: " + startTimeNanos / 1000000);
+
+            PbsRecordManager pbsRecordManager =
+                    WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean(PbsRecordManager.class);
+
+
+
+            Date limit = new Date(System.currentTimeMillis() - 720L * 3600_000L);
+
+            List<PBSRecord> records;
+            try {
+                records = PBSReader.readPBSFile(request.getInputStream(), limit, "/Pro".equalsIgnoreCase(request.getPathInfo()));
+            } catch (ParseException e) {
+                log.error("cannot parse pbs records", e);
+                throw new ServletException(e);
+            }
+
+            List<String> unsavedIdStrings = pbsRecordManager.saveRecords(records, remoteHost);
+
+            log.debug("elapsed time: " + (System.nanoTime() - startTimeNanos) / 1000000);
+
+            PrintWriter out = response.getWriter();
+            for (String s : unsavedIdStrings) {
+                out.println("not used: " + s);
+            }
+            out.println("total not used job records: " + unsavedIdStrings.size());
+            out.close();
+        } catch (Exception ex) {
+            log.error("Cannot process request from "+remoteHost,ex);
+            throw ex;
         }
-        List<String> unsavedIdStrings = pbsRecordManager.saveRecords(records, remoteHost);
+    }
 
-        log.debug("elapsed time: " + (System.nanoTime() - startTimeNanos) / 1000000);
 
-        for (String s : unsavedIdStrings) {
-            out.write("not used: " + s + "\n");
-        }
-        out.write("total not used job records: " + unsavedIdStrings.size());
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        sendError("Use POST method with " + request.getContextPath() + request.getServletPath(), response);
+    }
 
+
+    private void sendError(String error, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=utf-8");
+        PrintWriter out = response.getWriter();
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        out.println("<html><head><title>400 BAD REQUEST</title></head><body><h1>400 BAD REQUEST</h1>");
+        out.println(error + "</body></html>");
         out.close();
     }
 
-    /*
-    * (non-Java-doc)
-    *
-    * @see javax.servlet.http.HttpServlet#HttpServlet()
-    */
-    public ProcessPbs() {
-        super();
-    }
-
-    /*
-    * (non-Java-doc)
-    *
-    * @see javax.servlet.http.HttpServlet#doGet(HttpServletRequest request,
-    *      HttpServletResponse response)
-    */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
-    /*
-    * (non-Java-doc)
-    *
-    * @see javax.servlet.http.HttpServlet#doPost(HttpServletRequest request,
-    *      HttpServletResponse response)
-    */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+    private void sendMessage(String error, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=utf-8");
+        PrintWriter out = response.getWriter();
+        response.setStatus(HttpServletResponse.SC_OK);
+        out.println("<html><head><title>200 OK</title></head><body><h1>200 OK</h1>");
+        out.println(error + "</body></html>");
+        out.close();
     }
 }

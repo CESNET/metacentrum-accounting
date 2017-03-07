@@ -94,7 +94,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>ProcessPbs</servlet-name>
-        <url-pattern>/ProcessPbs</url-pattern>
+        <url-pattern>/ProcessPbs/*</url-pattern>
     </servlet-mapping>
 
     <servlet>
@@ -105,17 +105,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>ProcessPbsServerLog</servlet-name>
-        <url-pattern>/ProcessPbsServerLog</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <display-name>Test</display-name>
-        <servlet-name>Test</servlet-name>
-        <servlet-class>cz.cesnet.meta.accounting.server.servlet.Test</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Test</servlet-name>
-        <url-pattern>/Test</url-pattern>
+        <url-pattern>/ProcessPbsServerLog/*</url-pattern>
     </servlet-mapping>
 
 

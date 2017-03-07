@@ -32,12 +32,8 @@ public class PbsRecordManagerImpl extends JdbcDaoSupport implements PbsRecordMan
     HostManager hostManager;
     @Autowired
     UserManager userManager;
-//    @Autowired
-//    KernelRecordManager kernelRecordManager;
     @Autowired
     DbUtilsManager dbUtilsManager;
-    //@Autowired
-    //TransactionTemplate transactionTemplate;
 
     private Map<String, Long> getAllUserIds(List<PBSRecord> records) {
         Set<String> usernames = new HashSet<>();
@@ -217,7 +213,8 @@ public class PbsRecordManagerImpl extends JdbcDaoSupport implements PbsRecordMan
         }
 
         //uklid starych zaznamu
-        long limit = System.currentTimeMillis() - 720 * 3600000l;
+        long limit = System.currentTimeMillis() - 720L*3600_000L;
+
         jdbc.update("DELETE FROM acct_pbs_record_started WHERE date_time < ?", limit);
         jdbc.update("DELETE FROM acct_pbs_record_deleted WHERE date_time < ?", limit);
 

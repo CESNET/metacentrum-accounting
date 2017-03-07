@@ -16,5 +16,5 @@ public interface OutageManager {
      */
     void computeOutages();
 
-    void saveLogEvents(BufferedReader in, String server) throws IOException;
+    void saveLogEvents(BufferedReader in, String server, boolean pbspro) throws IOException;
 }

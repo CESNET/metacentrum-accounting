@@ -4,6 +4,9 @@ import cz.cesnet.meta.accounting.web.util.PbsUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Reprezentuje prosttředky přidělené na jednom stroji.
  *
@@ -11,6 +14,9 @@ import org.slf4j.LoggerFactory;
  */
 public class NodeSpec {
     final static Logger log = LoggerFactory.getLogger(NodeSpec.class);
+
+    private NodeSpec() {
+    }
 
     public NodeSpec(String spec) {
         try {
@@ -75,5 +81,49 @@ public class NodeSpec {
 
     public long getScratchVolume() {
         return scratchVolume;
+    }
+
+    public static List<NodeSpec> parseExecVnodePart(String exec_vnode) {
+        String[] split1 = exec_vnode.split("\\+");
+        List<NodeSpec> nodeSpecs = new ArrayList<>(split1.length);
+        for (String spec : split1) {
+            // (hildor3:ncpus=3:mem=819200kb:scratch_shared= 1048576kb)
+            //remove () around
+            spec = spec.substring(1, spec.length() - 1);
+            try {
+                NodeSpec nodeSpec = new NodeSpec();
+                String[] split = spec.split(":");
+                for (int i = 0; i < split.length; i++) {
+                    String attr = split[i];
+                    if (i == 0) {
+                        nodeSpec.hostname = attr;
+                        continue;
+                    }
+                    String[] kv = attr.split("=", 2);
+                    if (kv.length != 2) continue;
+                    String key = kv[0];
+                    String value = kv[1];
+                    switch (key) {
+                        case "ncpus":
+                            nodeSpec.ppn = Integer.parseInt(value);
+                            continue;
+                        case "mem":
+                            nodeSpec.mem = PbsUtils.parsePbsBytes(value);
+                            continue;
+                        case "ngpus":
+                            nodeSpec.gpu = Integer.parseInt(value);
+                            continue;
+                    }
+                    if (key.startsWith("scratch_")) {
+                        nodeSpec.scratchType = key.substring("scratch_".length());
+                        nodeSpec.scratchVolume = PbsUtils.parsePbsBytes(value);
+                    }
+                }
+                nodeSpecs.add(nodeSpec);
+            } catch (Exception e) {
+                log.error("problem parsing " + spec, e);
+            }
+        }
+        return nodeSpecs;
     }
 }

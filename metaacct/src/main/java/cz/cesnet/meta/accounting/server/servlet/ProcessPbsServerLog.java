@@ -1,7 +1,8 @@
 package cz.cesnet.meta.accounting.server.servlet;
 
 import cz.cesnet.meta.accounting.server.service.OutageManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -18,13 +19,13 @@ import java.net.InetAddress;
 /**
  * Servlet for processing data from server log.
  *
- * @see cz.cesnet.meta.accounting.server.service.OutageManagerImpl#saveLogEvents(java.io.BufferedReader, String)
+ * @see OutageManager#saveLogEvents(BufferedReader, String, boolean)
  * @author Martin Kuba makub@ics.muni.cz
  * @version $Id:$
  */
 public class ProcessPbsServerLog extends HttpServlet {
 
-    static private final Logger log = Logger.getLogger(ProcessPbsServerLog.class);
+    private final static Logger log = LoggerFactory.getLogger(ProcessPbsServerLog.class);
 
     @Override
     public void init() throws ServletException {
@@ -69,7 +70,7 @@ public class ProcessPbsServerLog extends HttpServlet {
         BufferedReader in = new BufferedReader(new InputStreamReader(request.getInputStream(), "utf-8"));
         try {
             OutageManager om = getOutageManager();
-            om.saveLogEvents(in, InetAddress.getByName(request.getRemoteAddr()).getHostName());
+            om.saveLogEvents(in, InetAddress.getByName(request.getRemoteAddr()).getHostName(),"/Pro".equalsIgnoreCase(request.getPathInfo()) );
             in.close();
             om.computeOutages();
             sendMessage("Log succesfully received", response);

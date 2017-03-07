@@ -1,7 +1,7 @@
 package cz.cesnet.meta.accounting.server.service;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
@@ -23,15 +23,16 @@ import java.util.regex.Pattern;
  */
 public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
 
-    static private final Logger log = Logger.getLogger(OutageManagerImpl.class);
-
-    //pripady nastaveni nebo smazani queue nebo comment
-    private static final Pattern EVENT_TORQUE
-            = Pattern.compile("^([^;]*);[^;]*;PBS_Server;(node;([^;]*);attributes set: (queue|note) (=|\\+|-) (.*)|Req;update_node_state;adjusting state for node ([^ ]*) - state=(\\d+), newstate=(\\d+).*)");
+    private final static Logger log = LoggerFactory.getLogger(OutageManagerImpl.class);
 
     // 06/09/2011 00:09:57;0004;PBS_Server;node;skirit80-2.ics.muni.cz;attributes set: queue = maintenance";
     // 06/16/2011 11:21:43;0004;PBS_Server;node;nympha1-1.zcu.cz;attributes set: note = upgrade OS, nastaveni BMC
-    // 06/16/2011 11:00:15;0040;PBS_Server;Req;update_node_state;adjusting state for node tarkil10-1.cesnet.cz - state=514, newstate=2
+    // 02/07/2017 12:18:53;0004;Server@arien-pro;Node;hildor19;attributes set: comment = Nejde zapnout, HW
+    // 02/07/2017 12:18:53;0004;Server@arien-pro;Node;hildor19;attributes set: queue = maintenance
+
+    private static final Pattern EVENT
+            = Pattern.compile("^([^;]*);[^;]*;[^;]*;([nN]ode);([^;]*);attributes set: (queue|comment|note) (=|\\+|-) (.*)");
+
 
     //format pouzivany PBS. Pri prechodu na zimni cas je prvni hodina po prechodu dvakrat :-(
     private static final SimpleDateFormat SDF;
@@ -41,9 +42,7 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
         SDF.setTimeZone(TimeZone.getTimeZone("CET"));
     }
 
-    private static final String NODE_UP = "node up";
-    private static final String NODE_DOWN = "node down";
-    static private final Set<String> ALLOWED_TYPES = new HashSet<>(Arrays.asList("queue", "comment", NODE_UP, NODE_DOWN));
+    static private final Set<String> ALLOWED_TYPES = new HashSet<>(Arrays.asList("queue", "comment"));
 
     @Autowired
     protected HostManager hostManager;
@@ -53,7 +52,7 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
 
     @Override
     @Transactional
-    public void saveLogEvents(BufferedReader in, String server) throws IOException {
+    public void saveLogEvents(BufferedReader in, String server, boolean pbspro) throws IOException {
         long startTime = System.currentTimeMillis();
         String line;
         long lastTime = 0;
@@ -62,56 +61,35 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
         long maxTime = Long.MIN_VALUE;
         Map<String, String> lastStates = new HashMap<>(500);
         while ((line = in.readLine()) != null) {
-            Matcher m = EVENT_TORQUE.matcher(line);
+            Matcher m = EVENT.matcher(line);
             if (m.find()) {
-                boolean process = false;
                 String cas = m.group(1);
-                String host = null;
-                String nadtyp = m.group(2);
-                String type = null;
-                String operace = null;
-                String value = null;
-                if (nadtyp.startsWith("node")) {
-                    host = m.group(3);
-                    type = m.group(4);//queue|note
-                    if ("note".equals(type)) type = "comment";
-                    operace = m.group(5);
-                    value = m.group(6);
-                    process = true;
-                } else if (nadtyp.startsWith("Req")) {
-                    host = m.group(7);
-                    int oldbit = Integer.parseInt(m.group(8)) & 2;
-                    int newbit = Integer.parseInt(m.group(9)) & 2;
-                    if (oldbit == 0 && newbit == 2) {
-                        type = NODE_DOWN;
-                        process = true;
-                    } else if (newbit == 0) {
-                        type = NODE_UP;
-                        process = true;
+                String host = m.group(3);
+                String type = m.group(4);//queue|note
+                if ("note".equals(type)) type = "comment";
+                String operace = m.group(5);
+                String value = m.group(6);
+                try {
+                    Date eventTime = SDF.parse(cas);
+                    //kvuli usporadani sekvenci udalosti v ramci jedne sekundy
+                    long time = eventTime.getTime();
+                    if (time == lastTime) {
+                        citac++;
+                        eventTime = new Date(lastTime + citac);
+                    } else {
+                        lastTime = time;
+                        citac = 0;
                     }
-                }
-                if (process) {
-                    try {
-                        Date eventTime = SDF.parse(cas);
-                        //kvuli usporadani sekvenci udalosti v ramci jedne sekundy
-                        long time = eventTime.getTime();
-                        if (time == lastTime) {
-                            citac++;
-                            eventTime = new Date(lastTime + citac);
-                        } else {
-                            lastTime = time;
-                            citac = 0;
-                        }
-                        if (time < minTime) minTime = time;
-                        if (time > maxTime) maxTime = time;
-                        if (host != null && ALLOWED_TYPES.contains(type)) {
-                            this.saveLogEvent(lastStates, host, eventTime, type, operace, value);
-                        } else {
-                            log.error("cannot save host=" + host + " type=" + type + " for line=" + line);
-                        }
-                    } catch (ParseException e) {
-                        log.error("failed parsing " + cas, e);
+                    if (time < minTime) minTime = time;
+                    if (time > maxTime) maxTime = time;
+                    if (host != null && ALLOWED_TYPES.contains(type)) {
+                        log.debug("saving event {} {} {} {} {}", host, eventTime, type, operace, value);
+                        this.saveLogEvent(lastStates, host, eventTime, type, operace, value);
+                    } else {
+                        log.error("cannot save host=" + host + " type=" + type + " for line=" + line);
                     }
+                } catch (ParseException e) {
+                    log.error("failed parsing " + cas, e);
                 }
             } else {
                 log.warn("line unrecognized: " + line);
@@ -125,20 +103,15 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
     }
 
     private static final String ZACATEK = "select count(*) from acct_pbs_log_events where acct_host_id=? and event_time=? and type=? ";
-    private static final String NN = ZACATEK + "and value is null and operation is null";
-    private static final String NV = ZACATEK + "and value is null and operation=?";
-    private static final String VN = ZACATEK + "and value=? and operation is null";
-    private static final String VV = ZACATEK + "and value=? and operation=?";
+    private static final String NN = ZACATEK + "and value IS NULL AND operation IS NULL";
+    private static final String NV = ZACATEK + "and value IS NULL AND operation=?";
+    private static final String VN = ZACATEK + "and value=? AND operation IS NULL";
+    private static final String VV = ZACATEK + "and value=? AND operation=?";
 
     private HashMap<String, Long> hostIdCache = new HashMap<>(500);
 
     private Long getCachedHostId(String host) {
-        Long hostid = hostIdCache.get(host);
-        if (hostid == null) {
-            hostid = hostManager.getHostId(host);
-            hostIdCache.put(host, hostid);
-        }
-        return hostid;
+        return hostIdCache.computeIfAbsent(host, k -> hostManager.getHostId(host));
     }
 
     /**
@@ -155,10 +128,6 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
         //normalizujeme prazdny string na null
         if (value != null && value.isEmpty()) value = null;
 
-        //zkontrolujeme, jestli nejde o nasobny host up nebo host down
-        String lastState = lastStates.get(host);
-        if(NODE_UP.equals(type)&&NODE_UP.equals(lastState)) return;
-        if(NODE_DOWN.equals(type)&&NODE_DOWN.equals(lastState)) return;
         lastStates.put(host, type);
 
         Long hostId = getCachedHostId(host);
@@ -183,15 +152,15 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
             if (type.startsWith("node")) {
                 if (log.isTraceEnabled()) log.trace("event already in database: " + time + "," + host + "," + type);
             } else {
-                if (log.isEnabledFor(Level.WARN))
+                if (log.isWarnEnabled())
                     log.warn("event already in database: " + time + "," + host + "," + type + "," + value);
             }
         } else {
-            jdbc.update("insert into acct_pbs_log_events (acct_host_id,event_time,type,value,operation) values (?,?,?,?,?)",
+            jdbc.update("INSERT INTO acct_pbs_log_events (acct_host_id,event_time,type,value,operation) VALUES (?,?,?,?,?)",
                     hostId, time, type, value, operace);
-            if(log.isTraceEnabled()) {
+            if (log.isTraceEnabled()) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                log.trace("inserted event "+hostId+","+sdf.format(time)+","+type+(value!=null?","+value:"")+(operace!=null?","+operace:""));
+                log.trace("inserted event " + hostId + "," + sdf.format(time) + "," + type + (value != null ? "," + value : "") + (operace != null ? "," + operace : ""));
             }
         }
     }
@@ -232,7 +201,6 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
         PbsLogEvent actualQueue = null;
         PbsLogEvent actualComment = null;
         PbsLogEvent lastComment = null;
-        PbsLogEvent actualDown = null;
         Date lastCommentEnd = null;
         ArrayList<Outage> outages = new ArrayList<>();
         for (PbsLogEvent event : events) {
@@ -266,28 +234,6 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
                     //jinak nic
                     actualQueue = null;
                 }
-            } else if (event.isNodeDownEvent()) {
-                if (actualDown == null) actualDown = event;
-            } else if (event.isNodeUpEvent()) {
-                //ukoncit vypadek
-                if (actualDown != null) {
-                    //pokud byl kratsi nez nejaka minimalni doba, nema smysl zaznamenavat
-                    Date zacatek = actualDown.getEventTime();
-                    Date konec = event.getEventTime();
-                    long delka = konec.getTime() - zacatek.getTime();
-                    if (delka > 30 * 60 * 1000) {
-                        delka = delka / 1000;
-                        long dnu = delka / (24 * 3600);
-                        delka = delka % (24 * 3600);
-                        long hodin = delka / 3600;
-                        delka = delka % (3600);
-                        long minut = delka / 60;
-                        long sekund = delka % 60;
-                        String k = String.format("doba %dd %02d:%02d:%02d", dnu, hodin, minut, sekund);
-                        outages.add(new Outage(hostId, NODE_DOWN, zacatek, konec, k));
-                    }
-                    actualDown = null;
-                }
             } else {
                 log.error("unknown event type: " + event.getType());
             }
@@ -296,9 +242,6 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
             //neskoncilo to
             String comment = findComment(null, actualQueue, actualComment, lastComment, lastCommentEnd);
             outages.add(new Outage(hostId, actualQueue.getQueue(), actualQueue.getEventTime(), null, comment));
-        }
-        if (actualDown != null) {
-            outages.add(new Outage(hostId, NODE_DOWN, actualDown.getEventTime(), null, null));
         }
         saveOutages(outages);
     }
@@ -311,7 +254,7 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
             commentOldEnough = true;
         } else {
             commentOldEnough = (actualComment != null
-                    && actualComment.getEventTime().before(new Date(event.getEventTime().getTime() - 600000l)));
+                    && actualComment.getEventTime().before(new Date(event.getEventTime().getTime() - 600000L)));
         }
         if (actualComment != null && actualComment.getComment() != null
                 && commentOldEnough) {
@@ -441,14 +384,6 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
 
         public boolean isCommentEvent() {
             return "comment".equals(type);
-        }
-
-        public boolean isNodeDownEvent() {
-            return NODE_DOWN.equals(type);
-        }
-
-        public boolean isNodeUpEvent() {
-            return NODE_UP.equals(type);
         }
 
         @Override

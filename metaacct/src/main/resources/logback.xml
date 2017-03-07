@@ -33,5 +33,10 @@
 
     <logger name="cz" level="info"/>
     <logger name="cz.cesnet.meta.accounting.server.service.PbsRecordManagerImpl" level="info"/>
-
+    <!--
+    <logger name="cz.cesnet.meta.accounting.server.servlet.ProcessPbs" level="debug"/>
+    <logger name="cz.cesnet.meta.accounting.server.util.PBSReader" level="debug"/>
+    <logger name="cz.cesnet.meta.accounting.server.servlet.ProcessPbsServerLog" level="debug"/>
+    <logger name="cz.cesnet.meta.accounting.server.service.OutageManagerImpl" level="debug"/>
+     -->
 </configuration>

@@ -25,7 +25,7 @@
             <version>${project.parent.version}</version>
         </dependency>
 
-        <!-- logogging, see http://docs.spring.io/platform/docs/current/reference/htmlsingle/#getting-started-logging -->
+        <!-- logging, see http://docs.spring.io/platform/docs/current/reference/htmlsingle/#getting-started-logging -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
