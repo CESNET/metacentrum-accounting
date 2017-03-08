@@ -17,11 +17,10 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 
 /**
- * Servlet for processing data from server log.
+ * Servlet for processing data from server log - events like nodes assigned to queues.
  *
- * @see OutageManager#saveLogEvents(BufferedReader, String, boolean)
+ * @see OutageManager#saveLogEvents(BufferedReader, String)
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id:$
  */
 public class ProcessPbsServerLog extends HttpServlet {
 
@@ -66,11 +65,12 @@ public class ProcessPbsServerLog extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        log.debug("POST from " + request.getRemoteHost());
+        String remoteHost = InetAddress.getByName(request.getRemoteAddr()).getHostName();
+        log.info("received request from {}", remoteHost);
         BufferedReader in = new BufferedReader(new InputStreamReader(request.getInputStream(), "utf-8"));
         try {
             OutageManager om = getOutageManager();
-            om.saveLogEvents(in, InetAddress.getByName(request.getRemoteAddr()).getHostName(),"/Pro".equalsIgnoreCase(request.getPathInfo()) );
+            om.saveLogEvents(in, InetAddress.getByName(request.getRemoteAddr()).getHostName());
             in.close();
             om.computeOutages();
             sendMessage("Log succesfully received", response);

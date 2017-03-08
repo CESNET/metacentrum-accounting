@@ -52,7 +52,7 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
 
     @Override
     @Transactional
-    public void saveLogEvents(BufferedReader in, String server, boolean pbspro) throws IOException {
+    public void saveLogEvents(BufferedReader in, String server) throws IOException {
         long startTime = System.currentTimeMillis();
         String line;
         long lastTime = 0;
