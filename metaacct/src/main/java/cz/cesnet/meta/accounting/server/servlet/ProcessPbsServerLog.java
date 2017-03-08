@@ -72,7 +72,10 @@ public class ProcessPbsServerLog extends HttpServlet {
             OutageManager om = getOutageManager();
             om.saveLogEvents(in, InetAddress.getByName(request.getRemoteAddr()).getHostName());
             in.close();
-            om.computeOutages();
+            if(!"/nocomp".equals(request.getPathInfo())) {
+                om.computeOutages();
+            }
+            log.info("log successfully received and saved");
             sendMessage("Log succesfully received", response);
         } catch (RuntimeException ex) {
             log.error("doPost()", ex);
@@ -82,6 +85,6 @@ public class ProcessPbsServerLog extends HttpServlet {
 
     private OutageManager getOutageManager() {
         WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-        return (OutageManager) ctx.getBean("outageManager", OutageManager.class);
+        return ctx.getBean("outageManager", OutageManager.class);
     }
 }

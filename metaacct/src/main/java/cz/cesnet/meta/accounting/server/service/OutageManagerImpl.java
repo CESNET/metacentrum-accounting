@@ -83,7 +83,7 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
                     if (time < minTime) minTime = time;
                     if (time > maxTime) maxTime = time;
                     if (host != null && ALLOWED_TYPES.contains(type)) {
-                        log.debug("saving event {} {} {} {} {}", host, eventTime, type, operace, value);
+                        log.info("saving event {} {} {} {} {}", host, eventTime, type, operace, value);
                         this.saveLogEvent(lastStates, host, eventTime, type, operace, value);
                     } else {
                         log.error("cannot save host=" + host + " type=" + type + " for line=" + line);
