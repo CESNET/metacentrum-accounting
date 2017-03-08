@@ -154,6 +154,11 @@ public class AccountingImpl implements Accounting {
 
     @Override
     public void checkMachinesTablesConsistency() {
+        //table acct_host contains PBS nodes as referenced in logs in jobs' attributes exec_host and exec_vhost
+        //table physical_hosts contains  physical machines as reported by Perun
+        //table physical_virtual_rel assigns them together
+        
+        //find all nodes that are not assigned to any physical machine
         List<String> strings = jdbc.query("SELECT ah.hostname FROM acct_host ah WHERE ah.acct_host_id NOT IN (SELECT fvr.acct_host_id FROM physical_virtual_rel fvr)",
                 new SingleColumnRowMapper<>(String.class));
         if (strings.isEmpty()) return;
@@ -176,13 +181,25 @@ public class AccountingImpl implements Accounting {
                 "WHERE ah.acct_host_id NOT IN (SELECT fvr.acct_host_id FROM physical_virtual_rel fvr) " +
                 "AND substr(ah.hostname,0,strpos(ah.hostname,'.'))||'.priv'||substr(ah.hostname,strpos(ah.hostname,'.'))=ph.name "
                 );
-        //pak vyrobit neexistujici fyzicke
-        jdbc.update("INSERT INTO physical_hosts (name) " +
-                "SELECT ah.hostname FROM acct_host ah " +
-                "WHERE ah.acct_host_id NOT IN (SELECT fvr.acct_host_id FROM physical_virtual_rel fvr)");
+        //pak uzly s kratkym jmenem na stroje se stejnym jmenem pred prvni teckou
+        jdbc.update("INSERT INTO physical_virtual_rel(acct_host_id,ph_id) " +
+                "SELECT ah.acct_host_id,ph.id FROM acct_host ah,physical_hosts ph " +
+                "WHERE ah.acct_host_id NOT IN (SELECT fvr.acct_host_id FROM physical_virtual_rel fvr) " +
+                "AND ah.hostname ~ '^[a-z]+[0-9]*$' AND substr(ph.name,0,strpos(ph.name,'.'))=ah.hostname"
+        );
+        //pak vyrobit neexistujici fyzicke - radeji uz ne, aby nevznikaly kratke nazvy
+//        jdbc.update("INSERT INTO physical_hosts (name) " +
+//                "SELECT ah.hostname FROM acct_host ah " +
+//                "WHERE ah.acct_host_id NOT IN (SELECT fvr.acct_host_id FROM physical_virtual_rel fvr)");
         // a znovu virtualni na existujici fyzicke stejneho jmena
-        jdbc.update(virt2phys);
-        log.info("corrected");
+//        jdbc.update(virt2phys);
+        strings = jdbc.query("SELECT ah.hostname FROM acct_host ah WHERE ah.acct_host_id NOT IN (SELECT fvr.acct_host_id FROM physical_virtual_rel fvr)",
+                new SingleColumnRowMapper<>(String.class));
+        if(!strings.isEmpty()) {
+            log.warn("the following PBS nodes are still not assigned to physical machines: " + strings);
+        } else {
+            log.info("corrected");
+        }
     }
 
 
