@@ -25,19 +25,67 @@ public class Statistics {
         Stats stats = new ClassPathXmlApplicationContext("spring-context.xml").getBean("stats", Stats.class);
         long startTime = System.currentTimeMillis();
 
-//        generateStats(stats, absoluteDate(2016,4,20), absoluteDate(2016,4,22));
+//        generateStats(stats, absoluteDate(2016, 4, 20), absoluteDate(2016, 4, 22));
+
+        //normal period
         generateStats(stats, relativeDate(-1), relativeDate(-1));
         generateStats(stats, relativeDate(-31), relativeDate(-31));
+        generateStats(stats, relativeDate(-93), relativeDate(-93));
         long endTime = System.currentTimeMillis();
         System.out.println();
         long duration = (endTime - startTime) / 60000;
-        System.out.println("Computed in "+duration+" minutes");
+        System.out.println("Computed in " + duration + " minutes");
     }
+
+    public static void main2(String[] args) {
+        Stats stats = new ClassPathXmlApplicationContext("spring-context.xml").getBean("stats", Stats.class);
+        recompute("tarkil.grid.cesnet.cz", "2016-11-02", stats);
+        recompute("meduseld.ics.muni.cz", "2016-11-15", stats);
+        recompute("ajax.zcu.cz", "2016-11-23", stats);
+        recompute("gram.zcu.cz", "2017-01-09", stats);
+        recompute("kalpa.fzu.cz", "2017-01-20", stats);
+        recompute("luna.fzu.cz", "2017-01-24", stats);
+        recompute("exmag.fzu.cz", "2017-01-24", stats);
+        recompute("mudrc.metacentrum.cz", "2017-01-24", stats);
+        recompute("hildor.metacentrum.cz", "2017-02-07", stats);
+        recompute("mandos.ics.muni.cz", "2017-02-12", stats);
+        recompute("loslab.ics.muni.cz", "2017-02-24", stats);
+        recompute("bofur.ics.muni.cz", "2017-02-27", stats);
+        recompute("haldir.metacentrum.cz", "2017-02-28", stats);
+        recompute("losgar.ics.muni.cz", "2017-02-28", stats);
+        recompute("doom.metacentrum.cz", "2017-03-01", stats);
+        recompute("alfrid-cluster.meta.zcu.cz", "2017-03-02", stats);
+        recompute("konos.fav.zcu.cz", "2017-03-02", stats);
+    }
+
+
+    private static void recompute(String clustername, String day, Stats stats) {
+        GregorianCalendar start = new GregorianCalendar();
+        start.setTime(java.sql.Date.valueOf(day));
+        GregorianCalendar end = absoluteDate(2017, 3, 7);
+
+        long startTime = System.currentTimeMillis();
+        PrintStream out = System.out;
+        out.println();
+        out.println("computing statistics for " + clustername+ " : " + CZECH_DATE.format(start.getTime()) + " - " + CZECH_DATE.format(end.getTime()));
+        for(String cluster : Collections.singletonList(clustername)) {
+            out.println();
+            out.println(cluster);
+            out.println();
+            out.println("den       ;CPU;cas celkem;maintenance;reserved;perun reserved;jobs time;maintenance%;reserved%;jobs%;vytizeni%;hrube vytizeni%");
+            generateLines(stats, cluster, start, end, out);
+        }
+        long endTime = System.currentTimeMillis();
+        System.out.println();
+        long duration = (endTime - startTime) / 60000;
+        System.out.println("Computed in " + duration + " minutes");
+    }
+
 
     private static void generateStats(Stats stats, GregorianCalendar start, GregorianCalendar end) {
         PrintStream out = System.out;
         out.println();
-        out.println("computing MetaCentrum VO statistics for " + CZECH_DATE.format(start.getTime()) + " - " +CZECH_DATE.format(end.getTime()));
+        out.println("computing MetaCentrum VO statistics for " + CZECH_DATE.format(start.getTime()) + " - " + CZECH_DATE.format(end.getTime()));
         for (String cluster : stats.getClusters(start, end)) {
 //        for(String cluster : Arrays.asList("hda.cerit-sc.cz")) {
             out.println();
@@ -72,10 +120,10 @@ public class Statistics {
 
     static GregorianCalendar relativeDate(int daysFromToday) {
         GregorianCalendar calendar = new GregorianCalendar(TimeZone.getTimeZone("CET"), CS);
-        calendar.set(Calendar.HOUR_OF_DAY,0);
-        calendar.set(Calendar.MINUTE,0);
-        calendar.set(Calendar.SECOND,0);
-        calendar.set(Calendar.MILLISECOND,0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
         calendar.add(Calendar.DATE, daysFromToday);
         return calendar;
     }
