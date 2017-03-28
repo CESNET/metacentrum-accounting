@@ -35,6 +35,8 @@
 
  /* icon of cloud */
  table.nodes td.opennebulausable a { background: url('/pbsmon2/img/cloud.png') top right no-repeat; }
+ /* icon of PBSPro */
+ table.nodes td.pbspro a { background: url('/pbsmon2/img/pro.png') left right no-repeat; }
 
  .job-busy,.reserved,.test,.job-sharing,.job-exclusive, .job-full { background-color: #6060FF; border-color: #6060FF;}
  .job-busy         {  color: black;}

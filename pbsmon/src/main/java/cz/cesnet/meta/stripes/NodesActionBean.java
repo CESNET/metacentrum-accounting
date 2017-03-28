@@ -72,6 +72,9 @@ public class NodesActionBean extends BaseActionBean {
         hsmInfo = hsmsLoader.getStoragesInfo();
         //GPU
         gpuNodes = findGpuNodes();
+        //PBSPro machines
+        markPBSProMachines();
+
         return new ForwardResolution("/nodes/nodes.jsp");
     }
 
@@ -82,6 +85,13 @@ public class NodesActionBean extends BaseActionBean {
                 .flatMap(stroj -> PbsmonUtils.getPbsNodesForPhysicalMachine(stroj,pbsky, pbsCache, cloud).stream())
                 .filter(Node::getHasGPU)
                 .collect(Collectors.toList());
+    }
+
+    private void markPBSProMachines() {
+        centra.stream()
+                .flatMap(centrum -> centrum.getZdroje().stream())
+                .flatMap(zdroj -> zdroj.isCluster()?zdroj.getStroje().stream():Stream.of(zdroj.getStroj()))
+                .forEach(stroj -> stroj.setPro(PbsmonUtils.getPbsNodesForPhysicalMachine(stroj,pbsky, pbsCache, cloud).stream().anyMatch(node -> node.getPbs().isPBSPro())));
     }
 
     public StoragesInfo getStoragesInfo() {
@@ -211,4 +221,5 @@ public class NodesActionBean extends BaseActionBean {
     public Map<String, CloudVirtualHost> getFqdn2CloudVMMap() {
         return fqdn2CloudVMMap;
     }
+
 }

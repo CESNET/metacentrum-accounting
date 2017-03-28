@@ -18,6 +18,7 @@ public class Stroj implements Comparable<Stroj> {
     private boolean nebulaPbsHost = false; //je v OpenNebule a obsahuje VM ktery je v PBS
     private boolean openNebulaUsable = false; //lze na něm spustit uživatelský VM přes OpenNebulu
     private String pbsName;
+    private boolean pro = false; //je na něm uzel z PBSPro
 
     private String state;
 
@@ -137,6 +138,15 @@ public class Stroj implements Comparable<Stroj> {
 
     public void setPbsName(String pbsName) {
         this.pbsName = pbsName;
+    }
+
+
+    public boolean isPro() {
+        return pro;
+    }
+
+    public void setPro(boolean pro) {
+        this.pro = pro;
     }
 
     @Override
