@@ -33,6 +33,22 @@ public class AccountingImpl implements Accounting {
         this.jdbc = new JdbcTemplate(dataSource);
     }
 
+
+    @Transactional
+    @Override
+    public void assignNodes(String nodeName,String machineName) {
+        int nodeId = findOrCreateAcctHostId(nodeName);
+        PhysicalHost machine = findPhysicalHost(machineName);
+        //log.info("found node {}={}, machine {}={}",nodeName,nodeId,machine.getId(),machine.getName());
+        List<Integer> ids = jdbc.query("select id from physical_virtual_rel where ph_id=? and acct_host_id=?", INT_MAPPER, machine.getId(), nodeId);
+        if(ids.isEmpty()) {
+            jdbc.update("insert into physical_virtual_rel(ph_id,acct_host_id) values (?,?)",machine.getId(), nodeId);
+            log.info("inserting assignment {} -> {}",nodeName,machineName);
+        } else {
+            log.info("found already assigned {} -> {}",nodeName,machineName);
+        }
+    }
+
     @Transactional
     @Override
     public void updateUsers(List<PerunUser> perunUsers) {
@@ -114,7 +130,7 @@ public class AccountingImpl implements Accounting {
                 log.debug("physical host " + name + " -> " + ph.getName());
             } catch (EmptyResultDataAccessException ex) {
                 //kdyz ne, zkusime mapovani z virtualnich na fyzicke
-                int acct_host_id = findAcctHostId(name);
+                int acct_host_id = findOrCreateAcctHostId(name);
                 try {
                     String phName = jdbc.queryForObject("SELECT ph.name FROM physical_virtual_rel pvr ,physical_hosts ph WHERE pvr.acct_host_id=? AND pvr.ph_id=ph.id",
                             String.class, acct_host_id);
@@ -128,7 +144,7 @@ public class AccountingImpl implements Accounting {
         return phNames;
     }
 
-    private int findAcctHostId(String name) {
+    private int findOrCreateAcctHostId(String name) {
         while (true) {
             try {
                 return jdbc.queryForObject("SELECT acct_host_id FROM acct_host WHERE hostname=?", Integer.class, name);

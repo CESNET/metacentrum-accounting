@@ -2,6 +2,7 @@ package cz.cesnet.meta.acct.hw;
 
 import cz.cesnet.meta.acct.hw.perun.ComputingResource;
 import cz.cesnet.meta.perun.api.PerunUser;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,8 @@ public interface Accounting {
 
 
     void checkMachinesTablesConsistency();
+
+    void assignNodes(String node, String machine);
 
     void updateUsers(List<PerunUser> allUsers);
 }
