@@ -7,7 +7,11 @@
 
 <tr>
     <td style="text-align: right;"><s:link href="/queue/${queue.name}">${queue.name}</s:link></td>
-    <td><c:if test="${queue.locked}"><s:link href="/queues/list" anchor="urceni"><img border="0" src="${pageContext.request.contextPath}/img/lock.png" alt="locked" title="<f:message key="queue_line_tag_locked"/>: ${queue.lockedFor}"/></s:link></c:if></td>
+    <td>
+        <c:if test="${queue.locked}"><s:link href="/queues/list" anchor="urceni"><img border="0" src="${pageContext.request.contextPath}/img/lock.png" alt="locked" title="<f:message key="queue_line_tag_locked"/>: ${queue.lockedFor}"/></s:link></c:if>
+        <c:if test="${queue.routing}"><img border="0" src="${pageContext.request.contextPath}/img/one_way_go.png" alt="routing queue" title="<f:message key="queue_line_tag_routing"/>"/></c:if>
+        <c:if test="${queue.fromRouteOnly}"><img border="0" src="${pageContext.request.contextPath}/img/one_way_stop.png" alt="not for submitting" title="<f:message key="queue_line_tag_no_submit"/>"/></c:if>
+    </td>
     <td>${queue.priority}</td>
     <td> ${(empty queue.walltimeMin) ? 0 : queue.walltimeMin} - ${(empty queue.walltimeMax) ? 0 : queue.walltimeMax }</td>
     <td>${queue.jobsQueued}</td>

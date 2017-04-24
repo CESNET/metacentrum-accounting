@@ -13,6 +13,16 @@
 
 
 
+            <c:choose>
+                <c:when test="${q.descriptionAvailable}">
+                    <p style="display: table-cell;" class="comment">
+                    <c:out value="${q.descriptionMap[pageContext.request.locale]}"/><!-- from pbs -->
+                    </p>
+                </c:when>
+                <%--<c:otherwise><f:message key="q_${q.shortName}_txt" /><!-- from ResourceBundle --></c:otherwise>--%>
+            </c:choose>
+
+
 <c:choose>
     <c:when test="${actionBean.queue.routing}">
         <p style="clear: right">
@@ -60,12 +70,6 @@
 
 
 
-<p class="comment">
-    <c:choose>
-        <c:when test="${q.descriptionAvailable}"><c:out value="${q.descriptionMap[pageContext.request.locale]}"/><!-- from pbs --></c:when>
-        <%--<c:otherwise><f:message key="q_${q.shortName}_txt" /><!-- from ResourceBundle --></c:otherwise>--%>
-    </c:choose>
-</p>
 
 
 <c:choose>
