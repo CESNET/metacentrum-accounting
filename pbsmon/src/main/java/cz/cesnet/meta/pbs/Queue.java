@@ -1,5 +1,6 @@
 package cz.cesnet.meta.pbs;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,7 @@ public class Queue extends PbsInfoObject {
     public static final String ATTRIBUTE_DESCRIPTION_CZECH = "description_cs";
     public static final String ATTRIBUTE_DESCRIPTION_ENGLISH = "description_en";
     public static final String ATTRIBUTE_FROM_ROUTE_ONLY = "from_route_only";
+    public static final String ATTRIBUTE_COMMENT = "comment";
 
     public Queue() {
         super();
@@ -318,10 +320,6 @@ public class Queue extends PbsInfoObject {
         return this.getClass().getSimpleName() + "[" + name + ",R=" + running + ",C=" + completed + ",Q=" + queued + ",T=" + total + "]";
     }
 
-    public String getOrigToString() {
-        return super.toString();
-    }
-
     public List<Node> getNodes() {
         return getPbs().getQueueToNodesMap().get(this.getName());
     }
@@ -337,16 +335,35 @@ public class Queue extends PbsInfoObject {
 
     private synchronized void prepareDescriptions() {
         descriptionsMap = new HashMap<>();
-        String description_cs = attrs.get(ATTRIBUTE_DESCRIPTION_CZECH);
-        if (description_cs != null) {
-            descriptionsMap.put(new Locale("cs"), description_cs);
+        if(getPbs().isTorque()) {
+            String description_cs = attrs.get(ATTRIBUTE_DESCRIPTION_CZECH);
+            if (description_cs != null) {
+                descriptionsMap.put(new Locale("cs"), description_cs);
+            }
+            String description_en = attrs.get(ATTRIBUTE_DESCRIPTION_ENGLISH);
+            if (description_en != null) {
+                descriptionsMap.put(new Locale("en"), description_en);
+            }
+            descriptionAvailable = (description_cs != null && description_en != null);
+            descriptionsPrepared = true;
+        } else {
+            String comment = attrs.get(ATTRIBUTE_COMMENT);
+            if(comment==null) {
+                descriptionAvailable = false;
+                descriptionsPrepared = true;
+                return;
+            }
+            int pos = comment.indexOf('|');
+            if(pos==-1) {
+                descriptionsMap.put(new Locale("en"), StringEscapeUtils.unescapeJava(comment));
+                descriptionsMap.put(new Locale("cs"), StringEscapeUtils.unescapeJava(comment));
+            } else {
+                descriptionsMap.put(new Locale("en"), StringEscapeUtils.unescapeJava(comment.substring(0,pos)));
+                descriptionsMap.put(new Locale("cs"), StringEscapeUtils.unescapeJava(comment.substring(pos+1)));
+            }
+            descriptionAvailable = true;
+            descriptionsPrepared = true;
         }
-        String description_en = attrs.get(ATTRIBUTE_DESCRIPTION_ENGLISH);
-        if (description_en != null) {
-            descriptionsMap.put(new Locale("en"), description_en);
-        }
-        descriptionAvailable = (description_cs != null && description_en != null);
-        descriptionsPrepared = true;
     }
 
     private Map<Locale, String> descriptionsMap;

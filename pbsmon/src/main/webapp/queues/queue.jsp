@@ -63,7 +63,7 @@
 <p class="comment">
     <c:choose>
         <c:when test="${q.descriptionAvailable}"><c:out value="${q.descriptionMap[pageContext.request.locale]}"/><!-- from pbs --></c:when>
-        <c:otherwise><f:message key="q_${q.shortName}_txt" /><!-- from ResourceBundle --></c:otherwise>
+        <%--<c:otherwise><f:message key="q_${q.shortName}_txt" /><!-- from ResourceBundle --></c:otherwise>--%>
     </c:choose>
 </p>
 
