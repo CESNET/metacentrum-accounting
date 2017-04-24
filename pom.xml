@@ -5,7 +5,11 @@
     <groupId>cz.metacentrum</groupId>
     <artifactId>accounting-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.0-SNAPSHOT</version>
+
+    <!--
+    Use "mvn versions:set -DnewVersion=3.9-SNAPSHOT; mvn versions:commit" to change version in all modules
+     -->
+    <version>3.1-SNAPSHOT</version>
     <name>MetaCentrum Accounting Parent Project</name>
 
     <properties>
