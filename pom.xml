@@ -10,6 +10,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <postgresql.version>42.0.0</postgresql.version>
     </properties>
 
     <!-- defines compatible versions of many libraries -->
@@ -17,18 +19,13 @@
     <parent>
         <groupId>io.spring.platform</groupId>
         <artifactId>platform-bom</artifactId>
-        <version>Brussels-RELEASE</version>
+        <version>Brussels-SR1</version>
         <relativePath/>
     </parent>
 
     <!-- specifies versions not defined by the Spring platform-bom -->
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>42.0.0</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
