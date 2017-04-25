@@ -22,7 +22,8 @@
                     name="ws"><c:forEach begin="0" end="59" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>
 
             -q <s:select name="fronta">
-                <s:option value="default@arien-pro.ics.muni.cz"> </s:option>
+                <s:option value="default"> </s:option>
+                <s:option value="default@wagap-pro.cerit-sc.cz">default@wagap-pro.cerit-sc.cz</s:option>
                 <c:forEach items="${actionBean.offerQueues}" var="q"><s:option value="${q.name}">${q.name}</s:option></c:forEach></s:select>
 
             \<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l select=<s:select name="nodes"><c:forEach begin="1" end="99" var="i"><s:option value="${i}" >${i}</s:option></c:forEach></s:select>

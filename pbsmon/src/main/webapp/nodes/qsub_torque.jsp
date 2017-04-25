@@ -23,7 +23,7 @@
                         <s:select name="wh"><c:forEach begin="0" end="24" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>h
                         <s:select name="wm"><c:forEach begin="0" end="59" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>m
                         <s:select name="ws"><c:forEach begin="0" end="59" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>s
-            \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-q <s:select name="fronta"><s:option value="default"> </s:option><s:option value="default@wagap.cerit-sc.cz">@wagap.cerit-sc.cz</s:option>
+            \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-q <s:select name="fronta"><s:option value="default@wagap.cerit-sc.cz">default@wagap.cerit-sc.cz</s:option>
                 <c:forEach items="${actionBean.offerQueues}" var="q"><s:option value="${q.name}">${q.name}</s:option></c:forEach></s:select>
             \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l mem=<s:text style="text-align: right;" name="mem" size="5"/><s:select name="memu"><s:option value="mb">mb</s:option><s:option value="gb">gb</s:option></s:select>
             \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-l scratch=<s:text style="text-align: right;" name="scratch" size="5"/><s:select name="scratchu"><s:option value="mb">mb</s:option><s:option value="gb">gb</s:option></s:select>
