@@ -46,7 +46,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                 -->
                 <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
                     <property name="host" value="arien-pro.ics.muni.cz"/>
-                    <property name="main" value="true"/> <!-- jedna musí být kvůli sestavovači -->
+                    <property name="main" value="true"/> <!-- jedna musí být hlavní kvůli sestavovači, při změně nezapomenout změnit selection list s frontami v sestavovačích -->
                     <property name="torque" value="false"/>
                     <property name="by_queue" value="false"/>
                     <property name="planbased" value="true"/>
