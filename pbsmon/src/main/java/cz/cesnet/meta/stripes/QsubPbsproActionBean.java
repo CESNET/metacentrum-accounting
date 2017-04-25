@@ -69,7 +69,8 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
     List<Queue> offerQueues;
     List<String> props;
     Map<String, Set<String>> resourceValues;
-
+    List<String> clusters;
+    List<String> cities;
 
     @DefaultHandler
     public Resolution show() throws UnsupportedEncodingException {
@@ -143,6 +144,13 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
                     }
                 }
             }
+            //filter out clusters
+            clusters = resourceValues.keySet().stream().filter(k -> k.startsWith("cl_")).collect(Collectors.toList());
+            clusters.forEach(resourceValues::remove);
+            //filter out cities
+            List<String> citynames = Arrays.asList("brno", "budejovice", "olomouc", "plzen", "praha");
+            cities = resourceValues.keySet().stream().filter(citynames::contains).collect(Collectors.toList());
+            cities.forEach(resourceValues::remove);
             //censored queues for offering the -q parameter
             offerQueues = new ArrayList<>(queues.size());
             for (Queue q : queues) {
@@ -177,6 +185,8 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
     long scratch = 400;
     String scratchu = "mb";
     String scratchtype = "local";
+    String cluster;
+    String city;
 
     int wm = 0;
     int wh = 1;
@@ -204,13 +214,19 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
         Resolution r = data();
         if (r != null) return r;
         //Sestavovac
-        log.info("sestavovac() user={} -l walltime={}:{}:{}:,q={},nodes={}:ncpus={}:scratch_{}={}{}:mem={}{}: resources= {}",
-                user, wh, wm, ws, fronta, nodes, ncpus, scratchtype, scratch, scratchu, mem, memu, resources);
+        log.info("sestavovac() user={} -l walltime={}:{}:{}:,q={},nodes={}:ncpus={}:scratch_{}={}{}:mem={}{}: resources= {}:cluster={}:city={}",
+                user, wh, wm, ws, fronta, nodes, ncpus, scratchtype, scratch, scratchu, mem, memu, resources,cluster,city);
 
         long memBytes = PbsUtils.parsePbsBytes(this.mem + this.memu);
         long scratchKB = PbsUtils.parsePbsBytes(this.scratch + this.scratchu) / 1024;
         long walltimeSecs = walltimeSecs();
 
+        if(cluster!=null&&!cluster.isEmpty()) {
+            resources.put(cluster,"True");
+        }
+        if(city!=null&&!city.isEmpty()) {
+            resources.put(city,"True");
+        }
 
         queue = pbsky.getQueueByName(fronta);
         List<Node> nodesList;
@@ -465,4 +481,27 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
         return resourceValues;
     }
 
+    public List<String> getCities() {
+        return cities;
+    }
+
+    public List<String> getClusters() {
+        return clusters;
+    }
+
+    public String getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(String cluster) {
+        this.cluster = cluster;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
 }

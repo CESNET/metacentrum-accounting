@@ -31,11 +31,13 @@
             :ngpus=<s:select name="ngpus"><c:forEach begin="0" end="4" var="i"><s:option value="${i}">${i}</s:option></c:forEach></s:select>
             :mem=<s:text style="text-align: right;" name="mem" size="3"/><s:select name="memu"><s:option value="mb">mb</s:option><s:option value="gb">gb</s:option></s:select>
             :scratch_<s:select name="scratchtype"><s:option value="local">local</s:option><s:option value="ssd">ssd</s:option><s:option value="shared">shared</s:option></s:select>=<s:text style="text-align: right;" name="scratch" size="3"/><s:select name="scratchu"><s:option value="mb">mb</s:option><s:option value="gb">gb</s:option></s:select>
+            <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>cluster ... <strong><s:select name="cluster"><s:option value=""> </s:option><c:forEach items="${actionBean.clusters}" var="cl"><s:option value="${cl}">:${cl}=True</s:option></c:forEach></s:select>
+            <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><t:i18n cs="město" en="city"/> ... <strong> <s:select name="city"><s:option value=""> </s:option><c:forEach items="${actionBean.cities}" var="ct"><s:option value="${ct}">:${ct}=True</s:option></c:forEach></s:select>
+            <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><t:i18n cs="jiné zdroje" en="other resources"/> ... <strong>
             <c:forEach items="${actionBean.resourceValues}" var="rv">
             <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :<c:out value="${rv.key}" />=<s:select name="resources.${rv.key}"><s:option value=""> </s:option><c:forEach items="${rv.value}" var="v"><s:option value="${v}">${v}</s:option></c:forEach></s:select>
             </c:forEach>
 
-            \<br> uloha.sh
         </strong>  <br>
         <br><br>
         <input type="submit" name="sestavovac" value="<f:message key="person_nalezt"/>"/>
