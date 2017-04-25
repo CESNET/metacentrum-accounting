@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Load data from PBS server using its C interface through Java Native Interface.
@@ -62,8 +63,8 @@ public class PbsConnectorJNI implements PbsConnector {
         log.debug("main");
         PbsConnectorJNI p = new PbsConnectorJNI();
         call(p, new PbsServerConfig("arien-pro.ics.muni.cz",false,false, true,Collections.<FairshareConfig>emptyList()));
-        call(p, new PbsServerConfig("arien.ics.muni.cz",false,true,true,Collections.<FairshareConfig>emptyList()));
-        call(p, new PbsServerConfig("wagap.cerit-sc.cz",false,true,true,Collections.<FairshareConfig>emptyList()));
+        //call(p, new PbsServerConfig("arien.ics.muni.cz",false,true,true,Collections.<FairshareConfig>emptyList()));
+        //call(p, new PbsServerConfig("wagap.cerit-sc.cz",false,true,true,Collections.<FairshareConfig>emptyList()));
 
     }
 
@@ -78,6 +79,11 @@ public class PbsConnectorJNI implements PbsConnector {
         System.out.println("time " + (end - start));
         System.out.println("pbs.getServer().getShortName() = " + pbs.getServer().getShortName());
         System.out.println("pbs.getServer().getVersion() = " + pbs.getServer().getVersion());
+        List<Job> jobs = pbs.getJobsById().stream().filter(j -> "makub".equals(j.getUser())).collect(Collectors.toList());
+        for (Job job : jobs) {
+            System.out.println("job = " + job);
+        }
+
 
 //        for(Job job: pbs.getJobsById()) {
 //            System.out.println("-------");
