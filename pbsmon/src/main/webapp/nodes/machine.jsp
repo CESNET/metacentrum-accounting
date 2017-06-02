@@ -69,7 +69,7 @@
                     <c:choose>
                         <c:when test="${vm.pbsNode}">
                             <td class="cloud-virt nebulapbshost">
-                                <s:link href="/node/${vm.fqdn}"><c:out value="${vm.fqdn}"/>
+                                <s:link href="/node/${vm.node.name}"><c:out value="${vm.fqdn}"/>
                                 (<c:out value="${vm.cpuReservedString}"/> CPU<c:if
                                         test="${vm.cpu_reserved_x100!=vm.cpu_avail_x100}">/${vm.VCPU}VCPU</c:if>)
                                 </s:link>

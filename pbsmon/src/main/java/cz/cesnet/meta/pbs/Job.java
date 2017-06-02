@@ -859,32 +859,37 @@ public class Job extends PbsInfoObject {
 
     // využito v node_detail.tag v seznamu úloh běžících na uzlu, zobrazuje kolik která úloha na uzlu využívá zdrojů
     public Map<String, ReservedResources> getNodeName2reservedResources() {
-        if (nodeName2reservedResources == null) {
-            synchronized (this) {
-                nodeName2reservedResources = new HashMap<>();
-                for (Chunk chunk : getChunks()) {
-                    String chunkNodeName = chunk.getNodeName();
-                    String chunkScratchType = chunk.getScratchType();
-                    long chunkScratchVolume = PbsUtils.parsePbsBytes(chunk.getScratchVolume());
-                    long chunkMemBytes = PbsUtils.parsePbsBytes(chunk.getMem());
-                    int chunkCpus = chunk.getNcpus();
+        try {
+            if (nodeName2reservedResources == null) {
+                synchronized (this) {
+                    nodeName2reservedResources = new HashMap<>();
+                    for (Chunk chunk : getChunks()) {
+                        String chunkNodeName = chunk.getNodeName();
+                        String chunkScratchType = chunk.getScratchType();
+                        long chunkScratchVolume = PbsUtils.parsePbsBytes(chunk.getScratchVolume());
+                        long chunkMemBytes = PbsUtils.parsePbsBytes(chunk.getMem());
+                        int chunkCpus = chunk.getNcpus();
 
-                    ReservedResources reservedResources = nodeName2reservedResources.get(chunkNodeName);
-                    if (reservedResources == null) { //první chunk na stroji
-                        reservedResources = new ReservedResources(this,chunkNodeName,chunkScratchType, chunkScratchVolume, chunkMemBytes, chunkCpus);
-                    } else { //další chunk na stejném stroji, přičíst k předešlému
-                        reservedResources = new ReservedResources(this,chunkNodeName,
-                                chunkScratchType.equals(reservedResources.getScratchType()) ? chunkScratchType : "mixed",
-                                chunkScratchVolume + reservedResources.getScratchVolumeBytes(),
-                                chunkMemBytes + reservedResources.getMemBytes(),
-                                chunkCpus + reservedResources.getCpus()
-                        );
+                        ReservedResources reservedResources = nodeName2reservedResources.get(chunkNodeName);
+                        if (reservedResources == null) { //první chunk na stroji
+                            reservedResources = new ReservedResources(this, chunkNodeName, chunkScratchType, chunkScratchVolume, chunkMemBytes, chunkCpus);
+                        } else { //další chunk na stejném stroji, přičíst k předešlému
+                            reservedResources = new ReservedResources(this, chunkNodeName,
+                                    Objects.equals(chunkScratchType,reservedResources.getScratchType()) ? chunkScratchType : "mixed",
+                                    chunkScratchVolume + reservedResources.getScratchVolumeBytes(),
+                                    chunkMemBytes + reservedResources.getMemBytes(),
+                                    chunkCpus + reservedResources.getCpus()
+                            );
+                        }
+                        nodeName2reservedResources.put(chunkNodeName, reservedResources);
                     }
-                    nodeName2reservedResources.put(chunkNodeName, reservedResources);
                 }
             }
+            return nodeName2reservedResources;
+        } catch (Exception ex) {
+            log.error("job "+this.getId()+ " getNodeName2reservedResources() throws exception",ex);
+            return Collections.emptyMap();
         }
-        return nodeName2reservedResources;
     }
 
     public static class ReservedResources {

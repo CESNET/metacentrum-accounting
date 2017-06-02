@@ -55,6 +55,7 @@ public class PbsmonUtils {
                     if (pbsNode != null) {
                         //virtuál obsahuje PBS Node
                         pbsNodes.add(pbsNode);
+                        cloudVirtualHost.setNode(pbsNode);
                     }
                 }
             }
