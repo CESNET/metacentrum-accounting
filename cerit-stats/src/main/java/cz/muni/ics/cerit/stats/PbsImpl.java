@@ -15,7 +15,7 @@ import java.util.*;
 public class PbsImpl implements Pbs {
 
     final static Logger log = LoggerFactory.getLogger(PbsImpl.class);
-    List<String> pbsURLs = Collections.singletonList("https://wiki.metacentrum.cz/pbsmon2/api/nodes?serverName=wagap.cerit-sc.cz");
+    List<String> pbsURLs = Collections.emptyList();
 
     public void setPbsURLs(List<String> pbsURLs) {
         this.pbsURLs = pbsURLs;
