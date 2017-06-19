@@ -141,7 +141,11 @@
          <td align="right"><%=job.getJobName()%></td>
          <td align="right" <%if(job.isUnderusingCPUs()){out.print("class=\"wasting\"");}%> ><%=job.getCPUTimeUsed()%></td>
          <td align="right"><%=job.getWallTimeUsed()%></td>
-         <td align="center" class="<%=job.getState()%>"><%=job.getState()%> - <f:message key='<%="jobs_"+job.getState()%>'/> </td>
+         <td align="center" class="<%=job.getState()%>"><%=job.getState()%> - <f:message key='<%="jobs_"+job.getState()%>'/>
+             <% if("F".equals(job.getState())) {
+                 out.print("(exit " + job.getExitStatus() + ")");
+             }%>
+         </td>
          <td align="left">
      <%if("R".equals(job.getState())&&job.getExecHostFirst()!=null) { pageContext.setAttribute("job",job);%>
 
