@@ -1,5 +1,6 @@
 <%@ page import="cz.cesnet.meta.pbs.Job" %>
 <%@ page import="cz.cesnet.meta.stripes.UserActionBean" %>
+<%@ page import="org.apache.taglibs.standard.util.EscapeXML" %>
 <%@ page pageEncoding="utf-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -143,7 +144,7 @@
          <td align="right"><%=job.getWallTimeUsed()%></td>
          <td align="center" class="<%=job.getState()%>"><%=job.getState()%> - <f:message key='<%="jobs_"+job.getState()%>'/>
              <% if("F".equals(job.getState())) {
-                 out.print("(exit " + job.getExitStatus() + ")");
+                 out.print("<span title='"+ EscapeXML.escape(job.getComment())+"'>(exit " + job.getExitStatus() + ")</span>");
              }%>
          </td>
          <td align="left">
