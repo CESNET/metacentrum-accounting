@@ -144,7 +144,9 @@
          <td align="right"><%=job.getWallTimeUsed()%></td>
          <td align="center" class="<%=job.getState()%>"><%=job.getState()%> - <f:message key='<%="jobs_"+job.getState()%>'/>
              <% if("F".equals(job.getState())) {
-                 out.print("<span title='"+ EscapeXML.escape(job.getComment())+"'>(exit " + job.getExitStatus() + ")</span>");
+                 String jobComment = job.getComment();
+                 if(jobComment!=null) jobComment = EscapeXML.escape(jobComment);
+                 out.print("<span title='"+ jobComment+"'>(exit " + job.getExitStatus() + ")</span>");
              }%>
          </td>
          <td align="left">
