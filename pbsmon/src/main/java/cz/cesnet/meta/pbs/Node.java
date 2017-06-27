@@ -596,8 +596,18 @@ public class Node extends PbsInfoObject {
      */
     public String[] getProperties() {
         if (this.properties == null) {
-            String propatr = attrs.get(ATTRIBUTE_PROPERTIES);
-            this.properties = propatr != null ? propatr.split(",") : new String[0];
+            if(pbs.isTorque()) {
+                String propatr = attrs.get(ATTRIBUTE_PROPERTIES);
+                this.properties = propatr != null ? propatr.split(",") : new String[0];
+            } else if(pbs.isPBSPro()) {
+                ArrayList<String> al = new ArrayList<>();
+                for (NodeResource r : getNodeResources()) {
+                    if(r.getType() == NodeResource.Type.BOOLEAN && "True".equals(r.getAvailable())) {
+                        al.add(r.getName());
+                    }
+                }
+                this.properties = al.toArray(new String[al.size()]);
+            }
         }
         return this.properties;
     }
@@ -831,7 +841,7 @@ public class Node extends PbsInfoObject {
 
         public static Type detectType(String value) {
             Type type;
-            if ("True".equals(value)) {
+            if ("True".equals(value)||"False".equals(value)) {
                 type = Type.BOOLEAN;
             } else if (value.matches("\\d+")) {
                 type = Type.INT;

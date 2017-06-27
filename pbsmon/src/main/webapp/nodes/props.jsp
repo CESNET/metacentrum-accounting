@@ -26,7 +26,7 @@
  <c:forEach items="${actionBean.nodes}" var="n">
  <tr>
   <td class="${n.state}"><h:link class="${n.state}" href="/node/${n.name}">${n.name}</h:link>
-  <td>${n.attributes.properties}</td>
+  <td><c:forEach items="${n.properties}" var="p"><c:out value="${p}"/> </c:forEach></td>
  </c:forEach>
 </table>
 
