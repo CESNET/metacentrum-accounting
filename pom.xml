@@ -9,12 +9,13 @@
     <!--
     Use "mvn versions:set -DnewVersion=3.9-SNAPSHOT; mvn versions:commit" to change version in all modules
      -->
-    <version>3.1-SNAPSHOT</version>
+    <version>3.2-SNAPSHOT</version>
     <name>MetaCentrum Accounting Parent Project</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <postgresql.version>42.0.0</postgresql.version>
     </properties>
 
@@ -23,7 +24,7 @@
     <parent>
         <groupId>io.spring.platform</groupId>
         <artifactId>platform-bom</artifactId>
-        <version>Brussels-SR1</version>
+        <version>Brussels-SR3</version>
         <relativePath/>
     </parent>
 
@@ -32,21 +33,6 @@
         <dependencies>
         </dependencies>
     </dependencyManagement>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>8</source>
-                        <target>8</target>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 
     <modules>
         <module>cloud</module><!-- API for MetaCentrum OpenNebula State -->
