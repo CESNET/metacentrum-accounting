@@ -85,7 +85,7 @@ public abstract class RefreshLoader implements TimeStamped {
                 log.debug("loading data on the very first request");
                 //if first attempt, load in this thread to wait for its finish
                 timeLoadStarted = new Date();
-                new LoadRunner().run();
+                new LoadRunner(true).run();
             } else {
                 //other attempts wait for the first one to finish
                 while (loadStarted.get()) {
@@ -109,7 +109,7 @@ public abstract class RefreshLoader implements TimeStamped {
                 log.trace("starting new load");
                 //load not started, start it in a new thread
                 timeLoadStarted = new Date();
-                new LoadRunner().start();
+                new LoadRunner(false).start();
                 refresh = loadRunTimeInMilliseconds;
             } else {
                 log.trace("load already started by another thread, do nothing");
@@ -127,14 +127,21 @@ public abstract class RefreshLoader implements TimeStamped {
 
     private class LoadRunner extends Thread {
 
-        public LoadRunner() {
+        private final boolean firstRun;
+
+        public LoadRunner(boolean firstRun) {
+            this.firstRun = firstRun;
             setDaemon(true);
             setName(RefreshLoader.this.getClass().getSimpleName() + "/LoadRunner-"+(threadCounter++));
         }
 
         @Override
         public void run() {
-            log.debug("starting data load");
+            if(firstRun) {
+                log.info("starting data load");
+            } else {
+                log.debug("starting data load");
+            }
             loadStarted.set(true);
             try {
                 load();
@@ -149,7 +156,11 @@ public abstract class RefreshLoader implements TimeStamped {
             if (timeNeeded > loadRunTimeInMilliseconds) {
                 log.warn("data not generated in time, needed {}ms instead of {}ms", timeNeeded, loadRunTimeInMilliseconds);
             }
-            log.debug("data load finished");
+            if(firstRun) {
+                log.info("data load finished in {} ms",timeNeeded);
+            } else {
+                log.debug("data load finished");
+            }
         }
     }
 

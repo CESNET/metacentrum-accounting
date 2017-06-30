@@ -64,6 +64,14 @@
             </c:if>
 
         </table>
+
+  <c:choose>
+      <c:when test="${node.cloudHost}">
+          <p class="cloud_warning"><f:message key="nodejsp_cloud"/></p>
+      </c:when>
+      <c:otherwise>
+
+
         <!-- rezervace a vyuziti -->
         <table class="zakladni">
             <tr>
@@ -319,3 +327,7 @@
                 <f:message key="node_detail_tag_none_found"/>
             </c:otherwise>
         </c:choose>
+
+      <%-- end of not cloud node --%>
+      </c:otherwise>
+  </c:choose>

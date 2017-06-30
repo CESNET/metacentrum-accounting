@@ -66,21 +66,29 @@ public class RozhodovacStavuStroju {
         //nevirtualizovane stroje v PBS pouziji svuj stav
         if (physNode != null && !physNode.getState().equals(Node.STATE_CLOUD)) {
             String state = physNode.getState();
-            if (state.equals(Node.STATE_JOB_BUSY) || state.equals(Node.STATE_JOB_EXCLUSIVE)
-                    || state.equals(Node.STATE_JOB_SHARING) || state.equals(Node.STATE_RESERVED) || state.equals(Node.STATE_JOB_FULL)) {
-                stroj.setState(Node.STATE_JOB_BUSY);
-            } else if (state.equals(Node.STATE_FREE)) {
-                stroj.setState(Node.STATE_FREE);
-            } else if (state.equals(Node.STATE_PARTIALY_FREE)) {
-                stroj.setState(Node.STATE_PARTIALY_FREE);
-                stroj.setUsedPercent(physNode.getUsedPercent());
-            } else {
-                stroj.setState(Node.STATE_UNKNOWN);
+            switch (state) {
+                case Node.STATE_JOB_BUSY:
+                case Node.STATE_JOB_EXCLUSIVE:
+                case Node.STATE_JOB_SHARING:
+                case Node.STATE_RESERVED:
+                case Node.STATE_JOB_FULL:
+                    stroj.setState(Node.STATE_JOB_BUSY);
+                    break;
+                case Node.STATE_FREE:
+                    stroj.setState(Node.STATE_FREE);
+                    break;
+                case Node.STATE_PARTIALY_FREE:
+                    stroj.setState(Node.STATE_PARTIALY_FREE);
+                    stroj.setUsedPercent(physNode.getUsedPercent());
+                    break;
+                default:
+                    stroj.setState(Node.STATE_UNKNOWN);
+                    break;
             }
             log.debug(" fyzicky {} v PBS, stav={}", jmenoStroje, stroj.getState());
         } else {
             //ostatni vezmeme podle stavu virtualnich stroju
-            String stav = Node.STATE_UNKNOWN;
+            String stav;
             List<String> virtNames = mapping.getPhysical2virtual().get(jmenoStroje);
             if (virtNames != null) {
                 //v pbsCache jsou udaje o virtualich strojich (urga)

@@ -240,6 +240,10 @@ public class Node extends PbsInfoObject {
      */
     public String getState() {
         if (this.state != null) return this.state;
+        if(this.isCloudHost()) {
+            this.state = Node.STATE_CLOUD;
+            return this.state;
+        }
         //report just text up to first comma
         this.state = getPbsState();
         if (this.isMaintenance()) {
@@ -464,6 +468,11 @@ public class Node extends PbsInfoObject {
         String rq = attrs.get(ATTRIBUTE_QUEUE);
         if (rq != null) rq = rq + getPbs().getSuffix();
         return rq;
+    }
+
+
+    public boolean isCloudHost() {
+        return "cloud".equals(attrs.get(ATTRIBUTE_QUEUE));
     }
 
     private String getRequiredQueueShort() {
