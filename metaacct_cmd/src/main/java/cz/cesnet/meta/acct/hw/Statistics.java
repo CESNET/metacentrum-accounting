@@ -21,7 +21,7 @@ public class Statistics {
 
     private static final Locale CS = new Locale("cs", "CZ");
 
-    public static void main(String[] args) throws DatatypeConfigurationException {
+    public static void main1(String[] args) throws DatatypeConfigurationException {
         Stats stats = new ClassPathXmlApplicationContext("spring-context.xml").getBean("stats", Stats.class);
         long startTime = System.currentTimeMillis();
 
@@ -37,32 +37,34 @@ public class Statistics {
         System.out.println("Computed in " + duration + " minutes");
     }
 
-    public static void main2(String[] args) {
+    public static void main(String[] args) {
         Stats stats = new ClassPathXmlApplicationContext("spring-context.xml").getBean("stats", Stats.class);
-        recompute("tarkil.grid.cesnet.cz", "2016-11-02", stats);
-        recompute("meduseld.ics.muni.cz", "2016-11-15", stats);
-        recompute("ajax.zcu.cz", "2016-11-23", stats);
-        recompute("gram.zcu.cz", "2017-01-09", stats);
-        recompute("kalpa.fzu.cz", "2017-01-20", stats);
-        recompute("luna.fzu.cz", "2017-01-24", stats);
-        recompute("exmag.fzu.cz", "2017-01-24", stats);
-        recompute("mudrc.metacentrum.cz", "2017-01-24", stats);
-        recompute("hildor.metacentrum.cz", "2017-02-07", stats);
-        recompute("mandos.ics.muni.cz", "2017-02-12", stats);
-        recompute("loslab.ics.muni.cz", "2017-02-24", stats);
-        recompute("bofur.ics.muni.cz", "2017-02-27", stats);
-        recompute("haldir.metacentrum.cz", "2017-02-28", stats);
-        recompute("losgar.ics.muni.cz", "2017-02-28", stats);
-        recompute("doom.metacentrum.cz", "2017-03-01", stats);
-        recompute("alfrid-cluster.meta.zcu.cz", "2017-03-02", stats);
-        recompute("konos.fav.zcu.cz", "2017-03-02", stats);
+        recompute("elixir-storage1.grid.cesnet.cz", "2017-07-24", "2017-07-24", stats);
+//        recompute("tarkil.grid.cesnet.cz", "2016-11-02", stats);
+//        recompute("meduseld.ics.muni.cz", "2016-11-15", stats);
+//        recompute("ajax.zcu.cz", "2016-11-23", stats);
+//        recompute("gram.zcu.cz", "2017-01-09", stats);
+//        recompute("kalpa.fzu.cz", "2017-01-20", stats);
+//        recompute("luna.fzu.cz", "2017-01-24", stats);
+//        recompute("exmag.fzu.cz", "2017-01-24", stats);
+//        recompute("mudrc.metacentrum.cz", "2017-01-24", stats);
+//        recompute("hildor.metacentrum.cz", "2017-02-07", stats);
+//        recompute("mandos.ics.muni.cz", "2017-02-12", stats);
+//        recompute("loslab.ics.muni.cz", "2017-02-24", stats);
+//        recompute("bofur.ics.muni.cz", "2017-02-27", stats);
+//        recompute("haldir.metacentrum.cz", "2017-02-28", stats);
+//        recompute("losgar.ics.muni.cz", "2017-02-28", stats);
+//        recompute("doom.metacentrum.cz", "2017-03-01", stats);
+//        recompute("alfrid-cluster.meta.zcu.cz", "2017-03-02", stats);
+//        recompute("konos.fav.zcu.cz", "2017-03-02", stats);
     }
 
 
-    private static void recompute(String clustername, String day, Stats stats) {
+    private static void recompute(String clustername, String startDay, String endDay, Stats stats) {
         GregorianCalendar start = new GregorianCalendar();
-        start.setTime(java.sql.Date.valueOf(day));
-        GregorianCalendar end = absoluteDate(2017, 3, 7);
+        start.setTime(java.sql.Date.valueOf(startDay));
+        GregorianCalendar end = new GregorianCalendar();
+        end.setTime(java.sql.Date.valueOf(endDay));
 
         long startTime = System.currentTimeMillis();
         PrintStream out = System.out;
