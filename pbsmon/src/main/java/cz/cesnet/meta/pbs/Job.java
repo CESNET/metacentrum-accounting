@@ -490,6 +490,49 @@ public class Job extends PbsInfoObject {
     }
 
     /**
+     * True for running or finished jobs.
+     * @return true for states R,C,F
+     */
+    public boolean isConsumingResources() {
+        String state = getState();
+        return "R".equals(state) || "C".equals(state) || "F".equals(state);
+    }
+
+    /**
+     * Computes percent of used memory.
+     * @return ratio of used and reserved memory times 100
+     */
+    public int getUsedMemPercent() {
+        if(!isConsumingResources()) return 0;
+        return (int) Math.round(100d* (double)getUsedMemoryNum() / (double)getReservedMemoryTotalNum());
+    }
+
+    /**
+     * Computes percent of used CPU time.
+     * @return ratio of used and reserved CPU time times 100
+     */
+    public int getUsedCpuTimePercent() {
+        if(!isConsumingResources()) return 0;
+        Duration walltimeUsed = getWalltimeUsed();
+        if(walltimeUsed==null) return 0;
+        return (int) Math.round(100d* (double)getCPUTimeUsedSec() / (double) (getNoOfUsedCPU() * walltimeUsed.getSeconds()));
+    }
+
+    /**
+     * Computes percent of used walltime.
+     * @return ratio of used and reserved walltime times 100
+     */
+    public int getUsedWalltimePercent() {
+        if(!isConsumingResources()) return 0;
+        Duration walltimeUsed = getWalltimeUsed();
+        if(walltimeUsed==null) return 0;
+        Duration walltimeReserved = getWalltimeReserved();
+        if(walltimeReserved==null || walltimeReserved.isZero()) return 0;
+        return (int) Math.round(100d* (double) walltimeUsed.getSeconds() / (double) walltimeReserved.getSeconds());
+    }
+
+
+    /**
      * Report jobs using less than 3/4 of allocated CPUs.
      * Only for running or completed jobs, which run more than 5 minutes.
      *
@@ -590,7 +633,11 @@ public class Job extends PbsInfoObject {
     }
 
     public Duration getWalltimeReserved() {
-        return PbsUtils.parseTime(attrs.get(ATTRIBUTE_WALLTIME_RESERVED));
+        return PbsUtils.parseTime(getWalltimeReservedString());
+    }
+
+    public String getWalltimeReservedString() {
+        return attrs.get(ATTRIBUTE_WALLTIME_RESERVED);
     }
 
     private Date expectedEndTime;

@@ -103,16 +103,16 @@
              <th><s:link href="/user/${actionBean.userName}/ReservedMemTotal"><f:message key="jobs_mem_reserved"/></s:link>
                  <c:if test="${actionBean.sort=='ReservedMemTotal'}"><img src="${pageContext.request.contextPath}/img/arrow.jpeg" width="15" height="15" alt="sort"></c:if>
              </th>
-             <th><s:link href="/user/${actionBean.userName}/UsedMem"><f:message key="jobs_mem_used"/></s:link>
+             <th colspan="2"><s:link href="/user/${actionBean.userName}/UsedMem"><f:message key="jobs_mem_used"/></s:link>
                  <c:if test="${actionBean.sort=='UsedMem'}"><img src="${pageContext.request.contextPath}/img/arrow.jpeg" width="15" height="15" alt="sort"></c:if>
              </th>
              <th><s:link href="/user/${actionBean.userName}/Name"><f:message key="jobs_jobname"/></s:link>
                  <c:if test="${actionBean.sort=='Name'}"><img src="${pageContext.request.contextPath}/img/arrow.jpeg" width="15" height="15" alt="sort"></c:if>
              </th>
-             <th><s:link href="/user/${actionBean.userName}/CPUTime"><f:message key="jobs_cputimeused"/></s:link>
+             <th colspan="2"><s:link href="/user/${actionBean.userName}/CPUTime"><f:message key="jobs_cputimeused"/></s:link>
                  <c:if test="${actionBean.sort=='CPUTime'}"><img src="${pageContext.request.contextPath}/img/arrow.jpeg" width="15" height="15" alt="sort"></c:if>
              </th>
-             <th><s:link href="/user/${actionBean.userName}/WallTime"><f:message key="jobs_walltimeused"/></s:link>
+             <th colspan="2"><s:link href="/user/${actionBean.userName}/WallTime"><f:message key="jobs_walltimeused"/></s:link>
                  <c:if test="${actionBean.sort=='WallTime'}"><img src="${pageContext.request.contextPath}/img/arrow.jpeg" width="15" height="15" alt="sort"></c:if>
              </th>
              <th><s:link href="/user/${actionBean.userName}/State"><f:message key="jobs_state"/></s:link>
@@ -138,10 +138,17 @@
          <td><a href="<%=contextPath+"/job/"+job.getName()%>" style="font-size: xx-small"><%=job.getName()%></a>
          <td align="center"><%=job.getNoOfUsedCPU()%></td>
          <td align="right"><%=job.getReservedMemoryTotal()%></td>
-         <td align="right" <%if(job.getMemoryExceeded()){out.print("class=\"memexceeded\"");}%> ><%=job.getUsedMemory()%></td>
+         <td align="right" ><%=job.getUsedMemory()%></td>
+         <td align="right" <%if(job.getMemoryExceeded()){out.print("class=\"memexceeded\"");}%>>
+             <% if(job.isConsumingResources()) { out.print(job.getUsedMemPercent()+"%"); } %>
+         </td>
          <td align="right"><%=job.getJobName()%></td>
-         <td align="right" <%if(job.isUnderusingCPUs()){out.print("class=\"wasting\"");}%> ><%=job.getCPUTimeUsed()%></td>
+         <td align="right" ><%=job.getCPUTimeUsed()%></td>
+         <td align="right" <%if(job.isUnderusingCPUs()){out.print("class=\"wasting\"");}%> >
+             <% if(job.isConsumingResources()) { out.print(job.getUsedCpuTimePercent()+"%");}%>
+         </td>
          <td align="right"><%=job.getWallTimeUsed()%></td>
+         <td align="right"><% if(job.isConsumingResources()) { out.print(job.getUsedWalltimePercent()+"%");}%></td>
          <td align="center" class="<%=job.getState()%>"><%=job.getState()%> - <f:message key='<%="jobs_"+job.getState()%>'/>
              <% if("F".equals(job.getState())) {
                  String jobComment = job.getComment();

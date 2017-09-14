@@ -44,6 +44,28 @@
          <p class="jobwarning"><f:message key="job_exceeds_cputime"/></p>
      </c:if>
 
+    <c:if test="${job.consumingResources}">
+        <table class="zakladni">
+            <tr><th colspan="3"><f:message key="job_used_resources"/></th></tr>
+            <tr>
+                <th>RAM</th>
+                <td>${job.usedMemPercent}%</td>
+                <td>${job.usedMemory} / ${job.reservedMemoryTotal}</td>
+            </tr>
+            <tr>
+                <th>CPU</th>
+                <td>${job.usedCpuTimePercent}%</td>
+                <td>${job.CPUTimeUsed} / (${job.noOfUsedCPU} * ${job.wallTimeUsed})</td>
+            </tr>
+            <tr>
+                <th>walltime</th>
+                <td>${job.usedWalltimePercent}%</td>
+                <td>${job.wallTimeUsed} / ${job.walltimeReservedString}</td>
+            </tr>
+        </table>
+    </c:if>
+
+
     <a name="tblVars"></a><h3><f:message key="tabled_variables"/></h3>
 
 
