@@ -69,7 +69,7 @@ JNIEXPORT void JNICALL Java_cz_cesnet_meta_pbs_PbsConnectorJNI_loadInfoPro (JNIE
  /* throw exception if not connected */
  if(con<0) {
     char *buf;
-    asprintf(&buf, "pbs_connect(\"%s\"): Error %d viz /software/pbs-7.0.0/include/pbs_error.h \n",pbs_server,pbs_errno);
+    asprintf(&buf, "pbs_connect(\"%s\"): Error %d viz https://github.com/PBSPro/pbspro/blob/master/src/include/pbs_error.h \n",pbs_server,pbs_errno);
     (*env)->ThrowNew(env, pbsException_class, buf); 
     free(buf);
     return;

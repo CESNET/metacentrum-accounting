@@ -20,7 +20,7 @@ public class PbsConnectorJNI implements PbsConnector {
         System.loadLibrary("pbsmon2pro");
     }
 
-    private native void loadInfoTorque();
+    //private native void loadInfoTorque();
     private native void loadInfoPro();
 
     String pbsServer;
@@ -35,7 +35,7 @@ public class PbsConnectorJNI implements PbsConnector {
         log.debug("loadData({})", pbsServer);
         if(pbsServerConfig.isTorque()) {
             log.debug("loadInfoTorque({})", pbsServer);
-            loadInfoTorque();
+            //loadInfoTorque();
         } else {
             log.debug("loadInfoPro({})", pbsServer);
             loadInfoPro();
@@ -52,7 +52,7 @@ public class PbsConnectorJNI implements PbsConnector {
     }
 
     private <T extends PbsInfoObject> Map<String, T> makeMap(T[] array) {
-        HashMap<String, T> map = new HashMap<String, T>((int) (array.length * 1.5));
+        HashMap<String, T> map = new HashMap<>((int) (array.length * 1.5));
         for (T po : array) map.put(po.getName(), po);
         return map;
     }
@@ -62,10 +62,12 @@ public class PbsConnectorJNI implements PbsConnector {
         System.out.println("start");
         log.debug("main");
         PbsConnectorJNI p = new PbsConnectorJNI();
-        call(p, new PbsServerConfig("arien-pro.ics.muni.cz",false,false, true,Collections.<FairshareConfig>emptyList()));
-        //call(p, new PbsServerConfig("arien.ics.muni.cz",false,true,true,Collections.<FairshareConfig>emptyList()));
-        //call(p, new PbsServerConfig("wagap.cerit-sc.cz",false,true,true,Collections.<FairshareConfig>emptyList()));
-
+        for(int i=0;i<10;i++) {
+            PBS arien = call(p, new PbsServerConfig("arien-pro.ics.muni.cz", true, false, true, Collections.emptyList()));
+            System.out.println(arien.getServer().getShortName()+" jobs: "+arien.getJobsById().size());
+            PBS wagap = call(p, new PbsServerConfig("wagap-pro.cerit-sc.cz", false, false, true, Collections.emptyList()));
+            System.out.println(wagap.getServer().getShortName()+" jobs: "+wagap.getJobsById().size());
+        }
     }
 
     static PBS call(PbsConnectorJNI p, PbsServerConfig server) {
@@ -83,7 +85,8 @@ public class PbsConnectorJNI implements PbsConnector {
         for (Job job : jobs) {
             System.out.println("job = " + job);
         }
-
+        int jobsNum = pbs.getJobsById().size();
+        System.out.println("jobsNum = " + jobsNum);
 
 //        for(Job job: pbs.getJobsById()) {
 //            System.out.println("-------");

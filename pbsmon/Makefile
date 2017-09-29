@@ -9,9 +9,9 @@ pbspro: target/libpbsmon2pro.so
 
 torque: target/libpbsmon2torque.so
 
-all: target/libpbsmon2pro.so target/libpbsmon2torque.so
+#all: target/libpbsmon2pro.so target/libpbsmon2torque.so
 
-#all: target/libpbsmon2pro.so 
+all: target/libpbsmon2pro.so
 #all: target/libpbsmon2torque.so
 
 run: target/libpbsmon2pro.so

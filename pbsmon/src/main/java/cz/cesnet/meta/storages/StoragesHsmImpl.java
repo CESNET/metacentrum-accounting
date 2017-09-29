@@ -57,6 +57,7 @@ public class StoragesHsmImpl extends RefreshLoader implements Storages {
     }
 
     private void loadCeritHsms(List<Storage> storagesList) {
+        log.info("loading CERIT storages from {}",cerit4File);
         try (BufferedReader in = new BufferedReader(new FileReader(cerit4File))) {
             String line;
             int sizeGB = 0;
@@ -70,10 +71,11 @@ public class StoragesHsmImpl extends RefreshLoader implements Storages {
         } catch (IOException e) {
             log.error("cannot read file " + cerit4File, e);
         }
-
+        log.info("loaded");
     }
 
     private void loadDuHsms(List<Storage> storagesList) {
+        log.info("Loading DU storages from {}",url);
         try {
             URL url = new URL(this.url);
             try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
@@ -100,11 +102,12 @@ public class StoragesHsmImpl extends RefreshLoader implements Storages {
                     storagesList.add(new Storage(ss[1] + "T", ss[2] + "T", dir));
                 }
             } catch (IOException e) {
-                log.error("", e);
+                log.error("cannot load "+this.url, e);
             }
         } catch (MalformedURLException e) {
             log.error("cannot parse URL " + this.url, e);
         }
+        log.info("loaded");
     }
 
 
