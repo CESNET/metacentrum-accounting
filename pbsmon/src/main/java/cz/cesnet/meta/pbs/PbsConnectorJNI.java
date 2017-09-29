@@ -16,7 +16,7 @@ public class PbsConnectorJNI implements PbsConnector {
     final static Logger log = LoggerFactory.getLogger(PbsConnectorJNI.class);
 
     static {
-        System.loadLibrary("pbsmon2torque");
+        //System.loadLibrary("pbsmon2torque");
         System.loadLibrary("pbsmon2pro");
     }
 
