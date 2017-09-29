@@ -92,7 +92,7 @@ JNIEXPORT void JNICALL Java_cz_cesnet_meta_pbs_PbsConnectorJNI_loadInfoPro (JNIE
  /* get Job class */
  job_class = (*env)->FindClass(env,"cz/cesnet/meta/pbs/Job");
  if( (*env)->ExceptionOccurred(env) != NULL) return;
- /* query the server */
+ /* query the server: t - job arrays, x - finished jobs*/
  bs = pbs_statjob(con, "", NULL, "tx");
  /* build array of java objects from response */
  jobs = buildArrayPro(bs,env,job_class,pbsException_class,pbsExceptionConstructor,internId);
