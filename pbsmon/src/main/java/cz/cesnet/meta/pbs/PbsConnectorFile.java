@@ -32,8 +32,8 @@ public class PbsConnectorFile implements PbsConnector {
 
         //run pbsprocaller
         try {
-            File tempStdoutFile = File.createTempFile("o", ".txt");
-            File tempStderrFile = File.createTempFile("e", ".txt");
+            File tempStdoutFile = File.createTempFile("stdout", ".txt");
+            File tempStderrFile = File.createTempFile("stderr", ".txt");
             File tmpDirectory = Paths.get(System.getProperty("java.io.tmpdir", "/tmp")).toFile();
 
             Process p = new ProcessBuilder("pbsprocaller", serverHost)
