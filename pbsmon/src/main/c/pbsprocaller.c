@@ -9,9 +9,7 @@ extern char *pbs_server;
 
 int main(int argc, char **argv) {
     /*PBS variables*/
-    char *errmsg;
     int con;
-    int res;
     struct batch_status *bs;
     /* my variables */
     char* server;
@@ -54,9 +52,7 @@ int process_data(struct batch_status *bs,char* type) {
 
         for(atp=tmp->attribs;atp!=NULL;atp=atp->next) {
             if(atp->resource!=NULL) {
-                char buff[256];
-                sprintf(buff,"%s.%s",atp->name,atp->resource);
-                printf("%s=%s\n",buff,atp->value);                
+                printf("%s.%s=%s\n",atp->name,atp->resource,atp->value);                
             } else {
                 printf("%s=%s\n",atp->name,atp->value);                
             }
