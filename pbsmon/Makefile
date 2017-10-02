@@ -11,8 +11,11 @@ torque: target/libpbsmon2torque.so
 
 #all: target/libpbsmon2pro.so target/libpbsmon2torque.so
 
-all: target/libpbsmon2pro.so
+all: target/libpbsmon2pro.so pbsprocaller
 #all: target/libpbsmon2torque.so
+
+pbsprocaller:
+	$(CC) -g -L/usr/lib -shared -fpic src/main/c/pbsprocaller.c -o target/pbsprocaller -lpbs
 
 run: target/libpbsmon2pro.so
 	LD_LIBRARY_PATH=$(PWD)/target java $(RUNJAVAFLAGS) -classpath $(PWD)/target/classes/:$(PWD)/target/pbsmon2/WEB-INF/lib/* cz.cesnet.meta.pbs.PbsConnectorJNI
