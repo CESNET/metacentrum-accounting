@@ -46,7 +46,11 @@ int process_data(struct batch_status *bs,char* type) {
     struct batch_status *tmp;
     struct attrl *atp;
     int i;
-    printf("\x1E%s\n",type);
+    int pocet=0;
+    /* count results */
+    for(tmp=bs;tmp!=NULL;tmp=tmp->next) { pocet++; }
+
+    printf("\x1E%s,%d\n",type,pocet);
     for(tmp=bs,i=0;tmp!=NULL;tmp=tmp->next,i++) {
         printf("\x1F%s\n",tmp->name);
 
