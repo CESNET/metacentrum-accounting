@@ -15,7 +15,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
     <context:annotation-config/>
     <tx:annotation-driven/>
 
-    <bean id="pbsConnector" class="cz.cesnet.meta.pbs.PbsConnectorJNI"/>
+    <bean id="pbsConnector" class="cz.cesnet.meta.pbs.PbsConnectorFile"/>
 
     <!-- main configuration of PBS servers -->
     <bean id="servers" class="java.util.ArrayList">
