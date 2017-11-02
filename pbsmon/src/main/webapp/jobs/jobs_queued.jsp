@@ -223,7 +223,7 @@
                 <td align="right"><a href="<%=contextPath+"/user/"+job.getUser()%>"><%=job.getUser()%>
                 </a></td>
                 <td align="right"><a
-                        href="<%=contextPath+"/queue/"+job.getQueueName()%>"><%=job.getQueue().getShortName()%>
+                        href="<%=contextPath+"/queue/"+job.getQueueName()%>"><%=job.getQueueShortName()%>
                 </a></td>
                 <td align="right"><%=job.getQueue().getPriority()%>
                 </td>

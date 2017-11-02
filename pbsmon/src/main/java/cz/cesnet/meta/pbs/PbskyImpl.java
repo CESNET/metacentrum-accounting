@@ -84,7 +84,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
                         log.debug("marked old data for clearing "+oldData);
                     }
                 } catch (RuntimeException ex) {
-                    log.error("Cannot load PBS data from server " + server.getHost() + ", reason: " + ex.getMessage());
+                    log.error("Cannot load PBS data from server " + server.getHost(),ex);
                     //keep old data for that server
                     if (oldData != null) {
                         log.warn("keeping old data " + pbsky.toString());

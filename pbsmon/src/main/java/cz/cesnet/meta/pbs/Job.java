@@ -1,6 +1,5 @@
 package cz.cesnet.meta.pbs;
 
-import cz.cesnet.meta.pbsmon.PbsmonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +82,7 @@ public class Job extends PbsInfoObject {
     };
 
     public static final Comparator<Job> PRIORITY_FAIRSHARE_JOB_COMPARATOR = (j1, j2) -> {
-        int c = j2.getQueue().getPriority() - j1.getQueue().getPriority();
+        int c = j2.getQueuePriority() - j1.getQueuePriority();
         if (c != 0) return c;
         c = j2.getFairshareRank() - j1.getFairshareRank();
         if (c != 0) return c;
@@ -137,7 +136,7 @@ public class Job extends PbsInfoObject {
     /**
      * Defines order of attributes.
      */
-    static String[] orderedAttributeNames = new String[]{
+    static final String[] orderedAttributeNames = new String[]{
             "submit_args", "Submit_arguments", ATTRIBUTE_COMMENT, ATTRIBUTE_JOB_NAME, ATTRIBUTE_JOB_OWNER, ATTRIBUTE_JOB_STATE, ATTRIBUTE_QUEUE,
             ATTRIBUTE_EXEC_HOST, "exec_vnode", "Output_Path", "Error_Path", "Join_Path",
             ATTRIBUTE_TIME_CREATED, "qtime", ATTRIBUTE_TIME_ELIGIBLE, ATTRIBUTE_PLANNED_START_TORQUE, ATTRIBUTE_TIME_MODIFIED, ATTRIBUTE_TIME_STARTED_PBSPRO, ATTRIBUTE_TIME_STARTED_TORQUE, ATTRIBUTE_TIME_COMPLETED, ATTRIBUTE_WALLTIME_REMAINING_TORQUE,
@@ -149,7 +148,7 @@ public class Job extends PbsInfoObject {
 
 
     private static final Pattern TORQUE_ARRAY_JOB = Pattern.compile("(\\d+)-(\\d+)");
-    private static final Pattern PBSPRO_ARRAY_JOB = Pattern.compile("(\\d+)\\[(\\d+)?\\]");
+    private static final Pattern PBSPRO_ARRAY_JOB = Pattern.compile("(\\d+)\\[(\\d+)?]");
 
     public int getIdNum() {
         if (idNum == -1) {
@@ -552,12 +551,9 @@ public class Job extends PbsInfoObject {
 
     public boolean getExceedsCPUTime() {
         String state = getState();
-        if (!("R".equals(state) || "C".equals(state)|| "F".equals(state))) return false;
+        if (!("R".equals(state) || "C".equals(state) || "F".equals(state))) return false;
         Duration walltimeUsed = getWalltimeUsed();
-        if(walltimeUsed==null) {
-            return false;
-        }
-        return getCPUTimeUsedSec() > getNoOfUsedCPU() * walltimeUsed.getSeconds();
+        return walltimeUsed != null && getCPUTimeUsedSec() > getNoOfUsedCPU() * walltimeUsed.getSeconds();
     }
 
 
@@ -686,8 +682,21 @@ public class Job extends PbsInfoObject {
     }
 
     public String getQueueName() {
-        return getQueue().getName();
+        Queue queue = getQueue();
+        //queue may not exist anymore, if it exists, use its name with suffix, if not, use string from attribute
+        return queue!=null ? queue.getName() : attrs.get(ATTRIBUTE_QUEUE) + pbs.getSuffix();
     }
+
+    public String getQueueShortName() {
+        Queue queue = getQueue();
+        return queue!=null ? queue.getShortName() : attrs.get(ATTRIBUTE_QUEUE);
+    }
+
+    public int getQueuePriority() {
+        Queue queue = getQueue();
+        return queue!=null ? queue.getPriority() : 0;
+    }
+
 
     public String getComment() {
         return attrs.get(ATTRIBUTE_COMMENT);
