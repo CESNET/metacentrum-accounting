@@ -44,9 +44,9 @@
  .job-exclusive, .job-full {  color: #0000A0;}
 
 
- .maintenance, .maintenance-busy, .down, .offline, .state-unknown { background-color: #c0c0c0; border-color: #c0c0c0;}
+ .maintenance, .maintenance-busy, .down, .offline, .offline-busy, .state-unknown { background-color: #c0c0c0; border-color: #c0c0c0;}
  .maintenance, .maintenance a:link,.maintenance a:visited {  color: black; }
- .maintenance-busy,.maintenance-busy a:link,.maintenance-busy a:visited, table.nodes td.maintenance-busy a:link, table.nodes td.maintenance-busy a:visited, table.mapping td.maintenance-busy a:link, table.mapping td.maintenance-busy a:visited  { color: #995C00; }
+ .maintenance-busy, .offline-busy, .maintenance-busy a:link, .offline-busy a:link, .maintenance-busy a:visited, .offline-busy a:visited, table.nodes td.maintenance-busy a:link, table.nodes td.maintenance-busy a:visited, table.mapping td.maintenance-busy a:link, table.mapping td.offline-busy a:link, table.mapping td.maintenance-busy a:visited, table.mapping td.offline-busy a:visited { color: #995C00; }
  .down             { color: #e00000;}
  .offline          { color: #f0f000;}
  .state-unknown    { color: orange;}

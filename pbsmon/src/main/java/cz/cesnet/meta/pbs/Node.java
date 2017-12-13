@@ -61,6 +61,7 @@ public class Node extends PbsInfoObject {
     public static final String STATE_PARTIALY_FREE = "partialy-free";
     public static final String STATE_OCCUPIED_WOULD_PREEMPT = "occupied-would-preempt";
     public static final String STATE_OFFLINE = "offline";
+    public static final String STATE_OFFLINE_BUSY = "offline-busy";
     public static final String STATE_DOWN = "down";
     public static final String STATE_JOB_BUSY = "job-busy";
     public static final String STATE_JOB_SHARING = "job-sharing";
@@ -251,6 +252,8 @@ public class Node extends PbsInfoObject {
                 this.state = STATE_MAINTENANCE_BUSY;
             else
                 this.state = STATE_MAINTENANCE;
+        } else if(STATE_OFFLINE.equals(this.state) && this.getHasJobs()) {
+            this.state = STATE_OFFLINE_BUSY;
         } else if (this.isReserved()) {
             this.state = STATE_RESERVED;
         } else if (this.isTest()) {
