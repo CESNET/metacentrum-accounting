@@ -3,10 +3,7 @@ package cz.cesnet.meta.pbs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -62,68 +59,103 @@ public class PbsConnectorFile implements PbsConnector {
         }
     }
 
+    /**
+     * Replacement for BufferedReader that uses US character as line separator.
+     * Enables lines to contain CR and LF characters.
+     */
+    public class RecordReader implements Closeable {
+
+        private final BufferedInputStream is;
+        private final StringBuilder sb = new StringBuilder(4000);
+
+        public RecordReader(BufferedInputStream is) {
+            this.is = is;
+        }
+
+        public String readLine() throws IOException {
+            int ch;
+            while ((ch = is.read()) != -1) {
+                if (ch == '\u001F') {
+                    String line = sb.toString();
+                    sb.setLength(0);
+                    return line;
+                } else {
+                    sb.append((char) ch);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public void close() throws IOException {
+            is.close();
+        }
+    }
+
     private PBS loadFileToMemory(PbsServerConfig serverConfig, File file) throws IOException {
         PBS pbs = new PBS(serverConfig);
         PbsServer server = null;
         HashMap<String, Node> nodes = new HashMap<>();
         HashMap<String, Queue> queues = new HashMap<>();
         HashMap<String, Job> jobs = new HashMap<>();
-        try (FileReader fr = new FileReader(file)) {
-            try (BufferedReader in = new BufferedReader(fr)) {
-                String objectType = "";
-                PbsInfoObject pbsInfoObject = new PbsInfoObject();
-                String line;
-                while ((line = in.readLine()) != null) {
-                    //object type separator
-                    if (line.charAt(0) == '\u001E') {
-                        String[] split = line.substring(1).split(",");
-                        objectType = split[0];
-                        int num = Integer.parseInt(split[1]);
-                        switch (objectType) {
-                            case "nodes":
-                                nodes = new HashMap<>((int) (num * 1.5));
-                                break;
-                            case "queues":
-                                queues = new HashMap<>((int) (num * 1.5));
-                                break;
-                            case "jobs":
-                                jobs = new HashMap<>((int) (num * 1.5));
-                                break;
-                        }
-                        continue;
+        try (RecordReader in = new RecordReader(new BufferedInputStream(new FileInputStream(file)))) {
+            String objectType = "";
+            PbsInfoObject pbsInfoObject = new PbsInfoObject();
+            String line;
+            while ((line = in.readLine()) != null) {
+                //object type separator
+                if (line.charAt(0) == '\u001D') {
+                    String[] split = line.substring(1).split(",");
+                    objectType = split[0];
+                    int num = Integer.parseInt(split[1]);
+                    switch (objectType) {
+                        case "nodes":
+                            nodes = new HashMap<>((int) (num * 1.5));
+                            break;
+                        case "queues":
+                            queues = new HashMap<>((int) (num * 1.5));
+                            break;
+                        case "jobs":
+                            jobs = new HashMap<>((int) (num * 1.5));
+                            break;
                     }
-                    //object separator
-                    if (line.charAt(0) == '\u001F') {
-                        String name = line.substring(1);
-                        switch (objectType) {
-                            case "servers":
-                                server = new PbsServer(name);
-                                server.setServerConfig(serverConfig);
-                                pbsInfoObject = server;
-                                break;
-                            case "nodes":
-                                Node node = new Node(name);
-                                nodes.put(name, node);
-                                pbsInfoObject = node;
-                                break;
-                            case "queues":
-                                Queue queue = new Queue(name);
-                                queues.put(name, queue);
-                                pbsInfoObject = queue;
-                                break;
-                            case "jobs":
-                                Job job = new Job(name);
-                                jobs.put(name, job);
-                                pbsInfoObject = job;
-                                break;
-                            default:
-                                pbsInfoObject = new PbsInfoObject(name);
-                                log.warn("unrecognized object type " + objectType + " name " + name);
-                        }
-                        continue;
+                    continue;
+                }
+                //object separator
+                if (line.charAt(0) == '\u001E') {
+                    String name = line.substring(1);
+                    switch (objectType) {
+                        case "servers":
+                            server = new PbsServer(name);
+                            server.setServerConfig(serverConfig);
+                            pbsInfoObject = server;
+                            break;
+                        case "nodes":
+                            Node node = new Node(name);
+                            nodes.put(name, node);
+                            pbsInfoObject = node;
+                            break;
+                        case "queues":
+                            Queue queue = new Queue(name);
+                            queues.put(name, queue);
+                            pbsInfoObject = queue;
+                            break;
+                        case "jobs":
+                            Job job = new Job(name);
+                            jobs.put(name, job);
+                            pbsInfoObject = job;
+                            break;
+                        default:
+                            pbsInfoObject = new PbsInfoObject(name);
+                            log.warn("unrecognized object type " + objectType + " name " + name);
                     }
-                    //attribute line
-                    String[] split = line.split("=", 2);
+                    continue;
+                }
+                //attribute line
+                String[] split = line.split("=", 2);
+                if (split.length != 2) {
+                    log.warn("line {} cannot be split at =; objectType={} pbsInfoObject.name={}", line, objectType, pbsInfoObject.getName());
+                } else {
                     pbsInfoObject.attrs.put(split[0].intern(), split[1]);
                 }
             }
