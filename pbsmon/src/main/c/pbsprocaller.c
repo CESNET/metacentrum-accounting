@@ -50,15 +50,15 @@ int process_data(struct batch_status *bs,char* type) {
     /* count results */
     for(tmp=bs;tmp!=NULL;tmp=tmp->next) { pocet++; }
 
-    printf("\x1E%s,%d\n",type,pocet);
+    printf("\x1D%s,%d\x1F",type,pocet);
     for(tmp=bs,i=0;tmp!=NULL;tmp=tmp->next,i++) {
-        printf("\x1F%s\n",tmp->name);
+        printf("\x1E%s\x1F",tmp->name);
 
         for(atp=tmp->attribs;atp!=NULL;atp=atp->next) {
             if(atp->resource!=NULL) {
-                printf("%s.%s=%s\n",atp->name,atp->resource,atp->value);                
+                printf("%s.%s=%s\x1F",atp->name,atp->resource,atp->value);
             } else {
-                printf("%s=%s\n",atp->name,atp->value);                
+                printf("%s=%s\x1F",atp->name,atp->value);
             }
         }
     }
