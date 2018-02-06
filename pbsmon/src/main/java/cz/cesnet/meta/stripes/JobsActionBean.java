@@ -131,8 +131,12 @@ public class JobsActionBean extends BaseActionBean {
                     if (comp != null) {
                         //ulohy ve stavu C bez casu dokonceni nebyly ani spusteny
                         int mins = (int) ((nowtime - comp.getTime()) / MILLIS_IN_15MINS);
-                        if (mins < INTERVALS) {
-                            completedCountersMins[mins]++;
+                        if(mins>=0) {
+                            if (mins < INTERVALS) {
+                                completedCountersMins[mins]++;
+                            }
+                        } else {
+                            log.warn("mins={} for job {}",mins,job.getId());
                         }
                     }
                 }
