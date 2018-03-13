@@ -201,7 +201,7 @@ public class AccountingImpl implements Accounting {
         jdbc.update("INSERT INTO physical_virtual_rel(acct_host_id,ph_id) " +
                 "SELECT ah.acct_host_id,ph.id FROM acct_host ah,physical_hosts ph " +
                 "WHERE ah.acct_host_id NOT IN (SELECT fvr.acct_host_id FROM physical_virtual_rel fvr) " +
-                "AND ah.hostname ~ '^[a-z]+[0-9]*$' AND substr(ph.name,0,strpos(ph.name,'.'))=ah.hostname"
+                "AND substr(ph.name,0,strpos(ph.name,'.'))=ah.hostname"
         );
         //pak vyrobit neexistujici fyzicke - radeji uz ne, aby nevznikaly kratke nazvy
 //        jdbc.update("INSERT INTO physical_hosts (name) " +

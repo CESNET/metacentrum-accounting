@@ -9,7 +9,7 @@
     <!--
     Use "mvn versions:set -DnewVersion=3.9-SNAPSHOT; mvn versions:commit" to change version in all modules
      -->
-    <version>3.2-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
     <name>MetaCentrum Accounting Parent Project</name>
 
     <properties>
@@ -24,7 +24,7 @@
     <parent>
         <groupId>io.spring.platform</groupId>
         <artifactId>platform-bom</artifactId>
-        <version>Brussels-SR5</version>
+        <version>Brussels-SR7</version>
         <relativePath/>
     </parent>
 
