@@ -18,7 +18,28 @@
                     <t:queue_line queue="${q}"/>
                 </c:forEach>
             </table>
+            <c:if test="${not empty pbs.reservations}">
+                Reservations:
+                <table class="reservations">
+                    <tr>
+                        <th>id</th>
+                        <th>owner</th>
+                        <th>start</th>
+                        <th>end</th>
+                    </tr>
+                <c:forEach items="${pbs.reservations}" var="resve">
+                    <tr>
+                        <td>${resve.value.name}</td>
+                        <td>${resve.value.owner}</td>
+                        <td><f:formatDate value="${resve.value.reserveStart}" dateStyle="medium" timeStyle="short" type="both"/></td>
+                        <td><f:formatDate value="${resve.value.reserveEnd}" dateStyle="medium" timeStyle="short" type="both"/></td>
+                    </tr>
+                </c:forEach>
+                </table>
+            </c:if>
         </c:forEach>
+
+
 
         <h2><a name="urceni"></a><f:message key="queues_list_urceni_front"/></h2>
         <p><f:message key="queues_list_urceni_pokec1"/></p>

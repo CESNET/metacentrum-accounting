@@ -37,6 +37,18 @@ int main(int argc, char **argv) {
     /* get jobs info: t - job arrays, x - finished jobs*/
     bs = pbs_statjob(con, "", NULL, "tx");
     process_data(bs,"jobs");
+    /* get reservations info */
+    bs = pbs_statresv(con, NULL, NULL, NULL);
+    process_data(bs,"reservations");
+    /* get resources info */
+    bs = pbs_statrsc(con, NULL, NULL, NULL);
+    process_data(bs,"resources");
+    /* get scheduler info */
+    bs = pbs_statsched(con, NULL, NULL, NULL);
+    process_data(bs,"schedulers");
+    /* get hook info */
+    bs = pbs_stathook(con, NULL, NULL, NULL);
+    process_data(bs,"hooks");
     /* end connection */
     pbs_disconnect(con);
     return 0;

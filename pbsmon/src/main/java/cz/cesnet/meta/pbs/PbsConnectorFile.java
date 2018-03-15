@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Loads data from PBS server by executing an external command and parsing its output.
@@ -95,9 +97,14 @@ public class PbsConnectorFile implements PbsConnector {
     private PBS loadFileToMemory(PbsServerConfig serverConfig, File file) throws IOException {
         PBS pbs = new PBS(serverConfig);
         PbsServer server = null;
-        HashMap<String, Node> nodes = new HashMap<>();
-        HashMap<String, Queue> queues = new HashMap<>();
-        HashMap<String, Job> jobs = new HashMap<>();
+        Map<String, Node> nodes = new HashMap<>();
+        Map<String, Queue> queues = new HashMap<>();
+        Map<String, Job> jobs = new HashMap<>();
+        Map<String, Reservation> reservations = new HashMap<>();
+        Map<String, PbsResource> resources = new HashMap<>();
+        Map<String, Scheduler> schedulers = new HashMap<>();
+        Map<String, Hook> hooks = new HashMap<>();
+
         try (RecordReader in = new RecordReader(new BufferedInputStream(new FileInputStream(file)))) {
             String objectType = "";
             PbsInfoObject pbsInfoObject = new PbsInfoObject();
@@ -117,6 +124,18 @@ public class PbsConnectorFile implements PbsConnector {
                             break;
                         case "jobs":
                             jobs = new HashMap<>((int) (num * 1.5));
+                            break;
+                        case "reservations":
+                            reservations = new HashMap<>((int) (num * 1.5));
+                            break;
+                        case "resources":
+                            resources = new TreeMap<>();
+                            break;
+                        case "schedulers":
+                            schedulers = new HashMap<>((int) (num * 1.5));
+                            break;
+                        case "hooks":
+                            hooks = new HashMap<>((int) (num * 1.5));
                             break;
                     }
                     continue;
@@ -145,6 +164,26 @@ public class PbsConnectorFile implements PbsConnector {
                             jobs.put(name, job);
                             pbsInfoObject = job;
                             break;
+                        case "reservations":
+                            Reservation reservation = new Reservation(name);
+                            reservations.put(name, reservation);
+                            pbsInfoObject = reservation;
+                            break;
+                        case "resources":
+                            PbsResource resource = new PbsResource(name);
+                            resources.put(name, resource);
+                            pbsInfoObject = resource;
+                            break;
+                        case "schedulers":
+                            Scheduler scheduler = new Scheduler(name);
+                            schedulers.put(name, scheduler);
+                            pbsInfoObject = scheduler;
+                            break;
+                        case "hooks":
+                            Hook hook = new Hook(name);
+                            hooks.put(name, hook);
+                            pbsInfoObject = hook;
+                            break;
                         default:
                             pbsInfoObject = new PbsInfoObject(name);
                             log.warn("unrecognized object type " + objectType + " name " + name);
@@ -164,6 +203,10 @@ public class PbsConnectorFile implements PbsConnector {
         pbs.setNodes(nodes);
         pbs.setJobs(jobs);
         pbs.setQueues(queues);
+        pbs.setReservations(reservations);
+        pbs.setResources(resources);
+        pbs.setSchedulers(schedulers);
+        pbs.setHooks(hooks);
         return pbs;
     }
 

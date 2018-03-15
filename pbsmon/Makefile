@@ -5,7 +5,7 @@ CFLAGS_PRO=-g -I./include_pro -L/usr/lib -I$(JAVA_HOME)/include/ -I$(JAVA_HOME)/
 
 #RUNJAVAFLAGS=-verbose:jni
 
-all: target/libpbsmon2pro.so target/pbsprocaller
+all: target/pbsprocaller
 
 pbspro: target/libpbsmon2pro.so
 
@@ -37,4 +37,4 @@ target/cz_cesnet_meta_pbs_PbsConnectorJNI.h: target/classes/cz/cesnet/meta/pbs/P
 target/classes/cz/cesnet/meta/pbs/PbsConnectorJNI.class: src/main/java/cz/cesnet/meta/pbs/PbsConnectorJNI.java
 	mvn package
 clean:
-	rm -f target/lib*
+	rm -f target/lib* target/pbsprocaller

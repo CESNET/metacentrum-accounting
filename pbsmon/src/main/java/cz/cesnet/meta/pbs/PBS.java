@@ -7,14 +7,14 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * JavaBean odpovídající formátu dat zpracovávanému JSON Tools.
+ * Data about objects as provided by the PBS server.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: PBS.java,v 1.23 2014/04/11 08:38:08 makub Exp $
  */
 public class PBS implements TimeStamped {
 
     private final PbsServerConfig serverConfig;
+
 
     public PBS(PbsServerConfig serverConfig) {
         this.serverConfig = serverConfig;
@@ -34,6 +34,10 @@ public class PBS implements TimeStamped {
     private Map<String, Queue> queues;
     private Map<String, Job> jobs;
     private Map<String, Node> nodes;
+    private Map<String, Reservation> reservations;
+    private Map<String, PbsResource> resources;
+    private Map<String, Scheduler> schedulers;
+    private Map<String, Hook> hooks;
 
     private List<Queue> queuesByPriority;
     private List<Node> nodesByName;
@@ -67,6 +71,14 @@ public class PBS implements TimeStamped {
             jobs = null;
             nodes.clear();
             nodes = null;
+            reservations.clear();
+            reservations = null;
+            resources.clear();
+            resources = null;
+            schedulers.clear();
+            schedulers = null;
+            hooks.clear();
+            hooks = null;
 
             log.trace("clearing secondary maps and queues");
             for (List<Node> lnodes : queueToNodesMap.values()) {
@@ -207,11 +219,47 @@ public class PBS implements TimeStamped {
         return fairshareTrees;
     }
 
+    public void setReservations(Map<String, Reservation> reservations) {
+        this.reservations = reservations;
+    }
+
+    public Map<String, Reservation> getReservations() {
+        return reservations;
+    }
+
+    public void setResources(Map<String, PbsResource> resources) {
+        this.resources = resources;
+    }
+
+    public Map<String, PbsResource> getResources() {
+        return resources;
+    }
+
+    public void setSchedulers(Map<String, Scheduler> schedulers) {
+        this.schedulers = schedulers;
+    }
+
+    public Map<String, Scheduler> getSchedulers() {
+        return schedulers;
+    }
+
+    public void setHooks(Map<String, Hook> hooks) {
+        this.hooks = hooks;
+    }
+
+    public Map<String, Hook> getHooks() {
+        return hooks;
+    }
+
     /**
      * Provede úpravy po prostém načtení dat.
      */
     public void uprav() {
 
+        //remove reservation queues from queues
+        for(Reservation reservation : reservations.values()) {
+            queues.remove(reservation.getQueue());
+        }
         //ukazatele nahoru
         for (Queue queue : queues.values()) {
             queue.setPbs(this);
@@ -437,4 +485,6 @@ public class PBS implements TimeStamped {
                 ",timeLoaded=" + timeLoaded +
                 '}';
     }
+
+
 }
