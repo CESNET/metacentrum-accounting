@@ -256,10 +256,6 @@ public class PBS implements TimeStamped {
      */
     public void uprav() {
 
-        //remove reservation queues from queues
-        for(Reservation reservation : reservations.values()) {
-            queues.remove(reservation.getQueue());
-        }
         //ukazatele nahoru
         for (Queue queue : queues.values()) {
             queue.setPbs(this);
@@ -275,6 +271,14 @@ public class PBS implements TimeStamped {
         }
         //suffix
         suffix = mainServer ? "" : "@" + server.getHost();
+
+        //mark reservation queues
+        for(Reservation reservation : reservations.values()) {
+            Queue qresv = queues.get(reservation.getQueue());
+            if(qresv!=null) {
+                qresv.setReservation(reservation);
+            }
+        }
 
         //serazena pole
         queuesByPriority = new ArrayList<>(queues.values());

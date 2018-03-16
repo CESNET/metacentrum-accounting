@@ -41,6 +41,7 @@ public class Queue extends PbsInfoObject {
     public static final String ATTRIBUTE_FROM_ROUTE_ONLY = "from_route_only";
     public static final String ATTRIBUTE_COMMENT = "comment";
 
+
     public Queue() {
         super();
     }
@@ -59,6 +60,7 @@ public class Queue extends PbsInfoObject {
     private String[] aclUsers = null;
     private String[] aclGroups = null;
     private String[] aclHosts = null;
+    private Reservation reservation;
 
     @Override
     public void clear() {
@@ -382,5 +384,17 @@ public class Queue extends PbsInfoObject {
 
     public boolean isFromRouteOnly() {
         return "True".equals(attrs.get(ATTRIBUTE_FROM_ROUTE_ONLY));
+    }
+
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
+    }
+
+    public boolean isReservationQueue() {
+        return this.reservation!=null;
+    }
+
+    public Reservation getReservation() {
+        return reservation;
     }
 }

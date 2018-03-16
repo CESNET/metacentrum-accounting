@@ -35,6 +35,39 @@
             </c:forEach>
         </table>
     </c:when>
+    <c:when test="${actionBean.queue.reservationQueue}">
+        <c:set value="${actionBean.queue.reservation}" var="resv"/>
+        <p style="clear: right">
+            Fronta je vytvořena pro rezervaci.
+        </p>
+        <table class="reservations">
+            <tr>
+                <th>id</th>
+                <th>owner</th>
+                <th>start</th>
+                <th>end</th>
+                <th>ctime</th>
+                <th>select</th>
+            </tr>
+            <tr>
+                <td>${resv.name}</td>
+                <td>${resv.owner}</td>
+                <td><f:formatDate value="${resv.reserveStart}" dateStyle="medium" timeStyle="short" type="both"/></td>
+                <td><f:formatDate value="${resv.reserveEnd}" dateStyle="medium" timeStyle="short" type="both"/></td>
+                <td><f:formatDate value="${resv.createdTime}" dateStyle="medium" timeStyle="short" type="both"/></td>
+                <td><c:out value="${resv.attributes['Resource_List.select']}"/></td>
+            </tr>
+        </table>
+        Reservation attributes:
+        <table class="attributes">
+            <c:forEach items="${resv.attributes}" var="a">
+                <tr>
+                    <td>${a.key}</td>
+                    <td>${a.value}</td>
+                </tr>
+            </c:forEach>
+        </table>
+    </c:when>
     <c:otherwise>
 
 
@@ -140,6 +173,7 @@
 
 
 <br>
+Queue attributes
 <table class="attributes">
  <c:forEach items="${q.attributes}" var="a">
  <tr>

@@ -51,7 +51,7 @@ public class QueueActionBean extends BaseActionBean {
         }
         jobs = queue.getJobs();
         if (queue.isRouting()) {
-            destinations = new ArrayList<Queue>();
+            destinations = new ArrayList<>();
             for(String dstName : queue.getDestQueueNames()) {
                 destinations.add(pbsky.getQueueByName(dstName));
             }
