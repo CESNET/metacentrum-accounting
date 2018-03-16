@@ -21,12 +21,16 @@ public class Statistics {
 
     private static final Locale CS = new Locale("cs", "CZ");
 
-    public static void main1(String[] args) throws DatatypeConfigurationException {
+    public static void main(String[] args) throws DatatypeConfigurationException {
+        if(args.length>0) {
+            manualStatistics();
+        } else {
+            regularStatistics();
+        }
+    }
+    public static void regularStatistics() throws DatatypeConfigurationException {
         Stats stats = new ClassPathXmlApplicationContext("spring-context.xml").getBean("stats", Stats.class);
         long startTime = System.currentTimeMillis();
-
-//        generateStats(stats, absoluteDate(2016, 4, 20), absoluteDate(2016, 4, 22));
-
         //normal period
         generateStats(stats, relativeDate(-1), relativeDate(-1));
         generateStats(stats, relativeDate(-31), relativeDate(-31));
@@ -37,9 +41,13 @@ public class Statistics {
         System.out.println("Computed in " + duration + " minutes");
     }
 
-    public static void main(String[] args) {
+    public static void manualStatistics() {
         Stats stats = new ClassPathXmlApplicationContext("spring-context.xml").getBean("stats", Stats.class);
-        recompute("elixir-storage1.grid.cesnet.cz", "2017-07-24", "2017-07-24", stats);
+        generateStats(stats, relativeDate(-3), relativeDate(-1));
+        generateStats(stats, relativeDate(-33), relativeDate(-31));
+        generateStats(stats, relativeDate(-95), relativeDate(-93));
+
+//        recompute("elixir-storage1.grid.cesnet.cz", "2017-07-24", "2017-07-24", stats);
 //        recompute("tarkil.grid.cesnet.cz", "2016-11-02", stats);
 //        recompute("meduseld.ics.muni.cz", "2016-11-15", stats);
 //        recompute("ajax.zcu.cz", "2016-11-23", stats);
@@ -89,7 +97,6 @@ public class Statistics {
         out.println();
         out.println("computing MetaCentrum VO statistics for " + CZECH_DATE.format(start.getTime()) + " - " + CZECH_DATE.format(end.getTime()));
         for (String cluster : stats.getClusters(start, end)) {
-//        for(String cluster : Arrays.asList("hda.cerit-sc.cz")) {
             out.println();
             out.println(cluster);
             out.println();
