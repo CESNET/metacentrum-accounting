@@ -241,7 +241,7 @@ public class Node extends PbsInfoObject {
      */
     public String getState() {
         if (this.state != null) return this.state;
-        if(this.isCloudHost()) {
+        if (this.isCloudHost()) {
             this.state = Node.STATE_CLOUD;
             return this.state;
         }
@@ -252,7 +252,7 @@ public class Node extends PbsInfoObject {
                 this.state = STATE_MAINTENANCE_BUSY;
             else
                 this.state = STATE_MAINTENANCE;
-        } else if(STATE_OFFLINE.equals(this.state) && this.getHasJobs()) {
+        } else if (STATE_OFFLINE.equals(this.state) && this.getHasJobs()) {
             this.state = STATE_OFFLINE_BUSY;
         } else if (this.isReserved()) {
             this.state = STATE_RESERVED;
@@ -564,9 +564,9 @@ public class Node extends PbsInfoObject {
     }
 
     public int getLastJobEndInMinutes() {
-        Date time =  getLastJobEndTime();
-        if(time==null) return 0;
-        return (int)((time.getTime() - System.currentTimeMillis()) / 60000L);
+        Date time = getLastJobEndTime();
+        if (time == null) return 0;
+        return (int) ((time.getTime() - System.currentTimeMillis()) / 60000L);
     }
 
     private Date availableBefore;
@@ -608,14 +608,24 @@ public class Node extends PbsInfoObject {
      */
     public String[] getProperties() {
         if (this.properties == null) {
-            if(pbs.isTorque()) {
+            if (pbs.isTorque()) {
                 String propatr = attrs.get(ATTRIBUTE_PROPERTIES);
                 this.properties = propatr != null ? propatr.split(",") : new String[0];
-            } else if(pbs.isPBSPro()) {
+            } else if (pbs.isPBSPro()) {
                 ArrayList<String> al = new ArrayList<>();
                 for (NodeResource r : getNodeResources()) {
-                    if(r.getType() == NodeResource.Type.BOOLEAN && "True".equals(r.getAvailable())) {
-                        al.add(r.getName());
+                    if (r.getAvailable() == null) continue;
+                    if (Arrays.asList("vnode", "host", "cpu_flag", "queue_list").contains(r.getName())) continue;
+                    switch (r.getType()) {
+                        case STRING:
+                        case BOOLEAN:
+                        case LONG:
+                            al.add(r.getName() + "=" + r.getAvailable());
+                            break;
+                        case STRING_ARRAY:
+                            for (String v : r.getAvailable().split(",")) {
+                                al.add(r.getName() + "=" + v);
+                            }
                     }
                 }
                 this.properties = al.toArray(new String[al.size()]);
@@ -803,25 +813,27 @@ public class Node extends PbsInfoObject {
 
 
     private List<NodeResource> nodeResources;
+
     /**
      * Parses and returns available and assigned resources
+     *
      * @return list of NodeResource objects
      */
     public List<NodeResource> getNodeResources() {
-        if(nodeResources!=null) return nodeResources;
-        if(pbs.isTorque()) return Collections.emptyList();
+        if (nodeResources != null) return nodeResources;
+        if (pbs.isTorque()) return Collections.emptyList();
 
-        Map<String,String> assigned = new HashMap<>();
-        Map<String,String> available = new HashMap<>();
+        Map<String, String> assigned = new HashMap<>();
+        Map<String, String> available = new HashMap<>();
 
         for (Map.Entry<String, String> e : getAttributes().entrySet()) {
             String key = e.getKey();
             if (key.startsWith(ATTRIBUTE_PREFIX_RESOURCES_AVAILABLE_PBSPRO)) {
                 String resourceName = key.substring(ATTRIBUTE_PREFIX_RESOURCES_AVAILABLE_PBSPRO.length());
-                available.put(resourceName,e.getValue());
+                available.put(resourceName, e.getValue());
             } else if (key.startsWith(ATTRIBUTE_PREFIX_RESOURCES_ASSIGNED_PBSPRO)) {
                 String resourceName = key.substring(ATTRIBUTE_PREFIX_RESOURCES_ASSIGNED_PBSPRO.length());
-                assigned.put(resourceName,e.getValue());
+                assigned.put(resourceName, e.getValue());
             }
         }
         Set<String> allResourceNames = new HashSet<>();
@@ -829,7 +841,11 @@ public class Node extends PbsInfoObject {
         allResourceNames.addAll(assigned.keySet());
         List<NodeResource> tmpNodeResources = new ArrayList<>(allResourceNames.size());
         for (String resourceName : allResourceNames) {
-            tmpNodeResources.add(new NodeResource(resourceName,available.get(resourceName),assigned.get(resourceName)));
+            PbsResource pbsResource = this.getPbs().getResources().get(resourceName);
+            if (pbsResource == null) {
+                log.warn("PbsResource for resource {} on node {} not found", resourceName, this.getName());
+            }
+            tmpNodeResources.add(new NodeResource(resourceName, available.get(resourceName), assigned.get(resourceName), pbsResource));
         }
         tmpNodeResources.sort((o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
         nodeResources = tmpNodeResources;
@@ -837,30 +853,47 @@ public class Node extends PbsInfoObject {
     }
 
     public static class NodeResource {
-        public enum Type {INT, LIST, SIZE, BOOLEAN, STRING}
+        public enum Type {
+            STRING, LONG, BOOLEAN, FLOAT, SIZE, STRING_ARRAY;
+
+            @Override
+            public String toString() {
+                return this.name().toLowerCase();
+            }
+        }
 
         private Type type;
         private String name;
         private String available;
         private String assigned;
 
-        public NodeResource(String name, String available, String assigned) {
+        public NodeResource(String name, String available, String assigned, PbsResource pbsResource) {
             this.name = name;
             this.available = available;
             this.assigned = assigned;
-            this.type = detectType(available!=null?available:assigned);
+            if (pbsResource != null) {
+                try {
+                    this.type = Type.valueOf(pbsResource.getType().toUpperCase());
+                } catch (IllegalArgumentException ex) {
+                    log.error("type " + pbsResource.getType() + " is unknown for Node.NodeResource.Type");
+                }
+            }
+            if (type == null) {
+                log.warn("resource {} has no PbsResource", name);
+                this.type = detectTypeByValue(available != null ? available : assigned);
+            }
         }
 
-        public static Type detectType(String value) {
+        public static Type detectTypeByValue(String value) {
             Type type;
-            if ("True".equals(value)||"False".equals(value)) {
+            if ("True".equals(value) || "False".equals(value)) {
                 type = Type.BOOLEAN;
             } else if (value.matches("\\d+")) {
-                type = Type.INT;
+                type = Type.LONG;
             } else if (value.matches("\\d+[kmg]b")) {
                 type = Type.SIZE;
             } else if (value.contains(",")) {
-                type = Type.LIST;
+                type = Type.STRING_ARRAY;
             } else {
                 type = Type.STRING;
             }

@@ -10,4 +10,13 @@ public class PbsResource extends PbsInfoObject{
     public PbsResource(String name) {
         super(name);
     }
+
+    public String getType() {
+        return attrs.get("type");
+    }
+
+    //hqnr
+    public String getFlag() {
+        return attrs.get("flag");
+    }
 }

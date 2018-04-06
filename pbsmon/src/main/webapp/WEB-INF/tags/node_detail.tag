@@ -149,12 +149,14 @@
     <table class="zakladni">
         <tr>
             <th><t:i18n cs="zdroj" en="resource"/></th>
+            <th><t:i18n cs="typ" en="type"/></th>
             <th><t:i18n cs="dostupné" en="available"/></th>
             <th><t:i18n cs="použito" en="assigned"/></th>
         </tr>
         <c:forEach items="${node.nodeResources}" var="res">
             <tr>
                 <td><c:out value="${res.name}"/></td>
+                <td><c:out value="${res.type}"/></td>
                 <td>
                     <c:choose>
                         <c:when test="${fn:length(res.available)>25}"><c:out

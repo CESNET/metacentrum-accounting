@@ -26,37 +26,14 @@
  <c:forEach items="${actionBean.nodes}" var="n">
  <tr>
   <td class="${n.state}"><h:link class="${n.state}" href="/node/${n.name}">${n.name}</h:link>
-  <td><c:forEach items="${n.properties}" var="p"><c:out value="${p}"/> </c:forEach></td>
+  <td><c:forEach items="${n.properties}" var="property"><c:out value="${property}"/> </c:forEach></td>
  </c:forEach>
 </table>
 
 <a name="prop2node"><h3><f:message key="props_prop2node"/></h3></a>
-<table class="prop2node">
- <tr>
-  <th><f:message key="props_prop2node_node"/></th>
-  <th><f:message key="props_prop2node_prop"/></th>
- </tr>
  <c:forEach items="${actionBean.props}" var="p">
- <tr id="${p}">
-  <td><a name="${p}">${p}</a></td>
-  <td>
-  <c:set var="numinrow" value="${0}"/>
-  <table class="nodes" cellspacing="0" border="0">
-  <tr>
-  <c:forEach items="${actionBean.propsMap[p]}" var="node">
-     <c:if test="${numinrow==8}">
-         <c:set var="numinrow" value="${0}"/>
-         </tr><tr>
-     </c:if>
-     <td class="${node.state}"> <h:link class="${node.state}" href="/node/${node.name}">${node.shortName}</h:link></td>
-     <c:set var="numinrow" value="${numinrow+1}"/>
+   <br><s:link href="/props"><s:param name="property" value="${p}"/><c:out value="${p}"/></s:link>
  </c:forEach>
- </tr>
- </table>
- </td>
- </c:forEach>
-</table>
-
 
 <a name="group2node"><h3><f:message key="props_group2node"/></h3></a>
 <table>

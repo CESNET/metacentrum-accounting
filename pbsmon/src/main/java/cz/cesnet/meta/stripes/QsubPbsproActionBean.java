@@ -124,7 +124,7 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
                 //resources
                 for (Node node : nodes) {
                     for (NodeResource nr : node.getNodeResources()) {
-                        if (nr.getType() == Type.INT) continue;
+                        if (nr.getType() == Type.LONG) continue;
                         if (nr.getType() == Type.SIZE) continue;
                         if (nr.getAvailable() == null) continue;
                         if(nr.getName().equals("queue_list")) continue;
@@ -137,7 +137,7 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
                                 foundValues.add("True");
                                 foundValues.add("False");
                                 break;
-                            case LIST:
+                            case STRING_ARRAY:
                                 foundValues.addAll(Arrays.asList(nr.getAvailable().split(",")));
                                 break;
                         }
@@ -148,7 +148,7 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
             clusters = resourceValues.keySet().stream().filter(k -> k.startsWith("cl_")).collect(Collectors.toList());
             clusters.forEach(resourceValues::remove);
             //filter out cities
-            List<String> citynames = Arrays.asList("brno", "budejovice", "olomouc", "plzen", "praha");
+            List<String> citynames = Arrays.asList("brno", "budejovice", "olomouc", "liberec", "plzen", "praha");
             cities = resourceValues.keySet().stream().filter(citynames::contains).collect(Collectors.toList());
             cities.forEach(resourceValues::remove);
             //censored queues for offering the -q parameter
