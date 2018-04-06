@@ -33,7 +33,7 @@
             <tr>
                 <th class="${node.state}"><f:message key="nodejsp_properties"/></th>
                 <td colspan="2" class="${node.state}">
-                    <c:out value="${fn:join(node.properties,', ')}"/>
+                    <c:out value="${fn:join(node.properties,':')}"/>
                 </td>
             </tr>
             <c:if test="${! empty node.requiredQueue}">
