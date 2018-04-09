@@ -8,7 +8,7 @@ public class OutageRecord {
 
     Enum e;
 
-    public enum Type { maintenance, reserved, xentest, node_down }
+    public enum Type { maintenance, reserved, cloud, node_down }
 
     private String pbsHostName;
     private int pbsHostId;

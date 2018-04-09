@@ -57,18 +57,15 @@ public class StatsImpl implements Stats {
         Map<String, OutageRecord.Type> vyhodnocene = new HashMap<>(m1.size() + 1);
         for (String virtName : m1.keySet()) {
             List<OutageRecord> recs = m1.get(virtName);
-            boolean xentest = false;
             boolean maintenance = false;
             boolean reserved = false;
             for (OutageRecord or : recs) {
                 switch (or.getType()) {
-                    case xentest:
-                        xentest = true;
-                        break;
                     case node_down:
                     case maintenance:
                         maintenance = true;
                         break;
+                    case cloud:
                     case reserved:
                         reserved = true;
                         break;
@@ -76,17 +73,14 @@ public class StatsImpl implements Stats {
                         throw new RuntimeException("moznost " + or.getType() + " neznama!");
                 }
             }
-            if (xentest) {
-                continue;
-            } else if (reserved) {
+            if (reserved) {
                 vyhodnocene.put(virtName, OutageRecord.Type.reserved);
                 continue;
             } else if (maintenance) {
                 vyhodnocene.put(virtName, OutageRecord.Type.maintenance);
             } else {
-                throw new RuntimeException(virtName + ": neni zadne z xentest|reserved|maintenance - " + recs);
+                throw new RuntimeException(virtName + ": neni zadne z cloud|reserved|maintenance - " + recs);
             }
-
         }
         return vyhodnocene;
     }
@@ -548,7 +542,6 @@ public class StatsImpl implements Stats {
 
                 } else if (outages_on_all_domU_found || fyz_machine_maintenance_found) {
                     // (Dalibor pridal zmenil podminku, puvodne bylo: virtualHostMap.size() == fmr.getVirtCount()
-                    //v.stroje v xentestu ignorujeme
                     //pokud byl aspon nejaky reserved, stroj byl reserved
                     //pokud byly vsechny maintenance, byl maintenance
                     //kdyz byl down, jako kdyby byl v maintenance
@@ -619,7 +612,6 @@ public class StatsImpl implements Stats {
 
         c.setMaintenanceCpuTime(maintenanceCpuMillis);
         c.setReservedCpuTime(reservedCpuMillis);
-        //TODO co viz nez 100% vytizeni na orkach ?
     }
 
     private List<JobRecord> findJobsOnPhysicalMachine(ClusterAtDay c, PhysicalMachineRecord fmr) {

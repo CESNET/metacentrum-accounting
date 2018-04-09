@@ -69,7 +69,6 @@ public class Node extends PbsInfoObject {
     public static final String STATE_UNKNOWN = "state-unknown";
     public static final String STATE_MAINTENANCE = "maintenance";
     public static final String STATE_MAINTENANCE_BUSY = "maintenance-busy";
-    public static final String STATE_TEST = "test";
     public static final String STATE_RESERVED = "reserved";
     public static final String STATE_CLOUD = "cloud";
     public static final String STATE_RUNNING_CLUSTER = "running-cluster";
@@ -256,8 +255,6 @@ public class Node extends PbsInfoObject {
             this.state = STATE_OFFLINE_BUSY;
         } else if (this.isReserved()) {
             this.state = STATE_RESERVED;
-        } else if (this.isTest()) {
-            this.state = STATE_TEST;
         }
         return this.state;
     }
@@ -447,15 +444,6 @@ public class Node extends PbsInfoObject {
      */
     public boolean isMaintenance() {
         return PbsUtils.MAINTENANCE.equals(getRequiredQueueShort());
-    }
-
-    /**
-     * METACentrum-specific queue.
-     *
-     * @return true for nodes in the xentest queue
-     */
-    public boolean isTest() {
-        return "xentest".equals(getRequiredQueueShort());
     }
 
     public boolean isReserved() {

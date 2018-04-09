@@ -178,14 +178,6 @@ public class RozhodovacStavuStroju {
      */
     private static String rozhodniStavFyzickehoPodleVirtualnich(Stroj stroj, List<Node> virtNodes) {
         String jmenoStroje = stroj.getName();
-        //zahodit testovaci VM
-        for (ListIterator<Node> nodeListIterator = virtNodes.listIterator(); nodeListIterator.hasNext(); ) {
-            Node node = nodeListIterator.next();
-            if (node.getState().equals(Node.STATE_TEST)) {
-                nodeListIterator.remove();
-                log.debug(" odstranuji testovaci VM {} ze seznamu", node.getName());
-            }
-        }
         //bez VM je stav neznamy
         if (virtNodes.isEmpty()) {
             log.debug(" fyzicky {} zadne VM", jmenoStroje);

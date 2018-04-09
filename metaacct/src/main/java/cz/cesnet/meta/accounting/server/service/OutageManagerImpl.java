@@ -31,7 +31,7 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
     // 02/07/2017 12:18:53;0004;Server@arien-pro;Node;hildor19;attributes set: queue = maintenance
 
     private static final Pattern EVENT
-            = Pattern.compile("^([^;]*);[^;]*;[^;]*;([nN]ode);([^;]*);attributes set: (queue|comment|note) (=|\\+|-) (.*)");
+            = Pattern.compile("^([^;]*);[^;]*;[^;]*;([nN]ode);([^;]*);attributes set: (queue|comment|note) ([=+-]) (.*)");
 
 
     //format pouzivany PBS. Pri prechodu na zimni cas je prvni hodina po prechodu dvakrat :-(
@@ -59,7 +59,7 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
         long citac = 0;
         long minTime = Long.MAX_VALUE;
         long maxTime = Long.MIN_VALUE;
-        Map<String, String> lastStates = new HashMap<>(500);
+        int savedEventsCounter = 0;
         while ((line = in.readLine()) != null) {
             Matcher m = EVENT.matcher(line);
             if (m.find()) {
@@ -83,8 +83,9 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
                     if (time < minTime) minTime = time;
                     if (time > maxTime) maxTime = time;
                     if (host != null && ALLOWED_TYPES.contains(type)) {
-                        log.info("saving event {} {} {} {} {}", host, eventTime, type, operace, value);
-                        this.saveLogEvent(lastStates, host, eventTime, type, operace, value);
+                        log.debug("saving event {} {} {} {} {}", host, eventTime, type, operace, value);
+                        savedEventsCounter++;
+                        this.saveLogEvent(host, eventTime, type, operace, value);
                     } else {
                         log.error("cannot save host=" + host + " type=" + type + " for line=" + line);
                     }
@@ -99,7 +100,7 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
                 minTime == Long.MAX_VALUE ? null : new Date(minTime),
                 maxTime == Long.MIN_VALUE ? null : new Date(maxTime));
         long endTime = System.currentTimeMillis();
-        log.info("pbs log events saved in " + (endTime - startTime) + "ms");
+        log.info("pbs "+savedEventsCounter+" log events from "+server+" saved in " + (endTime - startTime) + "ms");
     }
 
     private static final String ZACATEK = "select count(*) from acct_pbs_log_events where acct_host_id=? and event_time=? and type=? ";
@@ -117,18 +118,15 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
     /**
      * Uklada udalost z provozniho logu PBS. Zajimaji nas jen nastavovani front a komentaru.
      *
-     * @param lastStates mapa z nazvu stroju na posledni zapsany stav stroje
      * @param host       PBS node na kterem doslo k udalosti
      * @param time       cas kdy k ni doslo
      * @param type       [ "queue" | "comment" | "node up" | "node down" ]
      * @param operace    [ "+" | "-" | "=" ]
      * @param value      podle typu bud jmeno fronty, nebo obsah komentare
      */
-    private void saveLogEvent(Map<String, String> lastStates, String host, Date time, String type, String operace, String value) {
+    private void saveLogEvent(String host, Date time, String type, String operace, String value) {
         //normalizujeme prazdny string na null
         if (value != null && value.isEmpty()) value = null;
-
-        lastStates.put(host, type);
 
         Long hostId = getCachedHostId(host);
         JdbcTemplate jdbc = getJdbcTemplate();
@@ -225,7 +223,7 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
                     //ukoncit predchozi
                     outages.add(new Outage(hostId, actualQueue.getQueue(), actualQueue.getEventTime(), event.getEventTime(), comment));
                 }
-                if ("maintenance".equals(newQueue) || "reserved".equals(newQueue) || "xentest".equals(newQueue)) {
+                if ("maintenance".equals(newQueue) || "reserved".equals(newQueue) || "cloud".equals(newQueue) ) {
                     //pokud nas nova fronta zajima
                     if (actualQueue == null || !actualQueue.getQueue().equals(newQueue)) {
                         actualQueue = event;
@@ -311,14 +309,12 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
         List<Object[]> batch = new ArrayList<>();
         for (Outage outage : outages) {
             Object[] values = new Object[]{
-                    outage.getHostId(), outage.getQueue(), outage.getStart(), outage.getEnd(),
-                    "xentest".equals(outage.getQueue()) ? "" : outage.getComment()};
+                    outage.getHostId(), outage.getQueue(), outage.getStart(), outage.getEnd(), outage.getComment()};
             batch.add(values);
 
         }
         getJdbcTemplate().batchUpdate(
-                "INSERT INTO acct_outages (acct_host_id,type,start_time,end_time,comment) VALUES (?,?,?,?,?)",
-                batch);
+                "INSERT INTO acct_outages (acct_host_id,type,start_time,end_time,comment) VALUES (?,?,?,?,?)", batch);
     }
 
     public class PbsLogEvent {
@@ -372,15 +368,17 @@ public class OutageManagerImpl extends JdbcDaoSupport implements OutageManager {
             return "queue".equals(type);
         }
 
+        /*
         @SuppressWarnings("UnusedDeclaration")
         public boolean isReservedEvent() {
-            return isQueueEvent() && "reserved".equals(value);
+            return isQueueEvent() && ("reserved".equals(value));
         }
 
         @SuppressWarnings("UnusedDeclaration")
         public boolean isMaintenanceEvent() {
             return isQueueEvent() && "maintenance".equals(value);
         }
+        */
 
         public boolean isCommentEvent() {
             return "comment".equals(type);
