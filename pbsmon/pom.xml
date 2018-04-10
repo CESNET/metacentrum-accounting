@@ -117,6 +117,7 @@
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
+            <version>${commons-lang.version}</version>
         </dependency>
     </dependencies>
 

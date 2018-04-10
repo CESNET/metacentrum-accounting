@@ -13,18 +13,17 @@
     <name>MetaCentrum Accounting Parent Project</name>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
         <postgresql.version>42.2.2</postgresql.version>
+        <taglibs-standard.version>1.2.5</taglibs-standard.version>
+        <commons-lang.version>2.6</commons-lang.version>
     </properties>
 
     <!-- defines compatible versions of many libraries -->
-    <!-- see http://docs.spring.io/platform/docs/current/reference/htmlsingle/#getting-started-using-spring-io-platform-maven -->
+    <!-- see https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-build-systems.html#using-boot-maven-parent-pom -->
     <parent>
-        <groupId>io.spring.platform</groupId>
-        <artifactId>platform-bom</artifactId>
-        <version>Cairo-RELEASE</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.1.RELEASE</version>
         <relativePath/>
     </parent>
 
