@@ -7,11 +7,12 @@ import javax.servlet.http.HttpSession;
 
 import net.sourceforge.stripes.localization.DefaultLocalePicker;
 import net.sourceforge.stripes.localization.LocalePicker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.log4j.Logger;
 
 public class AcctLocalePicker extends DefaultLocalePicker implements LocalePicker {
-  static Logger log = Logger.getLogger(AcctLocalePicker.class);
+  static Logger log = LoggerFactory.getLogger(AcctLocalePicker.class);
 
   public static final String SESSION_KEY = "AcctLocalePicker.locale";
 

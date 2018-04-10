@@ -2,9 +2,9 @@ package cz.cesnet.meta.accounting.server.service;
 
 import cz.cesnet.meta.accounting.server.data.PbsReceiveLog;
 import cz.cesnet.meta.accounting.server.util.Page;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
-import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class ReceivePbsManagerImpl extends JdbcDaoSupport implements ReceivePbsManager {
 
-    private static Logger logger = Logger.getLogger(ReceivePbsManagerImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(ReceivePbsManagerImpl.class);
 
     /**
      * @return pocet kernel receive logu

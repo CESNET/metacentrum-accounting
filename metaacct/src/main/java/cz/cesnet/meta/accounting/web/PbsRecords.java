@@ -11,9 +11,10 @@ import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 import net.sourceforge.stripes.validation.*;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
@@ -21,7 +22,7 @@ import java.util.Date;
 public class PbsRecords extends AccountingWebBase implements ValidationErrorHandler {
 
 
-    static private final Logger log = Logger.getLogger(PbsRecords.class);
+    static private final Logger log = LoggerFactory.getLogger(PbsRecords.class);
 
     @SpringBean
     PbsRecordManager pbsRecordManager;

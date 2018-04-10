@@ -2,9 +2,9 @@ package cz.cesnet.meta.accounting.server.service;
 
 import cz.cesnet.meta.accounting.server.data.KernelReceiveLog;
 import cz.cesnet.meta.accounting.server.util.Page;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
-import org.springframework.stereotype.Repository;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ReceiveLogManagerImpl extends JdbcDaoSupport implements ReceiveLogManager {
-    private static Logger logger = Logger.getLogger(ReceiveLogManagerImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(ReceiveLogManagerImpl.class);
     private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override

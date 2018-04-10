@@ -8,12 +8,13 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 
-import org.apache.log4j.Logger;
 
 import cz.cesnet.meta.accounting.web.util.AcctLocalePicker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LocaleActionBean extends AccountingWebBase {
-  static Logger log = Logger.getLogger(LocaleActionBean.class);
+  static Logger log = LoggerFactory.getLogger(LocaleActionBean.class);
 
   private String kam;
   private String jazyk;

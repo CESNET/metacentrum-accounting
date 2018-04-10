@@ -1,6 +1,5 @@
 package cz.muni.ics.cerit.stats;
 
-import org.apache.log4j.helpers.LogLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

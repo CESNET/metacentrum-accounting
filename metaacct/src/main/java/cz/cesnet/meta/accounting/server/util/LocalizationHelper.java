@@ -4,12 +4,13 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.apache.log4j.Logger;
 
 import cz.cesnet.meta.accounting.web.util.AcctLocalePicker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LocalizationHelper {
-  private static Logger logger = Logger.getLogger(LocalizationHelper.class);
+  private static Logger logger = LoggerFactory.getLogger(LocalizationHelper.class);
   
   String basename;
   

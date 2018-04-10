@@ -3,7 +3,8 @@ package cz.cesnet.meta.accounting.server.service;
 import cz.cesnet.meta.accounting.server.data.HostData;
 import cz.cesnet.meta.accounting.server.data.PBSHost;
 import cz.cesnet.meta.accounting.server.util.Page;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 public class HostManagerImpl extends JdbcDaoSupport implements HostManager {
-    private static Logger logger = Logger.getLogger(HostManagerImpl.class);
+
+    private static Logger logger = LoggerFactory.getLogger(HostManagerImpl.class);
 
     @Autowired
     DbUtilsManager dbUtilsManager;

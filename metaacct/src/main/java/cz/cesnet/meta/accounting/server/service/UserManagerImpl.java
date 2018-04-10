@@ -2,7 +2,8 @@ package cz.cesnet.meta.accounting.server.service;
 
 import cz.cesnet.meta.accounting.server.data.User;
 import cz.cesnet.meta.accounting.server.util.Page;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 public class UserManagerImpl extends JdbcDaoSupport implements UserManager {
-    private static Logger logger = Logger.getLogger(UserManagerImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(UserManagerImpl.class);
 
     @Autowired
     DbUtilsManager dbUtilsManager;

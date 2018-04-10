@@ -1,13 +1,15 @@
 package cz.cesnet.meta.accounting.displaytag;
 
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import java.io.IOException;
 
 public class PaginationFilter implements Filter {
-    private final Logger logger = Logger.getLogger(PaginationFilter.class);
+    private final Logger logger = LoggerFactory.getLogger(PaginationFilter.class);
 
     public static final Integer DEFAULT_PAGE_SIZE_SHORT = 20;
     public static final Integer DEFAULT_PAGE_SIZE_LONG = 100;

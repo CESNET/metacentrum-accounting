@@ -1,6 +1,7 @@
 package cz.cesnet.meta.accounting.server.service;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PbsServerManagerImpl extends JdbcDaoSupport implements PbsServerManager {
-    private static Logger logger = Logger.getLogger(PbsServerManagerImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(PbsServerManagerImpl.class);
 
     @Autowired
     DbUtilsManager dbUtilsManager;
