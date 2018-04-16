@@ -23,10 +23,10 @@
         </else>
     </if>
 
-    <root level="info">
+    <root level="warn">
         <appender-ref ref="APP"/>
     </root>
-
+    <!--
     <logger name="org.apache.log4j.xml" level="info"/>
     <logger name="net.sourceforge.stripes.util.ResolverUtil" level="warn"/>
     <logger name="net.sourceforge.stripes" level="info"/>
@@ -64,5 +64,10 @@
     <logger name="cz.cesnet.meta.stripes.NodeActionBean" level="info"/>
 
     <logger name="cz.cesnet.meta.storages.StoragesHsmImpl" level="info"/>
+    -->
+
+    <logger name="net.sourceforge.stripes.controller.StripesFilter" level="info"/>
+    <logger name="cz.cesnet.meta.cloud.CloudPhysicalHost" level="error"/>
+    <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl" level="error"/>
 
 </configuration>

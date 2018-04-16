@@ -154,7 +154,6 @@ public class ApiActionBean extends BaseActionBean {
                 PerunUser perunUser = perun.getUserByName(userName);
                 usersData.put(perunUser.getLogname(), userData);
                 userData.put("logname", perunUser.getLogname());
-                userData.put("fullname", perunUser.getName());
                 userData.put("expires", sdf.format(perunUser.getExpires()));
             } catch (Exception ex) {
                 log.warn("Nemohu nacist PerunUser {} kvuli {} ", userName, ex.getMessage());

@@ -30,7 +30,6 @@ public class PerunJsonImpl extends PerunAbstractImpl {
 
     //keys for pbsmon_users.json structure
     public static final String LOGNAME = "logname";
-    public static final String NAME = "name";
     public static final String ORG = "org";
     public static final String STATISTIC_GROUPS = "statistic_groups";
     public static final String STATUS = "status";
@@ -229,7 +228,6 @@ public class PerunJsonImpl extends PerunAbstractImpl {
                     PerunUser perunUser = new PerunUser();
                     //attributes independent of VO
                     perunUser.setLogname(juser.get(LOGNAME).textValue());
-                    perunUser.setName(juser.get(NAME).textValue());
                     perunUser.setOrganization(juser.get(ORG).asText());
                     JsonNode jpubls = juser.path(PUBLICATIONS);
                     if (jpubls.isObject()) {

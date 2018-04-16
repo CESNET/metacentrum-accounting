@@ -13,7 +13,6 @@ import java.util.Map;
 public class PerunUser {
 
     private String logname;
-    private String name;
     private String organization;
     private Map<String,Integer> publications = new HashMap<>(3);
     private Map<String,Vo> vos = new HashMap<>(3);
@@ -79,20 +78,12 @@ public class PerunUser {
         return logname;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public String getOrganization() {
         return organization;
     }
 
     public void setLogname(String logname) {
         this.logname = logname;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public void setOrganization(String organization) {
@@ -133,7 +124,6 @@ public class PerunUser {
     public String toString() {
         return "PerunUser{" +
                 "logname='" + logname + '\'' +
-                ", name='" + name + '\'' +
                 ", organization='" + organization + '\'' +
                 ", publications=" + publications +
                 ", vos=" + vos +
