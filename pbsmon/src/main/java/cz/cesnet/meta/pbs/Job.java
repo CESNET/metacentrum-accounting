@@ -541,6 +541,7 @@ public class Job extends PbsInfoObject {
     public boolean isUnderusingCPUs() {
         String state = getState();
         if (!("R".equals(state) || "C".equals(state)|| "F".equals(state))) return false;
+        if ("oven".equals(getQueueName())) return false;
         Duration walltimeUsed = getWalltimeUsed();
         if(walltimeUsed==null) {
             return false;
