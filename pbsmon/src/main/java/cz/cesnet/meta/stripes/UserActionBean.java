@@ -31,8 +31,13 @@ public class UserActionBean extends BaseActionBean {
 
     @SpringBean("perun")
     protected Perun perun;
+
     @SpringBean("accounting")
     protected Accounting accounting;
+
+    @SpringBean("userAccess")
+    UserAccess userAccess;
+
     //parametr
     private String userName;
     //data
@@ -45,6 +50,7 @@ public class UserActionBean extends BaseActionBean {
     private List<String> usedQueueNames;
     private Map<String,JobsInfo> jobInfosByQueue;
     private List<CloudVirtualHost> userVMs;
+    private List<UserAccessImpl.Group> groups;
 
     @DefaultHandler
     public Resolution show() {
@@ -98,6 +104,9 @@ public class UserActionBean extends BaseActionBean {
                 .filter(vm -> userName.equals(vm.getOwner().getName()))
                 .collect(Collectors.toList());
 
+        //groups
+        groups = userAccess.getUserGroups(userName);
+
         return new ForwardResolution("/users/user.jsp");
     }
 
@@ -143,15 +152,15 @@ public class UserActionBean extends BaseActionBean {
         return usedQueueNames;
     }
 
-//    public Map<String, List<Job>> getJobsByQueue() {
-//        return jobsByQueue;
-//    }
-
     public Map<String, JobsInfo> getJobInfosByQueue() {
         return jobInfosByQueue;
     }
 
     public List<CloudVirtualHost> getUserVMs() {
         return userVMs;
+    }
+
+    public List<UserAccessImpl.Group> getGroups() {
+        return groups;
     }
 }

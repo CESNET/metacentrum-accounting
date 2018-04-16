@@ -13,4 +13,7 @@ public interface UserAccess {
 
 
     UserAccessImpl.Group getGroup(String pbsServerName, String groupName);
+
+    List<UserAccessImpl.Group> getUserGroups(String username);
+
 }

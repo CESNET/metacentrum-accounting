@@ -34,10 +34,12 @@ public class GroupActionBean extends BaseActionBean {
     private String groupName;
     private List<PerunUser> users;
 
+    @SuppressWarnings("unused") //used by Stripes to provide URL parameter
     public void setPbsServerName(String pbsServerName) {
         this.pbsServerName = pbsServerName;
     }
 
+    @SuppressWarnings("unused") //used by Stripes to provide URL parameter
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }

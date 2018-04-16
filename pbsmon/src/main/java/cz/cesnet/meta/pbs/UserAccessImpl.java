@@ -64,6 +64,30 @@ public class UserAccessImpl extends RefreshLoader implements UserAccess {
     }
 
     @Override
+    public List<Group> getUserGroups(String username) {
+        checkLoad();
+        List<Group> userGroups = new ArrayList<>();
+        for(PBS pbs : pbsky.getListOfPBS()) {
+            //find groups that are used for ACL in any queue
+            HashSet<String> aclGroupsNames = new HashSet<>();
+            for(Queue q : pbs.getQueuesByPriority()) {
+                if(q.isAclGroupsEnabled()) {
+                    aclGroupsNames.addAll(Arrays.asList(q.getAclGroupsArray()));
+                }
+            }
+            //get all groups read from /etc/group for the PBS host
+            for (Group group : pbs2groupName2GroupMap.get(pbs.getHost()).values()) {
+                //the group is not used in ACLs, let's ignore it
+                if(!aclGroupsNames.contains(group.getName())) continue;
+                if(group.getUsers().contains(username)) {
+                    userGroups.add(group);
+                }
+            }
+        }
+        return userGroups;
+    }
+
+    @Override
     protected void load() {
         log.debug("load() started");
         LinkedHashMap<String, Map<String,Group>> map = new LinkedHashMap<>();
@@ -86,7 +110,8 @@ public class UserAccessImpl extends RefreshLoader implements UserAccess {
     LinkedHashMap<String, Map<String,Group>> pbs2groupName2GroupMap;
 
     private List<Group> loadGroups(PbsServerConfig serverConfig) {
-        log.debug("loadGroups({})",serverConfig.getHost());
+        String host = serverConfig.getHost();
+        log.debug("loadGroups({})", host);
         try {
             List<Group> groups = new ArrayList<>();
             for(String line : Files.readAllLines(Paths.get(serverConfig.getGroupFile()))) {
@@ -96,9 +121,9 @@ public class UserAccessImpl extends RefreshLoader implements UserAccess {
                     List<String> userList = Arrays.asList(split[3].split(","));
                     Collections.sort(userList);
                     LinkedHashSet<String> userSet = new LinkedHashSet<>(userList);
-                    groups.add(new Group(groupName, userSet));
+                    groups.add(new Group(host, groupName, userSet));
                 } else {
-                    groups.add(new Group(groupName, new LinkedHashSet<>()));
+                    groups.add(new Group(host, groupName, new LinkedHashSet<>()));
                 }
             }
             return groups;
@@ -111,12 +136,18 @@ public class UserAccessImpl extends RefreshLoader implements UserAccess {
 
 
     static public class Group {
+        private String host;
         private String name;
         private LinkedHashSet<String> users;
 
-        public Group(String name, LinkedHashSet<String> users) {
+        public Group(String host, String name, LinkedHashSet<String> users) {
+            this.host = host;
             this.name = name;
             this.users = users;
+        }
+
+        public String getHost() {
+            return host;
         }
 
         public String getName() {

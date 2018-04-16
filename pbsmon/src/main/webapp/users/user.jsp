@@ -29,6 +29,10 @@
       <f:param value="${actionBean.perunUser.publications['MetaCentrum']}"/>
       <f:param value="${actionBean.perunUser.publications['CERIT-SC']}"/>
     </f:message>
+    <c:if test="${not empty actionBean.groups}">
+        <f:message key="user_jsp_hlaska_groups"/>
+        <c:forEach items="${actionBean.groups}" var="g"><s:link href="/group/${g.host}/${g.name}">${g.name}</s:link> </c:forEach>
+    </c:if>
     </p>
     <table class="zakladni">
         <tr><th><f:message key="user.rok"/></th><th><f:message key="jobs_pocet"/></th><th><f:message key="user.cpudny"/></th></tr>
