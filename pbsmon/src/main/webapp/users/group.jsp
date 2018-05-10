@@ -16,6 +16,7 @@
                 <tr>
                     <th>#</th>
                     <th>logname</th>
+                    <th>jméno</th>
                     <th>organizace</th>
                     <th>skupina</th>
                     <th>status</th>
@@ -26,6 +27,7 @@
                 <tr>
                     <td>${i.count}</td>
                     <td><s:link href="/user/${user.logname}"><c:out value="${user.logname}"/></s:link></td>
+                    <td><c:out value="${user.name}"/></td>
                     <td><c:out value="${user.organization}"/></td>
                     <td><c:out value="${user.researchGroup}"/></td>
                     <td><c:out value="${user.status}"/></td>

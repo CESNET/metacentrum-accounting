@@ -15,7 +15,7 @@
 
 <c:if test="${(! empty actionBean.perunUser) and (! empty actionBean.userInfo)}">
     <p><f:message key="user_jsp_hlaska_kdo">
-        <f:param value="${actionBean.perunUser.logname}"/>
+        <f:param value="${actionBean.perunUser.name}"/>
         <f:param value="${actionBean.perunUser.organization}"/>
         <f:param value="${actionBean.perunUser.researchGroup}"/>
         <f:param value="${actionBean.perunUser.mainVoName}"/>
