@@ -7,13 +7,13 @@
 <td class="node ${stroj.state} <c:if test='${stroj.openNebulaUsable}'>opennebulausable</c:if> <c:if test='${stroj.pro}'>pbspro</c:if>" style="height: ${stroj.cpuNum/8}em; padding: 0;">
     <c:choose>
         <c:when test="${stroj.state=='partialy-free'}">
-            <div class="usedwrapper" style="line-height: ${stroj.cpuNum/8}em;">
+            <div class="usedwrapper" style="height: ${stroj.cpuNum/8}em;">
                 <div class="usedbox" style="height: ${stroj.usedPercent}%;"></div>
-                <s:link href="/machine/${stroj.name}"><c:out value="${stroj.shortName}"/>&nbsp;(${stroj.cpuNum}&nbsp;CPU)</s:link>
+                <s:link style="height: ${stroj.cpuNum/8}em;" href="/machine/${stroj.name}"><c:out value="${stroj.shortName}"/> (${stroj.cpuNum}&nbsp;CPU)</s:link>
             </div>
         </c:when>
         <c:otherwise>
-            <s:link style="line-height: ${stroj.cpuNum/8}em;" href="/machine/${stroj.name}"><c:out value="${stroj.shortName}"/>&nbsp;(${stroj.cpuNum}&nbsp;CPU)</s:link>
+            <s:link style="height: ${stroj.cpuNum/8}em;" href="/machine/${stroj.name}"><c:out value="${stroj.shortName}"/> (${stroj.cpuNum}&nbsp;CPU)</s:link>
         </c:otherwise>
     </c:choose>
 </td>

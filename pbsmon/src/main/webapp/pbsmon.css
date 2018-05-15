@@ -14,10 +14,11 @@
  table.nodes td.spacer { border-width: 0; height: 5px; }
  table.nodes td a { width: 100%; font-weight: bold; font-size: small; display: inline-block; }
  table.nodes td a:hover { background-color: #f0f0f0;}
- table.nodes td.partialy-free a { position: relative; z-index: 10; vertical-align: middle; display: inline-block; }
+ table.nodes td.partialy-free a { position: relative; z-index: 10; vertical-align: middle; }
  table.nodes td.partialy-free div.usedbox { background-color: #6060FF; left:0;bottom:0; position:absolute; width: 100%; z-index: 1;}
  table.nodes td.partialy-free div.usedwrapper { position: relative; height: 100%; width: 100%; } /*needed for firefox,cannot position table cells*/
  table.nodes td.node.partialy-free { border-color: #6060F0; border-top-color: #6EED6E; }
+ table.nodes td.node a { display: flex; justify-content: center; align-items: center; }
 
  table.node td a:link { color: gold; }
 
