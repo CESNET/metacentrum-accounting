@@ -13,10 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,7 +24,7 @@ public class CheckCeritSC {
 
     final static Logger log = LoggerFactory.getLogger(CheckCeritSC.class);
 
-    public static void main(String[] args) throws UnknownHostException {
+    public static void main(String[] args) {
         ApplicationContext springCtx = new ClassPathXmlApplicationContext("spring-context.xml");
         Pbs pbs = springCtx.getBean("pbs", Pbs.class);
         OpenNebula nebula = springCtx.getBean("nebula", OpenNebula.class);
@@ -146,10 +143,10 @@ public class CheckCeritSC {
     }
 
     private static List<ExpectedHost> getExpectedHosts(VypocetniCentrum cerit) {
-        List<ExpectedHost> expectedHosts = new ArrayList<ExpectedHost>(220);
+        List<ExpectedHost> expectedHosts = new ArrayList<>(220);
         for (VypocetniZdroj resource : cerit.getZdroje()) {
             log.info("resource.getId() = {}", resource.getId());
-            List<Stroj> stroje = resource.isCluster() ? resource.getStroje() : Arrays.asList(resource.getStroj());
+            List<Stroj> stroje = resource.isCluster() ? resource.getStroje() : Collections.singletonList(resource.getStroj());
             for (Stroj stroj : stroje) {
                 log.debug("stroj = {}", stroj.getName());
                 expectedHosts.add(new ExpectedHost(stroj.getName()));

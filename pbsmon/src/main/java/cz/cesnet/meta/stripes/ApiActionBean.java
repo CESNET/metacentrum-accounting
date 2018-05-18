@@ -68,7 +68,7 @@ public class ApiActionBean extends BaseActionBean {
         data.put("nodes",nodesData);
         for (Node node : nodes) {
             Map<String,Object> nodeData = new LinkedHashMap<>();
-            String nodeName = node.getName();
+            String nodeName = node.getFQDN();
             nodesData.put(nodeName,nodeData);
             nodeData.put("name", nodeName);
             nodeData.put("attributes", node.getAttributes());
