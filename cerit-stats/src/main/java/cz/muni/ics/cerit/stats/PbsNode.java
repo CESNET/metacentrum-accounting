@@ -16,7 +16,7 @@ public class PbsNode {
     String name;
     String ntype;
     String queue;
-    //possible states:      ["down,offline", "job-exclusive", "free", "down", "state-unknown", "job-busy"]
+    //possible states:  ["down,offline", "offline,job-busy", "job-exclusive", "free", "down", "state-unknown", "job-busy"]
     String state;
     String jobs;
     String note;
@@ -40,8 +40,7 @@ public class PbsNode {
         } else if(state.startsWith("down")){
             reason = "down";
             return false;
-        } else if(state.equals("offline")){
-            //TODO co kdyz je reserved a offline
+        } else if(state.startsWith("offline")){
             reason = "offline";
             return false;
         } else if("job-exclusive".equals(state)||"free".equals(state)||"job-busy".equals(state)){ //free means even partially free
