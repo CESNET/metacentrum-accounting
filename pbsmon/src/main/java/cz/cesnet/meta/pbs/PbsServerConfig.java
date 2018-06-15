@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class PbsServerConfig {
 
+    private String shortName;
     private String host;
     private boolean main = false;
     private boolean torque = true;
@@ -80,6 +81,14 @@ public class PbsServerConfig {
 
     public void setGroupFile(String groupFile) {
         this.groupFile = groupFile;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     @Override

@@ -32,7 +32,7 @@ public class PbsServer extends PbsInfoObject {
     }
 
     public String getShortName() {
-        return getHost().split("\\.")[0];
+        return serverConfig.getShortName();
     }
 
     public void setServerConfig(PbsServerConfig serverConfig) {
