@@ -100,36 +100,36 @@
 
     <tr>
       <th> <f:message key="job_resource_nodes"/> </th>
-      <td colspan="9"><c:out value="${job.resourceNodes}"/></td>
+      <td colspan="10"><c:out value="${job.resourceNodes}"/></td>
     </tr>
     <!-- casy -->
     <tr>
       <th> <f:message key="job_ctime"/> </th>
-      <td colspan="9"><f:formatDate value="${job.timeCreated}" type="both" dateStyle="full" /></td>
+      <td colspan="10"><f:formatDate value="${job.timeCreated}" type="both" dateStyle="full" /></td>
     </tr>
 
     <c:if test="${! empty job.executionTime}">
     <tr>
       <th> <f:message key="job_exectime"/> </th>
-      <td colspan="9"><f:formatDate value="${job.executionTime}" type="both" dateStyle="full" /></td>
+      <td colspan="10"><f:formatDate value="${job.executionTime}" type="both" dateStyle="full" /></td>
     </tr>
     </c:if>
     <c:if test="${! empty job.timeEligible}">
     <tr>
       <th> <f:message key="job_etime"/> </th>
-      <td colspan="9"><f:formatDate value="${job.timeEligible}" type="both" dateStyle="full" /></td>
+      <td colspan="10"><f:formatDate value="${job.timeEligible}" type="both" dateStyle="full" /></td>
     </tr>
     </c:if>
     <c:if test="${job.state=='Q' and ! empty job.plannedStart}">
       <tr>
          <th> <f:message key="jobs_planned_start"/> </th>
-         <td colspan="9"><f:formatDate value="${job.plannedStart}" type="both" dateStyle="full" /></td>
+         <td colspan="10"><f:formatDate value="${job.plannedStart}" type="both" dateStyle="full" /></td>
       </tr>
     </c:if>
        <c:if test="${job.state=='Q' and ! empty job.plannedNodes}">
            <tr>
                <th> <f:message key="job_planned_nodes"/> </th>
-               <td colspan="9">
+               <td colspan="10">
                    <c:forEach items="${job.plannedNodesNames}" var="nodeName">
                        <s:link href="/node/${nodeName}"><c:out value="${nodeName}"/></s:link>
                    </c:forEach>
@@ -139,55 +139,55 @@
     <c:if test="${! empty job.timeStarted}">
     <tr>
       <th> <f:message key="job_start_time"/> </th>
-      <td colspan="9"><f:formatDate value="${job.timeStarted}" type="both" dateStyle="full" /></td>
+      <td colspan="10"><f:formatDate value="${job.timeStarted}" type="both" dateStyle="full" /></td>
     </tr>
     </c:if>
     <c:if test="${! empty job.timeExpectedEnd}">
     <tr>
        <th> <f:message key="job_expected_endtime"/> </th>
-       <td colspan="9" <c:if test="${job.overRun}">class="memexceeded"</c:if> >
+       <td colspan="10" <c:if test="${job.overRun}">class="memexceeded"</c:if> >
            <f:formatDate value="${job.timeExpectedEnd}" type="both" dateStyle="full" /></td>
     </tr>
     </c:if>
     <c:if test="${! empty job.timeCompleted}">
     <tr>
       <th> <f:message key="job_comp_time"/> </th>
-      <td colspan="9"><f:formatDate value="${job.timeCompleted}" type="both" dateStyle="full" /></td>
+      <td colspan="10"><f:formatDate value="${job.timeCompleted}" type="both" dateStyle="full" /></td>
     </tr>
     </c:if>
     <tr>
       <th> <f:message key="job_mtime"/> </th>
-      <td colspan="9"><f:formatDate value="${job.timeModified}" type="both" dateStyle="full" /></td>
+      <td colspan="10"><f:formatDate value="${job.timeModified}" type="both" dateStyle="full" /></td>
     </tr>
 
     <tr>
       <th> <f:message key="job_comment"/> </th>
-      <td colspan="9"><c:out value="${job.comment}"/></td>
+      <td colspan="10"><c:out value="${job.comment}"/></td>
     </tr>
 
     <c:if test="${!empty job.submitDir}">
      <tr>
       <th> <f:message key="job_submitdir"/> </th>
-      <td colspan="9"><c:out value="${job.submitDir}" /></td>
+      <td colspan="10"><c:out value="${job.submitDir}" /></td>
     </tr>
    </c:if>
 
     <c:if test="${!empty job.workDir}">
      <tr>
       <th> <f:message key="job_workdir"/> </th>
-      <td colspan="9"><c:out value="${job.workDir}" /></td>
+      <td colspan="10"><c:out value="${job.workDir}" /></td>
      </tr>
     </c:if>
 
    <c:if test="${!empty job.scratchType}">
       <tr>
         <th>SCRATCHDIR</th>
-        <td colspan="9"><c:out value="${job.scratchDir}" /></td>
+        <td colspan="10"><c:out value="${job.scratchDir}" /></td>
       </tr>
    </c:if>
 
    <tr><th><f:message key="job_variable_list"/></th>
-       <td colspan="9"><c:forEach items="${job.variables}" var="vl">
+       <td colspan="10"><c:forEach items="${job.variables}" var="vl">
            ${vl.key}=<c:out value="${fn:substring(vl.value,0,75)}"/><br>
        </c:forEach>
      </td></tr>
@@ -195,7 +195,7 @@
    <c:if test="${! empty job.chunks}">
        <tr>
            <th><f:message key="job_scheduled_nodespec"/></th>
-           <td colspan="9">
+           <td colspan="10">
                <table class="zakladni">
                    <tr>
                        <th><f:message key="job_nodespec_node"/></th>
