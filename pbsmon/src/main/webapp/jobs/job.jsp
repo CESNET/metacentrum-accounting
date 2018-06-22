@@ -72,6 +72,7 @@
    <table class="job">
     <tr>
       <th> <f:message key="jobs_job"/> </th>
+      <th> server </th>
       <th> <f:message key="jobs_ncpu"/> </th>
       <th> <f:message key="jobs_mem_reserved"/> </th>
       <th> <f:message key="jobs_mem_used"/> </th>  
@@ -85,6 +86,7 @@
        
     <tr>
       <td>${job.name}</td>
+      <td align="center">${job.pbs.serverConfig.shortName}</td>
       <td align="center">${job.noOfUsedCPU}</td>
       <td align="right">${job.reservedMemoryTotal}</td>
       <td align="right" <c:if test="${job.memoryExceeded}">class="memexceeded"</c:if> >${job.usedMemory}</td>

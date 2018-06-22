@@ -164,7 +164,8 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     public Job getJobByName(String jobName) {
         for (PBS pbs : getListOfPBS()) {
             Job job = pbs.getJobs().get(jobName);
-            if (job != null) return job;
+            //ignore jobs in Moved state, they are reported by another server in another state
+            if (job != null && !"M".equals(job.getState())) return job;
         }
         return null;
     }
@@ -173,40 +174,42 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     public List<Job> getSortedJobs(JobsSortOrder poradi) {
         checkLoad();
         List<Job> jobs = getAllJobs();
-        if (poradi != JobsSortOrder.Id) {
-            jobs = new ArrayList<>(jobs);
-            switch (poradi) {
-                case CPU:
-                    jobs.sort(jobCPUComparator);
-                    break;
-                case CPUTime:
-                    jobs.sort(jobCPUTimeUsedComparator);
-                    break;
-                case Name:
-                    jobs.sort(jobNameComparator);
-                    break;
-                case Queue:
-                    jobs.sort(jobQueueComparator);
-                    break;
-                case Ctime:
-                    jobs.sort(jobCtimeComparator);
-                    break;
-                case ReservedMemTotal:
-                    jobs.sort(jobReservedMemTotalComparator);
-                    break;
-                case UsedMem:
-                    jobs.sort(jobUsedMemComparator);
-                    break;
-                case User:
-                    jobs.sort(jobUserComparator);
-                    break;
-                case WallTime:
-                    jobs.sort(jobWallTimeUsedComparator);
-                    break;
-                case State:
-                    jobs.sort(jobStateComparator);
-                    break;
-            }
+        if(poradi==null) poradi = JobsSortOrder.Id;
+        jobs = new ArrayList<>(jobs);
+        switch (poradi) {
+            case Id:
+                jobs.sort(jobsIdComparator);
+                break;
+            case CPU:
+                jobs.sort(jobCPUComparator);
+                break;
+            case CPUTime:
+                jobs.sort(jobCPUTimeUsedComparator);
+                break;
+            case Name:
+                jobs.sort(jobNameComparator);
+                break;
+            case Queue:
+                jobs.sort(jobQueueComparator);
+                break;
+            case Ctime:
+                jobs.sort(jobCtimeComparator);
+                break;
+            case ReservedMemTotal:
+                jobs.sort(jobReservedMemTotalComparator);
+                break;
+            case UsedMem:
+                jobs.sort(jobUsedMemComparator);
+                break;
+            case User:
+                jobs.sort(jobUserComparator);
+                break;
+            case WallTime:
+                jobs.sort(jobWallTimeUsedComparator);
+                break;
+            case State:
+                jobs.sort(jobStateComparator);
+                break;
         }
         return jobs;
     }
@@ -412,8 +415,17 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
     };
 
     static final Comparator<Job> jobsIdComparator = (j1, j2) -> {
-        int diff = j1.getIdNum() - j2.getIdNum();
-        return (diff == 0) ? j1.getIdSubNum() - j2.getIdSubNum() : diff;
+        //first compare server part of id, e.g. arien-pro.ics.muni.cz
+        int serverDiff = j1.getIdServer().compareTo(j2.getIdServer());
+        if (serverDiff != 0) return serverDiff;
+        //if server part is the same, compare numerical id
+        int numDiff = j1.getIdNum() - j2.getIdNum();
+        if (numDiff != 0) return numDiff;
+        //if server and id are the same, maybe job array id is different
+        int subNumDiff = j1.getIdSubNum() - j2.getIdSubNum();
+        if (subNumDiff !=0 ) return subNumDiff;
+        //if the whole ids are identical, it is Moved job, sort by server
+        return j1.getPbs().getHost().compareTo(j2.getPbs().getHost());
     };
 
 

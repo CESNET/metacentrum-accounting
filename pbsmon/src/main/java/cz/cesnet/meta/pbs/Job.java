@@ -150,6 +150,15 @@ public class Job extends PbsInfoObject {
     private static final Pattern TORQUE_ARRAY_JOB = Pattern.compile("(\\d+)-(\\d+)");
     private static final Pattern PBSPRO_ARRAY_JOB = Pattern.compile("(\\d+)\\[(\\d+)?]");
 
+    private String idServer = null;
+
+    public String getIdServer() {
+        if(idServer==null) {
+            idServer = PbsUtils.substringAfter(name,'.');
+        }
+        return idServer;
+    }
+
     public int getIdNum() {
         if (idNum == -1) {
             String jobid = PbsUtils.substringBefore(name,'.');

@@ -101,6 +101,9 @@
              <th><s:link href="/user/${actionBean.userName}/Id"><f:message key="jobs_job"/></s:link>
                  <c:if test="${actionBean.sort=='Id'}"><img src="${pageContext.request.contextPath}/img/arrow.jpeg" width="15" height="15" alt="sort"></c:if>
              </th>
+             <th>
+                 server
+             </th>
              <th><s:link href="/user/${actionBean.userName}/CPU"><f:message key="jobs_ncpu"/></s:link>
                  <c:if test="${actionBean.sort=='CPU' or empty actionBean.sort}"><img src="${pageContext.request.contextPath}/img/arrow.jpeg" width="15" height="15" alt="sort"></c:if>
              </th>
@@ -140,6 +143,7 @@
 %>
          <tr>
          <td><a href="<%=contextPath+"/job/"+job.getName()%>" style="font-size: xx-small"><%=job.getName()%></a>
+         <td align="center"><%=job.getPbs().getServerConfig().getShortName()%></td>
          <td align="center"><%=job.getNoOfUsedCPU()%></td>
          <td align="right"><%=job.getReservedMemoryTotal()%></td>
          <td align="right" ><%=job.getUsedMemory()%></td>
