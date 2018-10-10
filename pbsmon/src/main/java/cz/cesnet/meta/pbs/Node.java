@@ -450,6 +450,10 @@ public class Node extends PbsInfoObject {
         return PbsUtils.RESERVED.equals(getRequiredQueueShort());
     }
 
+    public boolean isOffline() {
+        return STATE_OFFLINE.equals(getPbsState());
+    }
+
     /**
      * Returns a queue which has the only access to this node.
      *

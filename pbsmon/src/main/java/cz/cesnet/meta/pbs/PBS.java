@@ -365,20 +365,16 @@ public class PBS implements TimeStamped {
     /**
      * For each queue creates a list of nodes that can be used.
      * The rules for assigning nodes to queues differ for each planner.
-     * For vanilla Torque:
-     * <ul>
-     *  <li>A node can be used when it has a required property for queues that require a property,
-     * and is not reserved for another queue.
-     *  <li>If a queue has at least one node that is assigned to it, it can use only nodes
-     * that are assigned to it. Otherwise it can use any host that is not assigned to any queue.</li>
-     * </ul>
      * For PBS-Pro:
      * <ul>
-     *     <li>If a queue has at least one node that is assigned to it, it can use only nodes
-     * that are assigned to it. Otherwise it can use any host that is not assigned to any queue. Nodes are assigned
-     * to a queue by node's attribute "queue"</li>
-     *     <li>A queue has attribute default_chunk.queue_list, its value may be used in node's attribute resources_available.queue_list
-     *     then node accepts only from such queues</li>
+     *     <li>Nodes are assigned to a queue by node's attribute <b>queue</b></li>
+     *     <li>A node may have attribute <b>resources_available.queue_list</b> with array of strings (not queue names!)</li>
+     *     <li>A queue may have attribute <b>default_chunk.queue_list</b>, its value is a single string</li>
+     *     <li>If a queue has at least one node that is assigned to it, it can use only nodes that are assigned to it.</li>
+     *     <li>If a queue has no node assigned, and
+     *         <li>it has default_chunk.queue_list attribute, it can use only nodes that have such value in resources_available.queue_list</li>
+     *         <li>it does not have default_chunk.queue_list attribute, it can use any node</li>
+     *     </li>
      * </ul>
      *
      * @param queues queues
@@ -387,71 +383,50 @@ public class PBS implements TimeStamped {
      */
     private static Map<String, List<Node>> makeQueuesToNodeMap(List<Queue> queues, List<Node> nodes) {
         Map<String, List<Node>> queuesToNodesMap = new HashMap<>((int) (queues.size() * 1.5));
-        for (Queue q : queues) {
+        for (Queue queue : queues) {
             List<Node> nodeList = new ArrayList<>();
-            String queueName = q.getName();
+            String queueName = queue.getName();
             //non-execution queues have no nodes
-            if (!q.isExecutionQueue()) {
+            if (!queue.isExecutionQueue()) {
                 queuesToNodesMap.put(queueName, nodeList);
                 continue;
             }
-            if (q.getPbs().isTorque()) {
-                //TORQUE
-                //naprogramovano podle udaju od Simona v https://rt3.cesnet.cz/rt/Ticket/Display.html?id=28959
-                for (Node node : nodes) {
-                    String nrq = node.getRequiredQueue();//jmeno fronty vcetne pripony @server
-                    if (nrq != null) {
-                        if (nrq.equals(queueName)) {
-                            //node is assigned to the queue
-                            nodeList.add(node);
-                            node.getQueues().add(q);
-                            continue;
-                        } else {
-                            //node is reserved for another queue
-                            continue;
-                        }
-                    }
-                    if (!queueName.startsWith("maintenance") && !queueName.startsWith("reserved")) { //u maintenance brat jen vyhrazene stroje
-                        String qrp = q.getRequiredProperty();
-                        if (qrp != null && !node.hasProperty(qrp)) {
-                            //queue requires a node property that the node does not have
-                            continue;
-                        }
-                        //node is accessible by the queue
-                        nodeList.add(node);
-                        node.getQueues().add(q);
-                    }
+            //PBSPRO
+            //is any host assigned to the queue?
+            boolean assignedHostsExist = false;
+            for (Node node : nodes) {
+                String nrq = node.getRequiredQueue();
+                if (queueName.equals(nrq)) {
+                    assignedHostsExist = true;
+                    break;
                 }
-            } else {
-                //PBSPRO
-                //is any host assigned to the queue?
-                boolean assignedHostsExist = false;
-                for (Node node : nodes) {
-                    String nrq = node.getRequiredQueue();
-                    if (nrq != null && queueName.equals(nrq)) {
-                        assignedHostsExist = true;
-                        break;
-                    }
-                }
-                //what jobs in the queue require
-                String rql = q.getDefaultChunkQueuesList();
-                //for each node, decide whether it belongs to the queue
-                for (Node node : nodes) {
-                    String nodeRequiredQueue = node.getRequiredQueue();
-                    boolean assign;
-                    if(nodeRequiredQueue!=null) {
-                        //node assigned to a specific queue, so use it if it is this queue
-                        assign = nodeRequiredQueue.equals(queueName);
+            }
+            //what jobs in the queue require
+            String queueRequiredResource = queue.getDefaultChunkQueuesList();
+            //for each node, decide whether it belongs to the queue
+            for (Node node : nodes) {
+                String nodeRequiredQueue = node.getRequiredQueue();
+                boolean assignNodeToQueue;
+
+                if(assignedHostsExist) {
+                    //queue has some assigned nodes, use only them
+                    assignNodeToQueue = queueName.equals(nodeRequiredQueue);
+                } else {
+                    if(queueRequiredResource != null) {
+                        //queue has no assigned nodes, but requires a resource
+                        //node can be used only if it provides the required resource
+                        assignNodeToQueue = node.getResourceQueueList().contains(queueRequiredResource);
                     } else {
-                        //node not assigned to any queue, so use it only if no other node is assigned
-                        // and the node has a required value of resource queue_list
-                        assign = !assignedHostsExist && (rql == null || node.getResourceQueueList().contains(rql));
+                        //queue has no assigned nodes and requires no resource
+                        //any node can be used
+                        assignNodeToQueue = true;
                     }
-                    if(assign) {
-                        //node is accessible by the queue
-                        nodeList.add(node);
-                        node.getQueues().add(q);
-                    }
+                }
+
+                if (assignNodeToQueue) {
+                    //node is accessible by the queue
+                    nodeList.add(node);
+                    node.getQueues().add(queue);
                 }
             }
 

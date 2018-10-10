@@ -6,7 +6,27 @@
 <%@ taglib prefix="s" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%-- vystrahy --%>
+<c:if test="${node.maintenance}">
+    <p class="maintenance"><f:message key="nodejsp_maintenance"><f:param
+            value="${node.comment}"/></f:message></p>
+</c:if>
+<c:if test="${node.plannedOutage}">
+    <p class="maintenance">
+        <f:message key="nodejsp_planned_outage_note"><f:param value="${node.comment}"/></f:message>
+        <c:if test="${not empty node.availableBefore}"><f:message key="nodejsp_planned_outage_start"><f:param value="${node.availableBefore}"/></f:message></c:if>
+        <c:if test="${not empty node.availableAfter}"><f:message key="nodejsp_planned_outage_end"><f:param value="${node.availableAfter}"/></f:message></c:if>
+    </p>
+</c:if>
+<c:if test="${node.reserved}">
+    <p class="comment"><f:message key="nodejsp_reserved"><f:param value="${node.comment}"/></f:message></p>
+</c:if>
+<c:if test="${node.offline}">
+    <p class="comment"><f:message key="nodejsp_offline"><f:param value="${node.comment}"/></f:message></p>
+</c:if>
 
+
+<%-- barevna tabulka s hlavnimi udaji  --%>
         <table class="node" cellspacing="0">
             <tr>
                 <th class="${node.state}"><f:message key="nodejsp_name"/></th>
@@ -170,20 +190,7 @@
     </table>
 </c:if>
 
-        <c:if test="${node.maintenance}">
-            <p class="maintenance"><f:message key="nodejsp_maintenance"><f:param
-                    value="${node.comment}"/></f:message></p>
-        </c:if>
-        <c:if test="${node.plannedOutage}">
-            <p class="maintenance">
-                <f:message key="nodejsp_planned_outage_note"><f:param value="${node.comment}"/></f:message>
-                <c:if test="${not empty node.availableBefore}"><f:message key="nodejsp_planned_outage_start"><f:param value="${node.availableBefore}"/></f:message></c:if>
-                <c:if test="${not empty node.availableAfter}"><f:message key="nodejsp_planned_outage_end"><f:param value="${node.availableAfter}"/></f:message></c:if>
-            </p>
-        </c:if>
-        <c:if test="${node.reserved}">
-            <p class="comment"><f:message key="nodejsp_reserved"><f:param value="${node.comment}"/></f:message></p>
-        </c:if>
+
 
 
 
