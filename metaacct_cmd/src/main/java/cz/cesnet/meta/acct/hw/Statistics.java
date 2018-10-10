@@ -47,6 +47,8 @@ public class Statistics {
         generateStats(stats, relativeDate(-33), relativeDate(-31));
         generateStats(stats, relativeDate(-95), relativeDate(-93));
 
+//        recompute("glados.cerit-sc.cz", "2018-09-18", "2018-09-20", stats);
+//        recompute("safedx.metacentrum.cz", "2018-08-24", "2018-08-26", stats);
 //        recompute("elixir-storage1.grid.cesnet.cz", "2017-07-24", "2017-07-24", stats);
 //        recompute("tarkil.grid.cesnet.cz", "2016-11-02", stats);
 //        recompute("meduseld.ics.muni.cz", "2016-11-15", stats);
