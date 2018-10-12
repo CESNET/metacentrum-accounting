@@ -26,7 +26,7 @@ public class StoragesHsmImpl extends RefreshLoader implements Storages {
 
     //final static Logger log = LoggerFactory.getLogger(StoragesHsmImpl.class);
     private String url;
-    private String cerit4File;
+//    private String cerit4File;
 
     private StoragesInfo storagesInfo;
 
@@ -38,9 +38,9 @@ public class StoragesHsmImpl extends RefreshLoader implements Storages {
         this.url = url;
     }
 
-    public void setCerit4File(String cerit4File) {
-        this.cerit4File = cerit4File;
-    }
+//    public void setCerit4File(String cerit4File) {
+//        this.cerit4File = cerit4File;
+//    }
 
     @Override
     public StoragesInfo getStoragesInfo() {
@@ -52,27 +52,27 @@ public class StoragesHsmImpl extends RefreshLoader implements Storages {
     protected void load() {
         List<Storage> storagesList = new ArrayList<>();
         loadDuHsms(storagesList);
-        loadCeritHsms(storagesList);
+        //loadCeritHsms(storagesList);
         storagesInfo = new StoragesInfo(storagesList);
     }
 
-    private void loadCeritHsms(List<Storage> storagesList) {
-        log.info("loading CERIT storages from {}",cerit4File);
-        try (BufferedReader in = new BufferedReader(new FileReader(cerit4File))) {
-            String line;
-            int sizeGB = 0;
-            int freeGB = 0;
-            while ((line = in.readLine()) != null) {
-                String[] ss = line.split(" ", 2);
-                sizeGB += Storage.parseNum(ss[0]).numGB;
-                freeGB += Storage.parseNum(ss[1]).numGB;
-            }
-            storagesList.add(new Storage((sizeGB / 1024) + "T", (freeGB / 1024) + "T", "/storage/brno4-cerit-hsm"));
-        } catch (IOException e) {
-            log.error("cannot read file " + cerit4File, e);
-        }
-        log.info("loaded");
-    }
+//    private void loadCeritHsms(List<Storage> storagesList) {
+//        log.info("loading CERIT storages from {}",cerit4File);
+//        try (BufferedReader in = new BufferedReader(new FileReader(cerit4File))) {
+//            String line;
+//            int sizeGB = 0;
+//            int freeGB = 0;
+//            while ((line = in.readLine()) != null) {
+//                String[] ss = line.split(" ", 2);
+//                sizeGB += Storage.parseNum(ss[0]).numGB;
+//                freeGB += Storage.parseNum(ss[1]).numGB;
+//            }
+//            storagesList.add(new Storage((sizeGB / 1024) + "T", (freeGB / 1024) + "T", "/storage/brno4-cerit-hsm"));
+//        } catch (IOException e) {
+//            log.error("cannot read file " + cerit4File, e);
+//        }
+//        log.info("loaded");
+//    }
 
     private void loadDuHsms(List<Storage> storagesList) {
         log.info("Loading DU storages from {}",url);
@@ -95,6 +95,9 @@ public class StoragesHsmImpl extends RefreshLoader implements Storages {
                             break;
                         case "du3":
                             dir = "/storage/brno5-archive";
+                            break;
+                        case "du4":
+                            dir = "/storage/ostrava2-archive";
                             break;
                         default:
                             continue;

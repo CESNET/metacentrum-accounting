@@ -16,7 +16,7 @@ public class Storage {
     private String total;
     private int usedPercent;
     private String dir;
-    private static Pattern num = Pattern.compile("([0-9.]+)([TGM])");
+    private static Pattern num = Pattern.compile("([0-9.]+)([PTGM])");
 
     static class ParseResult {
         public String nums;
@@ -45,8 +45,9 @@ public class Storage {
         pr.unit = m.group(2);
         pr.nums= nums+"\u00A0"+pr.unit+"iB";
        switch (pr.unit) {
-           case "G": pr.numGB = Math.round(numf); break;
+           case "P": pr.numGB = Math.round(numf * 1024 * 1024); break;
            case "T": pr.numGB = Math.round(numf * 1024); break;
+           case "G": pr.numGB = Math.round(numf); break;
            case "M": pr.numGB = Math.round(numf / 1024); break;
        }
         return pr;

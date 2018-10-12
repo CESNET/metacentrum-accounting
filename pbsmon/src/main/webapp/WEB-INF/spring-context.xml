@@ -158,7 +158,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
 
     <bean id="hsms" class="cz.cesnet.meta.storages.StoragesHsmImpl" >
         <property name="url" value="https://accounting.du.cesnet.cz/du/du_motd_info.txt"/>
-        <property name="cerit4File" value="/home/pbsmon/brno4-cerit-hsm.txt" />
+        <!--<property name="cerit4File" value="/home/pbsmon/brno4-cerit-hsm.txt" />-->
         <property name="dataMaxAgeInMilliseconds" value="3600000"/>
     </bean>
 
