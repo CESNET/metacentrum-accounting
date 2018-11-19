@@ -7,7 +7,7 @@ import org.displaytag.properties.SortOrderEnum;
 
 public class Page implements PaginatedList {
 	private int fullListSize;
-	private List<? extends Object> list;
+	private List<Object> list;
 	private int pageSize;
 	private int pageNumber;
 	private boolean ascending;
@@ -24,12 +24,12 @@ public class Page implements PaginatedList {
 	
 	
 	@Override
-	public List<? extends Object> getList() {
+	public List<Object> getList() {
 		return list;
 	}
 	
-	public void setList(List<? extends Object> list) {
-		this.list = list;
+	public void setList(List<?> list) {
+		this.list = (List) list;
 	}
 
 	@Override
