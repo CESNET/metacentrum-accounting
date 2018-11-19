@@ -4,9 +4,7 @@ import cz.cesnet.meta.RefreshLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,6 +22,17 @@ public class CloudImpl extends RefreshLoader implements Cloud {
 
     private CloudLoader cloudLoader;
 
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    private boolean disabled;
+
+
     @Override
     public int getRefreshTime() {
         return 0;
@@ -37,39 +46,49 @@ public class CloudImpl extends RefreshLoader implements Cloud {
 
     @Override
     protected void load() {
-        List<CloudPhysicalHost> physicalHosts=null;
-        List<CloudVirtualHost> virtualHosts=null;
-        Map<String, CloudPhysicalHost> hostname2HostMap=null;
-        Map<String, List<CloudVirtualHost>> hostName2VirtualHostsMap=null;
-        Map<String, CloudPhysicalHost> vmFqdn2HostMap=null;
-        for(CloudServer server : servers) {
-            log.debug("loading from {}",server);
-            CloudLoader cloudLoader = new CloudLoader(server.getHostsURL(), server.getVmsURL());
-            cloudLoader.load();
-            if(physicalHosts==null) {
-                physicalHosts = cloudLoader.getPhysicalHosts();
-            } else {
-                physicalHosts.addAll(cloudLoader.getPhysicalHosts());
-            }
-            if(virtualHosts==null) {
-                virtualHosts = cloudLoader.getVirtualHosts();
-            } else {
-                virtualHosts.addAll(cloudLoader.getVirtualHosts());
-            }
-            if(hostname2HostMap==null) {
-                hostname2HostMap = cloudLoader.getHostname2HostMap();
-            } else {
-                hostname2HostMap.putAll(cloudLoader.getHostname2HostMap());
-            }
-            if(hostName2VirtualHostsMap==null) {
-                hostName2VirtualHostsMap = cloudLoader.getHostName2VirtualHostsMap();
-            } else {
-                hostName2VirtualHostsMap.putAll(cloudLoader.getHostName2VirtualHostsMap());
-            }
-            if(vmFqdn2HostMap==null) {
-                vmFqdn2HostMap = cloudLoader.getVmFqdn2HostMap();
-            } else {
-                vmFqdn2HostMap.putAll(cloudLoader.getVmFqdn2HostMap());
+        List<CloudPhysicalHost> physicalHosts = null;
+        List<CloudVirtualHost> virtualHosts = null;
+        Map<String, CloudPhysicalHost> hostname2HostMap = null;
+        Map<String, List<CloudVirtualHost>> hostName2VirtualHostsMap = null;
+        Map<String, CloudPhysicalHost> vmFqdn2HostMap = null;
+        if (disabled) {
+            log.debug("cloud is disabled, using empty data");
+            physicalHosts = Collections.emptyList();
+            virtualHosts = Collections.emptyList();
+            hostname2HostMap = Collections.emptyMap();
+            hostName2VirtualHostsMap = Collections.emptyMap();
+            vmFqdn2HostMap = Collections.emptyMap();
+        } else {
+            for (CloudServer server : servers) {
+                log.debug("loading from {}", server);
+                CloudLoader cloudLoader = new CloudLoader(server.getHostsURL(), server.getVmsURL());
+                cloudLoader.load();
+                log.debug("loaded from {}", server);
+                if (physicalHosts == null) {
+                    physicalHosts = cloudLoader.getPhysicalHosts();
+                } else {
+                    physicalHosts.addAll(cloudLoader.getPhysicalHosts());
+                }
+                if (virtualHosts == null) {
+                    virtualHosts = cloudLoader.getVirtualHosts();
+                } else {
+                    virtualHosts.addAll(cloudLoader.getVirtualHosts());
+                }
+                if (hostname2HostMap == null) {
+                    hostname2HostMap = cloudLoader.getHostname2HostMap();
+                } else {
+                    hostname2HostMap.putAll(cloudLoader.getHostname2HostMap());
+                }
+                if (hostName2VirtualHostsMap == null) {
+                    hostName2VirtualHostsMap = cloudLoader.getHostName2VirtualHostsMap();
+                } else {
+                    hostName2VirtualHostsMap.putAll(cloudLoader.getHostName2VirtualHostsMap());
+                }
+                if (vmFqdn2HostMap == null) {
+                    vmFqdn2HostMap = cloudLoader.getVmFqdn2HostMap();
+                } else {
+                    vmFqdn2HostMap.putAll(cloudLoader.getVmFqdn2HostMap());
+                }
             }
         }
         this.physicalHosts = physicalHosts;

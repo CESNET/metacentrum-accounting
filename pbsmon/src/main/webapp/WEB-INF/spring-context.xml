@@ -149,6 +149,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
     <bean id="cloud" class="cz.cesnet.meta.cloud.CloudImpl" >
         <property name="dataMaxAgeInMilliseconds" value="300000"/>
         <property name="loadRunTimeInMilliseconds" value="30000"/>
+        <property name="disabled" value="true"/>
     </bean>
 
     <bean id="diskArrays" class="cz.cesnet.meta.storages.StoragesDiskArrayMotdImpl">

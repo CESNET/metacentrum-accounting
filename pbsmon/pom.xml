@@ -4,7 +4,7 @@
     <parent>
         <groupId>cz.metacentrum</groupId>
         <artifactId>accounting-parent</artifactId>
-        <version>3.8-SNAPSHOT</version>
+        <version>3.9-SNAPSHOT</version>
     </parent>
 
     <artifactId>pbsmon</artifactId>
@@ -114,10 +114,15 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>commons-lang</groupId>-->
+            <!--<artifactId>commons-lang</artifactId>-->
+            <!--<version>${commons-lang.version}</version>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>${commons-lang.version}</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>${commons-text.version}</version>
         </dependency>
     </dependencies>
 

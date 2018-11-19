@@ -64,6 +64,10 @@
     <logger name="cz.cesnet.meta.stripes.NodeActionBean" level="info"/>
 
     <logger name="cz.cesnet.meta.storages.StoragesHsmImpl" level="info"/>
+
+    <logger name="cz.cesnet.meta.pbs.PbsConnectorFile" level="debug"/>
+    <logger name="cz.cesnet.meta.pbs.PbskyImpl" level="debug"/>
+    <logger name="cz.cesnet.meta.cloud.CloudImpl" level="debug"/>
     -->
 
     <logger name="net.sourceforge.stripes.controller.StripesFilter" level="info"/>
