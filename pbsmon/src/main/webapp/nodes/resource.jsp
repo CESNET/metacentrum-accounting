@@ -18,7 +18,7 @@
 
         <div id="photo">
             <c:if test="${not empty actionBean.resource.thumbnail}">
-            <a href="<c:out value='${actionBean.resource.photo}'/>"><img src="<c:out value='${actionBean.resource.thumbnail}'/>" alt="photo"/></a>
+            <a href="<c:out value='${actionBean.resource.photo}'/>"><img src="<c:out value='${actionBean.resource.thumbnail}'/>" alt="photo" width="100px"/></a>
             </c:if>
         </div>
 

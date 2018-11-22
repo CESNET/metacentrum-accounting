@@ -42,7 +42,7 @@
                         <td>
                             <div id="photo">
                                 <c:if test="${not empty zdr.thumbnail}">
-                                    <s:link href="/resource/${zdr.id}"><img src="<c:out value='${zdr.thumbnail}'/>" alt="photo"/></s:link>
+                                    <s:link href="/resource/${zdr.id}"><img src="<c:out value='${zdr.thumbnail}'/>" alt="photo" width="100px"/></s:link>
                                 </c:if>
                             </div>
                         </td>
