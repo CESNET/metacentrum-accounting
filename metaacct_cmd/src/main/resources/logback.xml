@@ -27,5 +27,7 @@
     <logger name="cz.cesnet.meta.acct.hw.stats.StatsImpl.sql" level="info"/>
     <logger name="cz.cesnet.meta.acct.hw.stats.StatsImpl.exe" level="info"/>
     <logger name="cz.cesnet.meta.acct.hw.stats.StatsImpl.hw" level="info"/>
+    <logger name="cz.cesnet.meta.perun.impl.PerunJsonImpl" level="warn"/>
+    <logger name="cz.cesnet.meta.acct.hw.SavePhysicalResources" level="warn"/>
 
 </configuration>
