@@ -61,7 +61,7 @@ public class PerunHwJsonImpl implements Perun {
                 List<Stroj> stroje = zdroj.getStroje();
                 List<Machine> machines = new ArrayList<Machine>(stroje.size());
                 for(Stroj stroj : stroje) {
-                    machines.add(new Machine(stroj.getName(),stroj.isVirtual(),stroj.getCpuNum()));
+                    machines.add(new Machine(stroj.getName(), stroj.getCpuNum()));
                 }
                 cr.setMachines(machines);
                 List<VypocetniZdroj> podclustery = zdroj.getPodclustery();
@@ -70,7 +70,7 @@ public class PerunHwJsonImpl implements Perun {
                 }
             } else {
                 Stroj stroj = zdroj.getStroj();
-                cr.setMachine(new Machine(stroj.getName(),stroj.isVirtual(),stroj.getCpuNum()));
+                cr.setMachine(new Machine(stroj.getName(), stroj.getCpuNum()));
             }
             resources.add(cr);
         }

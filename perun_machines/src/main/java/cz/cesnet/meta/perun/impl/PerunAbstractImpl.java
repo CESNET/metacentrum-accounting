@@ -29,13 +29,8 @@ public abstract class PerunAbstractImpl implements Perun {
         Map<String, Integer> cpuMap;
 
         List<Stroj> vsechnyStroje = this.getMetacentroveStroje();
-        Set<Stroj> fyzickeSet = new HashSet<Stroj>();
-        Map<String, Stroj> vsechnyStrojeMap = new HashMap<String, Stroj>();
-        for (Stroj s : vsechnyStroje) {
-            if (!(s.isVirtual())) fyzickeSet.add(s);
-            vsechnyStrojeMap.put(s.getName(), s);
-        }
-        cpuMap = new HashMap<String, Integer>();
+        Set<Stroj> fyzickeSet = new HashSet<>(vsechnyStroje);
+        cpuMap = new HashMap<>();
 
         centra = this.najdiVypocetniCentra();
         for (VypocetniCentrum c : centra) {
@@ -73,8 +68,8 @@ public abstract class PerunAbstractImpl implements Perun {
             cpuMap.put(c.getId(), cpuSumCentrum);
         }
 
-        zbyle = new ArrayList<Stroj>(fyzickeSet);
-        Collections.sort(zbyle);
+        zbyle = new ArrayList<>(fyzickeSet);
+        zbyle.sort(Stroj.NAME_COMPARATOR);
 
         int cpuSum = 0;
         for (Stroj s : zbyle) {
@@ -84,10 +79,8 @@ public abstract class PerunAbstractImpl implements Perun {
         cpuSum = 0;
 
         for (Stroj s : vsechnyStroje) {
-            if (!(s.isVirtual())) {
-                cpuSum += s.getCpuNum();
+            cpuSum += s.getCpuNum();
 
-            }
         }
         cpuMap.put("vsechny", cpuSum);
         return new FyzickeStroje(centra, zbyle, cpuMap);

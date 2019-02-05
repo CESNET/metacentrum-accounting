@@ -62,9 +62,6 @@ public class MachineActionBean extends BaseActionBean {
             log.warn("Machine {} not found ", machineName);
             return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND, "Machine " + machineName + " not found in Perun.");
         }
-        if (perunMachine.isVirtual()) {
-            return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND, "Machine " + machineName + " is virtual, not physical.");
-        }
         //frontendy z peruna - v Perun 3 se nepoužívá
         VyhledavacFrontendu vyhledavacFrontendu = perun.getVyhledavacFrontendu();
 

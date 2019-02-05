@@ -125,10 +125,9 @@ public class NodesActionBean extends BaseActionBean {
     @SuppressWarnings("unused")
     public Resolution virtual() {
         log.debug("virtual()");
-        List<Stroj> vsechnyStroje = this.perun.getMetacentroveStroje();
-        fyzicke = new ArrayList<>(vsechnyStroje.size());
+        fyzicke = this.perun.getMetacentroveStroje();
         //mapa z hostname PBS uzlu na PBS uzel
-        nodeMap = new HashMap<>(vsechnyStroje.size());
+        nodeMap = new HashMap<>(fyzicke.size());
         //mapovani z jmen virtualnich stroju na jmena fyzickych stroju a naopak
         mapping = makeUnifiedMapping(this.pbsCache, this.cloud);
         //mapa VM z cloudu
@@ -138,28 +137,22 @@ public class NodesActionBean extends BaseActionBean {
             fqdn2CloudVMMap.put(vm.getFqdn(), vm);
         }
         //pripravit
-        for (Stroj s : vsechnyStroje) {
+        for (Stroj s : fyzicke) {
             String strojName = s.getName();
             //PBs uzel primo na fyzickem - nevirtualizovane
             Node pbsNode = pbsky.getNodeByFQDN(strojName);
             if (pbsNode != null) nodeMap.put(strojName, pbsNode);
             // pro vsechny fyzicke vytahat virtualni s PBS uzly
-            if (!s.isVirtual()) {
-                fyzicke.add(s);
-                List<String> virtNames = mapping.getPhysical2virtual().get(s.getName());
-                if (virtNames != null) {
-                    for (String virtName : virtNames) {
-                        Node vn = pbsky.getNodeByFQDN(virtName);
-                        if (vn != null) {
-                            nodeMap.put(vn.getName(), vn);
-                        }
+            List<String> virtNames = mapping.getPhysical2virtual().get(s.getName());
+            if (virtNames != null) {
+                for (String virtName : virtNames) {
+                    Node vn = pbsky.getNodeByFQDN(virtName);
+                    if (vn != null) {
+                        nodeMap.put(vn.getName(), vn);
                     }
                 }
             }
         }
-
-        Collections.sort(fyzicke);
-
 
         maxVirtual = 0;
         for (List<String> list : mapping.getPhysical2virtual().values()) {

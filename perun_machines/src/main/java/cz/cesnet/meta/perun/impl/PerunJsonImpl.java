@@ -12,17 +12,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
  * Implementace čtoucí JSON data. Oproti předchozí PerunJdbcImpl nepotřebuje žádné on-line spojení na Peruna,
- * jen čte soubory ve formátu JSON vygenerované Perunem. Ze staréhoPeruna lze vygenerovat správně formátovaný
- * soubor třídou PerunV2Export.
+ * jen čte soubory ve formátu JSON vygenerované Perunem.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: PerunJsonImpl.java,v 1.5 2012/01/04 13:47:44 makub Exp $
  */
 public class PerunJsonImpl extends PerunAbstractImpl {
 
@@ -183,12 +182,13 @@ public class PerunJsonImpl extends PerunAbstractImpl {
             zdroj.setStroje(new ArrayList<>());
             for (JSONValue jv2 : ((JSONArray) jzdroj.get("machines")).getValue()) {
                 JSONObject jstroj = (JSONObject) jv2;
-                Stroj stroj = new Stroj(zdroj, getString(jstroj, "name"), false, getInt(jstroj, "cpu"));
+                Stroj stroj = new Stroj(zdroj, getString(jstroj, "name"), getInt(jstroj, "cpu"));
                 zdroj.getStroje().add(stroj);
                 allMachines.add(stroj);
             }
+            zdroj.getStroje().sort(Stroj.NAME_COMPARATOR);
         } else {
-            Stroj stroj = new Stroj(zdroj, zdroj.getNazev(), false, getInt(jzdroj, "cpu"));
+            Stroj stroj = new Stroj(zdroj, zdroj.getNazev(), getInt(jzdroj, "cpu"));
             zdroj.setStroj(stroj);
             zdroj.setStroje(Collections.singletonList(stroj));
             allMachines.add(stroj);
@@ -249,7 +249,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
                             try {
                                 vo.setExpires(sdf.parse(jvo.path(EXPIRES).asText()));
                             } catch (ParseException ex) {
-                                vo.setExpires(new GregorianCalendar(3000, 0, 1).getTime());
+                                vo.setExpires(new GregorianCalendar(3000, Calendar.JANUARY, 1).getTime());
                             }
                             //stats groups
                             JsonNode statistic_groups = jvo.get(STATISTIC_GROUPS);
@@ -294,7 +294,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         for (File f : machineFiles) {
             log.info("loading {}", f);
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(f), "utf-8"));
+                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8));
                 final JSONParser jsonParser = new JSONParser(in);
                 JSONObject perun_machines = (JSONObject) jsonParser.nextValue();
                 in.close();
@@ -321,6 +321,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         for (Stroj stroj : allMachines) {
             allMachinesMap.put(stroj.getName(), stroj);
         }
+        allMachines.sort(Stroj.NAME_COMPARATOR);
         this.vyhledavacVyhrazenychStroju = new JsonVyhledavacVyhrazenychStroju(reserved_names);
         this.vyhledavacFrontendu = new JsonVyhledavacFrontendu(frontend_names);
         PerunJsonImpl.texty = texty;
@@ -397,7 +398,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
     @Override
     public boolean isNodePhysical(String nodeName) {
         Stroj stroj = getStrojByName(nodeName);
-        boolean b = stroj != null && !stroj.isVirtual();
+        boolean b = stroj != null;
         log.debug("isNodePhysical({}) returns {}",nodeName,b);
         return b;
     }

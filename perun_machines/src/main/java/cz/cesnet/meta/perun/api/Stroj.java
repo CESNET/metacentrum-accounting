@@ -1,17 +1,13 @@
 package cz.cesnet.meta.perun.api;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class Stroj implements Comparable<Stroj> {
+import java.util.Comparator;
 
-    private static final Pattern whole = Pattern.compile("^([A-Za-z]+)(\\d*)-*([0-9a-z]*)");
-    private String name = null;
-    private boolean virtual;
-    private int cpuNum = 0;
+public class Stroj {
+
+    private String name;
+    private int cpuNum;
     private String shortName;
-    private String clusterName;
-    private int numInCluster = 0;
     private VypocetniZdroj vypocetniZdroj;
     private int usedPercent = 0;
     private boolean openNebulaManaged = false; //je v OpenNebule
@@ -22,10 +18,9 @@ public class Stroj implements Comparable<Stroj> {
 
     private String state;
 
-    public Stroj(VypocetniZdroj vypocetniZdroj,String name, boolean virtual, int cpuNum) {
+    public Stroj(VypocetniZdroj vypocetniZdroj, String name, int cpuNum) {
         this.vypocetniZdroj = vypocetniZdroj;
         this.name = name;
-        this.virtual = virtual; //vzdycky false od pbsmon_json
         this.cpuNum = cpuNum;
 
         int dot = name.indexOf(46);
@@ -33,16 +28,6 @@ public class Stroj implements Comparable<Stroj> {
             this.shortName = name;
         else
             this.shortName = name.substring(0, dot);
-
-        Matcher m = whole.matcher(this.shortName);
-        if (m.find()) {
-            this.clusterName = m.group(1);
-            String numInC = m.group(2);
-            if ((numInC != null) && (numInC.length() > 0))
-                this.numInCluster = Integer.parseInt(numInC);
-        } else {
-            throw new RuntimeException("name " + this.shortName + " is non-parseable");
-        }
     }
 
     public String getState() {
@@ -57,39 +42,12 @@ public class Stroj implements Comparable<Stroj> {
         return vypocetniZdroj;
     }
 
-    /**
-     * Řazení strojů podle názvu clusteru, pak podle pozice v clusteru.
-     *
-     * @param s stroj
-     * @return int podle compareTo()
-     */
-    public int compareTo(Stroj s) {
-        if (equals(s)) return 0;
-        int c = getClusterName().compareTo(s.getClusterName());
-        return ((c != 0) ? c : getNumInCluster() - s.getNumInCluster());
-    }
-
-    //------- generovano -------
-
-    public String getClusterName() {
-        return this.clusterName;
-    }
-
     public String getName() {
         return this.name;
     }
 
-    public int getNumInCluster() {
-        return this.numInCluster;
-    }
-
     public String getShortName() {
         return this.shortName;
-    }
-
-
-    public boolean isVirtual() {
-        return this.virtual;
     }
 
     public int getCpuNum() {
@@ -114,7 +72,6 @@ public class Stroj implements Comparable<Stroj> {
 
     /**
      * Vlasta Holer's definition of cloud host -  is in OpenNebula and is not wholy taken by PBS Node
-     * @return
      */
     public boolean isOpenNebulaUsable() {
         return openNebulaUsable;
@@ -166,8 +123,68 @@ public class Stroj implements Comparable<Stroj> {
     public String toString() {
         return "Stroj{" +
                 "name='" + name + '\'' +
-                ", virtual=" + virtual +
                 ", cpuNum=" + cpuNum +
                 '}';
+    }
+
+    /**
+     * Compares two machines using their names. It recursively splits the names into non-digit-only
+     * and digit-only strings, and compares non-digit-only strings as strings and digit-only strings as numbers.
+     */
+    public static final NameComparator NAME_COMPARATOR = new NameComparator();
+
+    public static class NameComparator implements Comparator<Stroj> {
+
+        @Override
+        public int compare(Stroj stroj1, Stroj stroj2) {
+            return smartCompare(stroj1.getName(), stroj2.getName());
+        }
+
+        public static int smartCompare(String s1, String s2) {
+            String p1 = parseNotDigitPrefix(s1);
+            String p2 = parseNotDigitPrefix(s2);
+
+            int compare = p1.compareToIgnoreCase(p2);
+            if (compare == 0 && p1.length() != s1.length() && p2.length() != s2.length()) {
+                return smartDigitCompare(s1.substring(p1.length()), s2.substring(p2.length()));
+            }
+            return compare;
+        }
+
+        private static int smartDigitCompare(String s1, String s2) {
+            String p1 = parseDigitPrefix(s1);
+            String p2 = parseDigitPrefix(s2);
+
+            int compare;
+            if (p1.length() > 0 && p2.length() > 0) {
+                compare = Integer.compare(Integer.valueOf(p1), Integer.valueOf(p2));
+            } else {
+                compare = p1.compareToIgnoreCase(p2);
+            }
+            if (compare == 0 && p1.length() != s1.length() && p2.length() != s2.length()) {
+                return smartCompare(s1.substring(p1.length()), s2.substring(p2.length()));
+            }
+            return compare;
+        }
+
+        private static String parsePrefix(String s, boolean digits) {
+            StringBuilder p = new StringBuilder();
+            for (int i = 0; i < s.length(); i++) {
+                char c = s.charAt(i);
+                if (((!digits) && (c >= '0' && c <= '9')) || (digits && !(c >= '0' && c <= '9'))) {
+                    break;
+                }
+                p.append(c);
+            }
+            return p.toString();
+        }
+
+        private static String parseDigitPrefix(String s) {
+            return parsePrefix(s, true);
+        }
+
+        private static String parseNotDigitPrefix(String s) {
+            return parsePrefix(s, false);
+        }
     }
 }

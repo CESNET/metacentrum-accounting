@@ -91,7 +91,7 @@ public class QueueActionBean extends BaseActionBean {
             }
         }
         //sort physical machines by name
-        Collections.sort(machines);
+        machines.sort(Stroj.NAME_COMPARATOR);
         //update their state
         for (Stroj stroj : machines) {
             RozhodovacStavuStroju.rozhodniStav(stroj, pbsky, pbsCache.getMapping(), perun.getVyhledavacFrontendu(), perun.getVyhledavacVyhrazenychStroju(), cloud);

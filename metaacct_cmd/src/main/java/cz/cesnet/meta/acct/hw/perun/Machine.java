@@ -1,5 +1,7 @@
 package cz.cesnet.meta.acct.hw.perun;
 
+import java.util.Objects;
+
 /**
  * Created by IntelliJ IDEA.
  *
@@ -7,23 +9,16 @@ package cz.cesnet.meta.acct.hw.perun;
  * @version $Id: Machine.java,v 1.2 2009/10/20 11:02:09 makub Exp $
  */
 public class Machine {
-    private String name = null;
-    private boolean virtual;
-    private int cpuNum = 0;
+    private String name;
+    private int cpuNum;
 
-    public Machine(String name, boolean virtual, int cpuNum) {
+    public Machine(String name, int cpuNum) {
         this.name = name;
-        this.virtual = virtual;
         this.cpuNum = cpuNum;
-        if(virtual) throw new RuntimeException("machine "+name+" is virtual");
     }
 
     public String getName() {
         return name;
-    }
-
-    public boolean isVirtual() {
-        return virtual;
     }
 
     public int getCpuNum() {
@@ -34,7 +29,6 @@ public class Machine {
     public String toString() {
         return "Machine{" +
                 "name='" + name + '\'' +
-                ", virtual=" + virtual +
                 ", cpuNum=" + cpuNum +
                 '}';
     }
@@ -45,10 +39,7 @@ public class Machine {
         if (!(o instanceof Machine)) return false;
 
         Machine machine = (Machine) o;
-
-        if (name != null ? !name.equals(machine.name) : machine.name != null) return false;
-
-        return true;
+        return Objects.equals(name, machine.name);
     }
 
     @Override
