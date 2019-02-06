@@ -72,10 +72,30 @@ public class NodesActionBean extends BaseActionBean {
         hsmInfo = hsmsLoader.getStoragesInfo();
         //GPU
         gpuNodes = findGpuNodes();
-        //PBSPro machines
-        markPBSProMachines();
 
         return new ForwardResolution("/nodes/nodes.jsp");
+    }
+
+    public Resolution pbs() {
+        log.debug("pbs({})", ctx.getRequest().getRemoteHost());
+        FyzickeStroje fyzickeStroje = perun.getFyzickeStroje();
+        centra = fyzickeStroje.getCentra();
+        cpuMap = fyzickeStroje.getCpuMap();
+        for (Stroj stroj : perun.getMetacentroveStroje()) {
+            List<Node> nodes = PbsmonUtils.getPbsNodesForPhysicalMachine(stroj, pbsky, pbsCache, cloud);
+            if(nodes.size()>0) {
+                Node node = nodes.get(0);
+                stroj.setPbsName(node.getName());
+                stroj.setPbsState(node.getState());
+            } else {
+                stroj.setPbsName(null);
+                stroj.setPbsState(null);
+            }
+        }
+        jobsQueuedCount = pbsky.getJobsQueuedCount();
+        //GPU
+        gpuNodes = findGpuNodes();
+        return new ForwardResolution("/nodes/pbs.jsp");
     }
 
     private  List<Node> findGpuNodes() {
@@ -85,13 +105,6 @@ public class NodesActionBean extends BaseActionBean {
                 .flatMap(stroj -> PbsmonUtils.getPbsNodesForPhysicalMachine(stroj,pbsky, pbsCache, cloud).stream())
                 .filter(Node::getHasGPU)
                 .collect(Collectors.toList());
-    }
-
-    private void markPBSProMachines() {
-        centra.stream()
-                .flatMap(centrum -> centrum.getZdroje().stream())
-                .flatMap(zdroj -> zdroj.isCluster()?zdroj.getStroje().stream():Stream.of(zdroj.getStroj()))
-                .forEach(stroj -> stroj.setPro(PbsmonUtils.getPbsNodesForPhysicalMachine(stroj,pbsky, pbsCache, cloud).stream().anyMatch(node -> node.getPbs().isPBSPro())));
     }
 
     public StoragesInfo getStoragesInfo() {

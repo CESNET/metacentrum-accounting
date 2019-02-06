@@ -14,7 +14,7 @@ public class Stroj {
     private boolean nebulaPbsHost = false; //je v OpenNebule a obsahuje VM ktery je v PBS
     private boolean openNebulaUsable = false; //lze na něm spustit uživatelský VM přes OpenNebulu
     private String pbsName;
-    private boolean pro = false; //je na něm uzel z PBSPro
+    private String pbsState;
 
     private String state;
 
@@ -97,13 +97,12 @@ public class Stroj {
         this.pbsName = pbsName;
     }
 
-
-    public boolean isPro() {
-        return pro;
+    public String getPbsState() {
+        return pbsState;
     }
 
-    public void setPro(boolean pro) {
-        this.pro = pro;
+    public void setPbsState(String pbsState) {
+        this.pbsState = pbsState;
     }
 
     @Override
