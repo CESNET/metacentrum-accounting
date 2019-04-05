@@ -25,6 +25,7 @@ public class PerunUser {
     public static class Vo {
         private String voName;
         private String status;
+        private String organization;
         private Date expires;
         private Map<String,Integer> statsGroups = new HashMap<>(3);
 
@@ -34,6 +35,10 @@ public class PerunUser {
 
         public void setStatus(String status) {
             this.status = status;
+        }
+
+        public void setOrganization(String organization) {
+            this.organization = organization;
         }
 
         public void setExpires(Date expires) {
@@ -46,6 +51,10 @@ public class PerunUser {
 
         public String getStatus() {
             return status;
+        }
+
+        public String getOrganization() {
+            return organization;
         }
 
         public Date getExpires() {
@@ -84,7 +93,7 @@ public class PerunUser {
     }
 
     public String getOrganization() {
-        return organization;
+        return mainVo != null && mainVo.getOrganization() != null ? mainVo.getOrganization() : organization;
     }
 
     public void setLogname(String logname) {

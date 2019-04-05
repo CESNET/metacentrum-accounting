@@ -245,6 +245,9 @@ public class PerunJsonImpl extends PerunAbstractImpl {
                             PerunUser.Vo vo = new PerunUser.Vo(voName);
                             //status
                             vo.setStatus(jvo.get(STATUS).asText());
+                            //organization
+                            JsonNode o = jvo.get(ORG);
+                            vo.setOrganization(o.isNull() ? null : o.asText());
                             //expires
                             try {
                                 vo.setExpires(sdf.parse(jvo.path(EXPIRES).asText()));
