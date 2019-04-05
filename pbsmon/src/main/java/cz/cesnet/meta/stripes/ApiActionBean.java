@@ -2,6 +2,7 @@ package cz.cesnet.meta.stripes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import cz.cesnet.meta.acct.Accounting;
 import cz.cesnet.meta.pbs.Job;
 import cz.cesnet.meta.pbs.Node;
 import cz.cesnet.meta.pbs.PBS;
@@ -37,6 +38,9 @@ public class ApiActionBean extends BaseActionBean {
 
     @SpringBean("perun")
     protected Perun perun;
+
+    @SpringBean("accounting")
+    protected Accounting accounting;
 
     private List<String> users;
     private boolean pretty = false;
@@ -183,7 +187,12 @@ public class ApiActionBean extends BaseActionBean {
 
     }
 
-    private Resolution sendJSON(final Map<String, ?> data) {
+    public Resolution org_names() {
+        log.debug("org_names");
+        return sendJSON(accounting.getCanonicalOrgNames());
+    }
+
+    private Resolution sendJSON(final Object data) {
         return new Resolution() {
             @Override
             public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {

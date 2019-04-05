@@ -3,6 +3,7 @@ package cz.cesnet.meta.acct;
 import cz.cesnet.meta.pbs.Node;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,4 +18,6 @@ public interface Accounting {
     List<OutageRecord> getOutagesForNode(Node node);
 
     List<String> getStartedJobIds();
+
+    List<Map<String, Object>> getCanonicalOrgNames();
 }

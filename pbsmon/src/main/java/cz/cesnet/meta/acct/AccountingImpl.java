@@ -12,6 +12,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -89,5 +90,10 @@ public class AccountingImpl implements Accounting {
     public List<String> getStartedJobIds() {
         log.debug("getStartedJobIds()");
         return jdbc.queryForList("select acct_id_string from acct_pbs_record_started order by acct_id_string",String.class);
+    }
+
+    @Override
+    public List<Map<String, Object>> getCanonicalOrgNames() {
+        return jdbc.queryForList("select user_org,name,akademie from org_names order by name");
     }
 }
