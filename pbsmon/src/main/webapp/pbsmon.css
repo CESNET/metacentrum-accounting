@@ -33,6 +33,7 @@
  .cloud         { background-color: #AFC1CD; border-color: #AFC1CD; color: black; }
  .cloud_warning { color: #AFC1CD; }
  .nebulapbshost    { background-color: #e0d8a1; border-color: #e0d8a1; color: #7c7427; }
+ .resv-exclusive { background: #FABF06; border-color: #FABF06; color: black; }
 
  /* icon of cloud */
  table.nodes td.opennebulausable a { background: url('/pbsmon2/img/cloud.png') top right no-repeat; }

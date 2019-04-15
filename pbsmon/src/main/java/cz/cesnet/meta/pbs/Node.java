@@ -73,6 +73,7 @@ public class Node extends PbsInfoObject {
     public static final String STATE_CLOUD = "cloud";
     public static final String STATE_RUNNING_CLUSTER = "running-cluster";
     public static final String STATE_JOB_FULL = "job-full"; //pseudo state for all used CPUs or all used memory
+    public static final String STATE_RESERVATION_EXCLUSIVE = "resv-exclusive";
 
     private static final Pattern whole = Pattern.compile("^([A-Za-z]+)(\\d*)-*([0-9a-z]*)");
 
