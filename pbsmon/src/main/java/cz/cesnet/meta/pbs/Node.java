@@ -92,11 +92,8 @@ public class Node extends PbsInfoObject {
     private Map<String, String> status;
     private Map<String, String> gpuJobMap;
 
-    public Node() {
-    }
-
-    public Node(String name) {
-        super(name);
+    public Node(PBS pbs, String name) {
+        super(pbs, name);
         this.setName(name);
     }
 

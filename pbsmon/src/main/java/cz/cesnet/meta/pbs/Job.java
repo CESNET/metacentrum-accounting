@@ -90,12 +90,8 @@ public class Job extends PbsInfoObject {
         return j1.getId().compareTo(j2.getId());
     };
 
-
-    public Job() {
-    }
-
-    public Job(String name) {
-        super(name);
+    public Job(PBS pbs, String name) {
+        super(pbs, name);
     }
     //primary data are inherited from PBSInfoObject
 

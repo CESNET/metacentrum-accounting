@@ -87,6 +87,7 @@
 
  table.reservations th { background: #F5B800; }
  table.reservations td { background: #FABF06; text-align: center;}
+ table.reservations a { color: black; }
 
  table.attributes td { background: #e0e0e0; }
  table.prop2node th { background: #c0c0c0; }

@@ -23,12 +23,8 @@ public class PbsInfoObject {
         attrs = null;
     }
 
-    //pouužíván JSON Tools
-    public PbsInfoObject() {
-    }
-
-    //používán JNI
-    public PbsInfoObject(String name) {
+    public PbsInfoObject(PBS pbs, String name) {
+        this.pbs = pbs;
         this.name = name;
         this.attrs = new TreeMap<>();
     }
@@ -61,10 +57,6 @@ public class PbsInfoObject {
 
     public PBS getPbs() {
         return pbs;
-    }
-
-    public void setPbs(PBS pbs) {
-        this.pbs = pbs;
     }
 
     @Override

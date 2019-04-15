@@ -107,7 +107,7 @@ public class PbsConnectorFile implements PbsConnector {
 
         try (RecordReader in = new RecordReader(new BufferedInputStream(new FileInputStream(file)))) {
             String objectType = "";
-            PbsInfoObject pbsInfoObject = new PbsInfoObject();
+            PbsInfoObject pbsInfoObject = new PbsInfoObject(pbs, "unknown");
             String line;
             while ((line = in.readLine()) != null) {
                 //object type separator
@@ -145,47 +145,47 @@ public class PbsConnectorFile implements PbsConnector {
                     String name = line.substring(1);
                     switch (objectType) {
                         case "servers":
-                            server = new PbsServer(name);
+                            server = new PbsServer(pbs, name);
                             server.setServerConfig(serverConfig);
                             pbsInfoObject = server;
                             break;
                         case "nodes":
-                            Node node = new Node(name);
+                            Node node = new Node(pbs, name);
                             nodes.put(name, node);
                             pbsInfoObject = node;
                             break;
                         case "queues":
-                            Queue queue = new Queue(name);
+                            Queue queue = new Queue(pbs, name);
                             queues.put(name, queue);
                             pbsInfoObject = queue;
                             break;
                         case "jobs":
-                            Job job = new Job(name);
+                            Job job = new Job(pbs, name);
                             jobs.put(name, job);
                             pbsInfoObject = job;
                             break;
                         case "reservations":
-                            Reservation reservation = new Reservation(name);
+                            Reservation reservation = new Reservation(pbs, name);
                             reservations.put(name, reservation);
                             pbsInfoObject = reservation;
                             break;
                         case "resources":
-                            PbsResource resource = new PbsResource(name);
+                            PbsResource resource = new PbsResource(pbs, name);
                             resources.put(name, resource);
                             pbsInfoObject = resource;
                             break;
                         case "schedulers":
-                            Scheduler scheduler = new Scheduler(name);
+                            Scheduler scheduler = new Scheduler(pbs, name);
                             schedulers.put(name, scheduler);
                             pbsInfoObject = scheduler;
                             break;
                         case "hooks":
-                            Hook hook = new Hook(name);
+                            Hook hook = new Hook(pbs, name);
                             hooks.put(name, hook);
                             pbsInfoObject = hook;
                             break;
                         default:
-                            pbsInfoObject = new PbsInfoObject(name);
+                            pbsInfoObject = new PbsInfoObject(pbs, name);
                             log.warn("unrecognized object type " + objectType + " name " + name);
                     }
                     continue;

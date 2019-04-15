@@ -42,12 +42,9 @@ public class Queue extends PbsInfoObject {
     public static final String ATTRIBUTE_COMMENT = "comment";
 
 
-    public Queue() {
-        super();
-    }
 
-    public Queue(String name) {
-        super(name);
+    public Queue(PBS pbs, String name) {
+        super(pbs, name);
     }
 
     //primary data are inherited from PBSInfoObject

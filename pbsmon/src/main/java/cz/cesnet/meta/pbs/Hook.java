@@ -7,7 +7,7 @@ package cz.cesnet.meta.pbs;
  */
 public class Hook extends PbsInfoObject {
 
-    public Hook(String name) {
-        super(name);
+    public Hook(PBS pbs, String name) {
+        super(pbs, name);
     }
 }

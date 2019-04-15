@@ -28,12 +28,14 @@ public class PbsUtils {
     }
 
     public static String substringBefore(String string, char ch) {
+        if (string == null) return null;
         int pos = string.indexOf(ch);
         if (pos == -1) return string;
         return string.substring(0, pos);
     }
 
     public static String substringAfter(String string, char ch) {
+        if (string == null) return null;
         int pos = string.indexOf(ch);
         if (pos == -1) return string;
         return string.substring(pos + 1);

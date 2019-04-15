@@ -7,7 +7,7 @@ package cz.cesnet.meta.pbs;
  */
 public class Scheduler extends PbsInfoObject {
 
-    public Scheduler(String name) {
-        super(name);
+    public Scheduler(PBS pbs, String name) {
+        super(pbs, name);
     }
 }

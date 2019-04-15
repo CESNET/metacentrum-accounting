@@ -43,6 +43,7 @@
         <table class="reservations">
             <tr>
                 <th>id</th>
+                <th>name</th>
                 <th>owner</th>
                 <th>start</th>
                 <th>end</th>
@@ -50,14 +51,19 @@
                 <th>select</th>
             </tr>
             <tr>
-                <td>${resv.name}</td>
-                <td>${resv.owner}</td>
+                <td><c:out value="${resv.name}"/></td>
+                <td><c:out value="${resv.reserveName}"/></td>
+                <td><s:link href="/user/${resv.owner}">${resv.owner}</s:link></td>
                 <td><f:formatDate value="${resv.reserveStart}" dateStyle="medium" timeStyle="short" type="both"/></td>
                 <td><f:formatDate value="${resv.reserveEnd}" dateStyle="medium" timeStyle="short" type="both"/></td>
                 <td><f:formatDate value="${resv.createdTime}" dateStyle="medium" timeStyle="short" type="both"/></td>
-                <td><c:out value="${resv.attributes['Resource_List.select']}"/></td>
+                <td><c:out value="${resv.select}"/></td>
             </tr>
         </table>
+
+        Nodes:
+        <t:node_table nodes="${resv.nodes}"/>
+
         Reservation attributes:
         <table class="attributes">
             <c:forEach items="${resv.attributes}" var="a">

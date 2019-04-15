@@ -7,8 +7,8 @@ package cz.cesnet.meta.pbs;
  */
 public class PbsResource extends PbsInfoObject{
 
-    public PbsResource(String name) {
-        super(name);
+    public PbsResource(PBS pbs, String name) {
+        super(pbs, name);
     }
 
     public String getType() {

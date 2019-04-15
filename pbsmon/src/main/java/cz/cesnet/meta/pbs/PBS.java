@@ -256,17 +256,8 @@ public class PBS implements TimeStamped {
      */
     public void uprav() {
 
-        //ukazatele nahoru
-        for (Queue queue : queues.values()) {
-            queue.setPbs(this);
-        }
-        for (Job job : jobs.values()) {
-            job.setPbs(this);
-        }
-
         fqdnToNodeMap = new HashMap<>(nodes.size());
         for (Node node : nodes.values()) {
-            node.setPbs(this);
             fqdnToNodeMap.put(node.getFQDN(),node);
         }
         //suffix
@@ -274,9 +265,10 @@ public class PBS implements TimeStamped {
 
         //mark reservation queues
         for(Reservation reservation : reservations.values()) {
-            Queue qresv = queues.get(reservation.getQueue());
+            Queue qresv = queues.get(reservation.getQueueName());
             if(qresv!=null) {
                 qresv.setReservation(reservation);
+                reservation.setQueue(qresv);
             }
         }
 

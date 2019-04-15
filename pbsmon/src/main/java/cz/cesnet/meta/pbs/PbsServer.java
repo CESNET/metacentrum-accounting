@@ -12,11 +12,8 @@ public class PbsServer extends PbsInfoObject {
 
     private PbsServerConfig serverConfig;
 
-    public PbsServer() {
-    }
-
-    public PbsServer(String name) {
-        super(name);
+    public PbsServer(PBS pbs, String name) {
+        super(pbs, name);
     }
 
     public String getVersion() {
