@@ -42,7 +42,7 @@
 
     <logger name="cz.cesnet.meta.cloud.CloudPhysicalHost" level="error"/>
     <logger name="cz.cesnet.meta.cloud.CloudImpl" level="info"/>
-    <logger name="cz.cesnet.meta.cloud.CloudLoader" level="info"/>
+    <logger name="cz.cesnet.meta.cloud.opennebula.NebulaCloudLoader" level="info"/>
 
     <logger name="cz.cesnet.meta.pbsmon.RozhodovacStavuStroju" level="info"/>
 
@@ -73,5 +73,6 @@
     <logger name="net.sourceforge.stripes.controller.StripesFilter" level="info"/>
     <logger name="cz.cesnet.meta.cloud.CloudPhysicalHost" level="error"/>
     <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl" level="error"/>
+    <logger name="cz.cesnet.meta.cloud.CloudImpl" level="info"/>
 
 </configuration>

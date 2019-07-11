@@ -2,8 +2,6 @@ package cz.muni.ics.cerit.stats;
 
 import cz.cesnet.meta.cloud.CloudLoader;
 
-import java.util.Map;
-
 /**
  * Created with IntelliJ IDEA.
  *

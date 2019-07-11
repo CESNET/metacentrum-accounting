@@ -1,4 +1,6 @@
-package cz.cesnet.meta.cloud;
+package cz.cesnet.meta.cloud.opennebula;
+
+import cz.cesnet.meta.cloud.CloudPhysicalHost;
 
 import java.util.List;
 

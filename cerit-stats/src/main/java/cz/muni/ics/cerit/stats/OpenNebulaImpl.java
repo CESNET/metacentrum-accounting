@@ -1,12 +1,9 @@
 package cz.muni.ics.cerit.stats;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import cz.cesnet.meta.cloud.CloudLoader;
+import cz.cesnet.meta.cloud.opennebula.NebulaCloudLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,7 +26,7 @@ public class OpenNebulaImpl implements OpenNebula {
 
     @Override
     public CloudLoader getCloud() {
-        CloudLoader cloud = new CloudLoader(physicalHostsURL, vmsURL);
+        CloudLoader cloud = new NebulaCloudLoader(physicalHostsURL, vmsURL);
         cloud.load();
         return cloud;
     }

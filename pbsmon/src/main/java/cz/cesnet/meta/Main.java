@@ -2,7 +2,7 @@ package cz.cesnet.meta;
 
 import cz.cesnet.meta.cloud.CloudImpl;
 import cz.cesnet.meta.cloud.CloudPhysicalHost;
-import cz.cesnet.meta.cloud.HostsDocument;
+import cz.cesnet.meta.cloud.opennebula.HostsDocument;
 import cz.cesnet.meta.pbs.*;
 import cz.cesnet.meta.pbscache.PbsCache;
 import cz.cesnet.meta.pbscache.PbsCacheImpl;

@@ -45,10 +45,10 @@
         <p>
             <c:choose>
                 <c:when test="${pageContext.request.locale=='cs'}">
-                    <a href="http://meta.cesnet.cz/wiki/Kategorie:Cloudy">Dokumentace ke cloudu v MetaCentru</a>
+                    <a href="http://wiki.metacentrum.cz/wiki/Kategorie:Cloudy">Dokumentace ke cloudu v MetaCentru</a>
                 </c:when>
                 <c:otherwise>
-                    <a href="http://meta.cesnet.cz/wiki/Kategorie:Clouds">Documentation for cloud in MetaCentrum</a>
+                    <a href="http://wiki.metacentrum.cz/wiki/Kategorie:Clouds">Documentation for cloud in MetaCentrum</a>
                 </c:otherwise>
             </c:choose>
         </p>
