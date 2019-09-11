@@ -148,7 +148,11 @@ public class Node extends PbsInfoObject {
                 try {
                     this.virtNum = Integer.parseInt(virtN);
                 } catch (NumberFormatException ex) {
-                    this.virtNum = Integer.parseInt(virtN, 36) - 9;//a=1 atd
+                    try {
+                        this.virtNum = Integer.parseInt(virtN, 36) - 9;//a=1 atd
+                    } catch (NumberFormatException ex2) {
+                        this.virtNum = 0;
+                    }
                 }
             }
         } else {

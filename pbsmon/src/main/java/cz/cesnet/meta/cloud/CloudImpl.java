@@ -53,7 +53,7 @@ public class CloudImpl extends RefreshLoader implements Cloud {
         Map<String, List<CloudVirtualHost>> hostName2VirtualHostsMap = null;
         Map<String, CloudPhysicalHost> vmFqdn2HostMap = null;
         if (disabled) {
-            log.info("cloud is disabled, using empty data");
+            log.debug("cloud is disabled, using empty data");
             physicalHosts = Collections.emptyList();
             virtualHosts = Collections.emptyList();
             hostname2HostMap = Collections.emptyMap();
@@ -61,7 +61,7 @@ public class CloudImpl extends RefreshLoader implements Cloud {
             vmFqdn2HostMap = Collections.emptyMap();
         } else {
             for (CloudServer server : servers) {
-                log.info("loading cloud from {}", server);
+                log.debug("loading cloud from {}", server);
                 CloudLoader cloudLoader = new NebulaCloudLoader(server.getHostsURL(), server.getVmsURL());
                 cloudLoader.load();
                 log.debug("loaded from {}", server);
