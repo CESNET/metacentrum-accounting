@@ -115,36 +115,21 @@
                 <tr>
                     <th><f:message key="nodejsp_reserved_scratch_ssd"/></th>
                     <td>${node.scratch.ssdReservedPercent}%</td>
-                    <td>${node.scratch.ssdReservedInPbsUnits} / ${node.scratch.ssdSizeInPbsUnits}</td>
-                </tr>
-                <tr>
-                    <th><f:message key="nodejsp_used_scratch_ssd"/></th>
-                    <td>${node.scratch.ssdUsedPercent}%</td>
-                    <td>${node.scratch.ssdUsedInPbsUnits} / ${node.scratch.ssdSizeInPbsUnits}</td>
+                    <td>${node.scratch.ssdAssignedInPbsUnits} / ${node.scratch.ssdAvailableInPbsUnits}</td>
                 </tr>
             </c:if>
             <c:if test="${node.scratch.hasLocal}">
                 <tr>
                     <th><f:message key="nodejsp_reserved_scratch_local"/></th>
                     <td>${node.scratch.localReservedPercent}%</td>
-                    <td>${node.scratch.localReservedInPbsUnits} / ${node.scratch.localSizeInPbsUnits}</td>
-                </tr>
-                <tr>
-                    <th><f:message key="nodejsp_used_scratch_local"/></th>
-                    <td>${node.scratch.localUsedPercent}%</td>
-                    <td>${node.scratch.localUsedInPbsUnits} / ${node.scratch.localSizeInPbsUnits}</td>
+                    <td>${node.scratch.localAssignedInPbsUnits} / ${node.scratch.localAvailableInPbsUnits}</td>
                 </tr>
             </c:if>
             <c:if test="${node.scratch.hasShared}">
                 <tr>
                     <th><f:message key="nodejsp_reserved_scratch_shared"/></th>
                     <td>${node.scratch.sharedReservedPercent}%</td>
-                    <td>${node.scratch.sharedReservedInPbsUnits} / ${node.scratch.sharedSizeInPbsUnits}</td>
-                </tr>
-                <tr>
-                    <th><f:message key="nodejsp_used_scratch_shared"/></th>
-                    <td>${node.scratch.sharedUsedPercent}%</td>
-                    <td>${node.scratch.sharedUsedInPbsUnits} / ${node.scratch.sharedSizeInPbsUnits}</td>
+                    <td>${node.scratch.sharedAssignedInPbsUnits} / ${node.scratch.sharedAvailableInPbsUnits}</td>
                 </tr>
             </c:if>
         </table>

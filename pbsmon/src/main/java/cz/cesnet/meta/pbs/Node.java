@@ -640,11 +640,6 @@ public class Node extends PbsInfoObject {
         this.outages = outages;
     }
 
-    public String getScratchFree() {
-        if (this.scratch == null) return "?";
-        return PbsUtils.formatInHumanUnits(this.scratch.getAnyFreeKiB() * 1024);
-    }
-
     public Scratch getScratch() {
         if (scratch == null) {
             //happens for nodes that are down
@@ -654,44 +649,20 @@ public class Node extends PbsInfoObject {
         return scratch;
     }
 
-    public void setScratch(Scratch scratch) {
-        if (scratch == null) scratch = new Scratch(this.getName());
-        scratch.setSsdSize(getStatus("scratch_ssd"));
-        scratch.setLocalSize(getStatus("scratch_local"));
-        long allocatedSsd = 0L;
-        long allocatedLocal = 0L;
-        for (Job.ReservedResources reservedResources : this.getResourcesReservedByJobs()) {
-            String scratchType = reservedResources.getScratchType();
-            if (scratchType != null) {
-                switch (scratchType) {
-                    case "ssd":
-                        allocatedSsd += reservedResources.getScratchVolumeBytes();
-                        break;
-                    case "local":
-                        allocatedLocal += reservedResources.getScratchVolumeBytes();
-                        break;
-                }
-            }
-        }
-        scratch.setSsdReservedByJobs(allocatedSsd);
-        scratch.setLocalReservedByJobs(allocatedLocal);
-        this.scratch = scratch;
-    }
-
     /*
-        resources_available.scratch_* je kolik zbývá volného místa
+        resources_available.scratch_* je volného místo = kapacita disku mínus binec nepatřící žádné běžící úloze
         resources_assigned.scratch_* je kolik mají zarezervované úlohy
         tato dvě čísla spolu nesouvisí, protože úloha může část zarezervovaného místa zaplnit a tím sníží volné místo
      */
     public void setScratchPBSPro() {
         log.debug("setScratchPBSPro() for node {}", this.getName());
         scratch = new Scratch(this.getName());
-        scratch.setSsdFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_ssd")) / 1024L);
-        scratch.setSsdReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_ssd")));
-        scratch.setLocalFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_local")) / 1024L);
-        scratch.setLocalReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_local")));
-        scratch.setSharedFreeKiB(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_shared")) / 1024L);
-        scratch.setSharedReservedByJobs(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_shared")));
+        scratch.setSsdAvailable(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_ssd")));
+        scratch.setSsdAssigned(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_ssd")));
+        scratch.setLocalAvailable(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_local")));
+        scratch.setLocalAssigned(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_local")));
+        scratch.setSharedAvailable(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_shared")));
+        scratch.setSharedAssigned(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_shared")));
     }
 
     private List<Job.ReservedResources> getResourcesReservedByJobs() {

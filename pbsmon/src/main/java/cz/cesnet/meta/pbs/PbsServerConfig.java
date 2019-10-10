@@ -25,7 +25,8 @@ public class PbsServerConfig {
     public PbsServerConfig() {
     }
 
-    public PbsServerConfig(String host, boolean main, boolean torque, boolean by_queue,List<FairshareConfig> fairshares) {
+    public PbsServerConfig(String shortName, String host, boolean main, boolean torque, boolean by_queue,List<FairshareConfig> fairshares) {
+        this.shortName = shortName;
         this.host = host;
         this.main = main;
         this.torque = torque;

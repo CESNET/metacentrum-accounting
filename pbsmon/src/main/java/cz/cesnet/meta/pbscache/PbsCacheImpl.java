@@ -1,7 +1,5 @@
 package cz.cesnet.meta.pbscache;
 
-import com.sdicons.json.mapper.JSONMapper;
-import com.sdicons.json.parser.JSONParser;
 import cz.cesnet.meta.RefreshLoader;
 import cz.cesnet.meta.pbs.FairshareConfig;
 import cz.cesnet.meta.pbs.Node;
@@ -10,8 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -71,7 +67,6 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
     protected void load() {
         log.debug("load()");
         loadMapping();//only static mapping now
-        loadScratchSizes();
         loadFairshare();
         loadGpuAllocation();
     }
@@ -233,74 +228,6 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
         }
     }
 
-
-    enum ScratchType {local, ssd, pool}
-
-    private void loadScratchSizes() {
-        Map<String, Scratch> scratchSizes = new HashMap<>();
-        for (PbsServerConfig server : pbsServers) {
-            if (server.isTorque()) {
-                for (ScratchType scratchType : ScratchType.values()) {
-                    loadScratchSizes(server, scratchSizes, scratchType);
-                }
-            }
-        }
-        this.scratchSizes = scratchSizes;
-    }
-
-    private boolean loadScratchSizes(PbsServerConfig serverConfig, Map<String, Scratch> scratchSizes, ScratchType type) {
-        String server = serverConfig.getHost();
-        //log.trace("loadScratchSizes({},{})", server, type);
-        Map<String, Long> pools = null;
-        if (type == ScratchType.pool) {
-            pools = loadNetworkScratchSizes(serverConfig);
-        }
-        long mez = System.currentTimeMillis() - (4 * 60 * 60 * 1000L);
-        List<PbsCacheEntry> entries = new ArrayList<>();
-        loadMetrics(serverConfig, "scratch_" + type, entries);
-        for (PbsCacheEntry pce : entries) {
-            if (type == ScratchType.pool || pce.getTimestamp() > mez) {
-                String nodename = pce.getKey();
-                Scratch scratch = scratchSizes.get(nodename);
-                if (scratch == null) {
-                    scratch = new Scratch(nodename);
-                    scratchSizes.put(nodename, scratch);
-                }
-                if (type == ScratchType.local) {
-                    scratch.setLocalFreeKiB(parseScratchCacheValue(pce.getValue()));
-                } else if (type == ScratchType.ssd) {
-                    scratch.setSsdFreeKiB(parseScratchCacheValue(pce.getValue()));
-                } else if (type == ScratchType.pool) {
-                    Long size = pools.get(pce.getValue());
-                    if (size != null) {
-                        scratch.setSharedFreeKiB(size);
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    private static long parseScratchCacheValue(String s) {
-        int idx = s.indexOf(';');
-        if (idx >= 0) {
-            s = s.substring(0, idx);
-        }
-        return Long.parseLong(s);
-    }
-
-    private Map<String, Long> loadNetworkScratchSizes(PbsServerConfig serverConfig) {
-        long mez = System.currentTimeMillis() - (4 * 60 * 60 * 1000L);
-        Map<String, Long> map = new HashMap<>();
-        log.trace("loadNetworkScratchSizes({})", serverConfig.getHost());
-        List<PbsCacheEntry> entries = new ArrayList<>();
-        loadMetrics(serverConfig, "dynamic_resources", entries);
-        entries.stream()
-                .filter(x -> x.getKey().startsWith("scratch"))
-                .filter(x -> x.getTimestamp() > mez)
-                .forEach(x -> map.put(x.getKey(), Long.parseLong(x.getValue())));
-        return map;
-    }
 
     private void loadMapping() {
         Mapping m = new Mapping();

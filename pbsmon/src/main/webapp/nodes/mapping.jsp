@@ -50,7 +50,7 @@
                      <c:when test="${! empty snode}">
                          <td class="node pbs1 ${snode.state}"><s:link href="/node/${snode.name}" class="${snode.state}">${snode.noOfCPU} CPU</s:link></td>
                          <td class="node pbs2 ${snode.state}"><s:link href="/node/${snode.name}" class="${snode.state}">${snode.totalMemoryB} RAM</s:link></td>
-                         <td class="node pbs3 ${snode.state}"><s:link href="/node/${snode.name}" class="${snode.state}">${snode.scratch.anySizeInHumanUnits} HDD</s:link></td>
+                         <td class="node pbs3 ${snode.state}"><s:link href="/node/${snode.name}" class="${snode.state}">${snode.scratch.anyAvailableInHumanUnits} HDD</s:link></td>
                      </c:when>
                      <c:otherwise>
                          <td class="pbs1"> </td>
@@ -68,7 +68,7 @@
                              <td class="node v1 ${vnode.state}"><s:link href="/node/${vnode.name}">${vnode.shortName}</s:link> </td>
                              <td class="node v2 ${vnode.state}">${vnode.noOfCPU} CPU</td>
                              <td class="node v3 ${vnode.state}">${vnode.totalMemoryB} RAM</td>
-                             <td class="node v4 ${vnode.state}">${vnode.scratch.anySizeInHumanUnits} HDD
+                             <td class="node v4 ${vnode.state}">${vnode.scratch.anyAvailableInHumanUnits} HDD
                                  <c:if test="${! empty param.states}">(${vnode.pbsState})</c:if>
                              </td>
                          </c:when>

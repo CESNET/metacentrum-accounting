@@ -7,7 +7,7 @@
     <parent>
         <groupId>cz.metacentrum</groupId>
         <artifactId>accounting-parent</artifactId>
-        <version>3.12-SNAPSHOT</version>
+        <version>3.13-SNAPSHOT</version>
     </parent>
 
     <artifactId>metaacct</artifactId>

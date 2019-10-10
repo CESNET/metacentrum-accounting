@@ -7,10 +7,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Loads data from PBS server by executing an external command and parsing its output.
@@ -210,16 +207,25 @@ public class PbsConnectorFile implements PbsConnector {
         return pbs;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         System.out.println("start");
         log.debug("main");
         PbsConnectorFile p = new PbsConnectorFile();
-        for (int i = 0; i < 10; i++) {
-            PBS arien = call(p, new PbsServerConfig("arien-pro.ics.muni.cz", true, false, true, Collections.emptyList()));
-            System.out.println(arien.getServer().getShortName() + " jobs: " + arien.getJobsById().size());
-            PBS wagap = call(p, new PbsServerConfig("wagap-pro.cerit-sc.cz", false, false, true, Collections.emptyList()));
-            System.out.println(wagap.getServer().getShortName() + " jobs: " + wagap.getJobsById().size());
+        PbsServerConfig arienServerConfig = new PbsServerConfig("arien", "arien-pro.ics.muni.cz", true, false, true, Collections.emptyList());
+        PBS arien = p.loadFileToMemory(arienServerConfig, new File("/tmp/pbs.txt"));
+        for(String nodeName : Arrays.asList("perian50", "hildor27")) {
+            Node node = arien.getNodes().get(nodeName);
+            node.setScratchPBSPro();
+            System.out.println(arien.getServer().getShortName() + " node.name: " + node.getName());
+            System.out.println(arien.getServer().getShortName() + " node.scratch: " + node.getScratch());
+            System.out.println(arien.getServer().getShortName() + " node.scratch.available: " + node.getScratch().getAnyAvailableInHumanUnits());
         }
+//        for (int i = 0; i < 10; i++) {
+//            PBS arien = call(p, arienServerConfig);
+//            System.out.println(arien.getServer().getShortName() + " jobs: " + arien.getJobsById().size());
+//            PBS wagap = call(p, new PbsServerConfig("wagap-pro.cerit-sc.cz", false, false, true, Collections.emptyList()));
+//            System.out.println(wagap.getServer().getShortName() + " jobs: " + wagap.getJobsById().size());
+//        }
     }
 
     static PBS call(PbsConnector p, PbsServerConfig server) {

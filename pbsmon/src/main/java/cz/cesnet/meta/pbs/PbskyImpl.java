@@ -101,11 +101,7 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
                     queuesMapNew.put(q.getName(), q);
                 }
                 for (Node node : pbs.getNodesByName()) {
-                    if(node.getPbs().isTorque()) {
-                        node.setScratch(pbsCache.getScratchForNode(node));
-                    } else {
-                        node.setScratchPBSPro();
-                    }
+                    node.setScratchPBSPro();
                     node.setGpuJobMap(pbsCache.getGpuAlloc(node));
                 }
             }

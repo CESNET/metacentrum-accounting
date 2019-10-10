@@ -218,7 +218,7 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
                 user, wh, wm, ws, fronta, nodes, ncpus, scratchtype, scratch, scratchu, mem, memu, resources,cluster,city);
 
         long memBytes = PbsUtils.parsePbsBytes(this.mem + this.memu);
-        long scratchKB = PbsUtils.parsePbsBytes(this.scratch + this.scratchu) / 1024;
+        long scratchBytes = PbsUtils.parsePbsBytes(this.scratch + this.scratchu);
         long walltimeSecs = walltimeSecs();
 
         if(cluster!=null&&!cluster.isEmpty()) {
@@ -281,17 +281,17 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
             }
             //musi mit vhodny typ scratche
             Scratch nodeScratch = node.getScratch();
-            if (scratchKB > 0) {
-                if (scratchtype.equals("ssd") && !nodeScratch.getHasFreeSsd()) {
-                    log.debug("node {} has not enough scratch_ssd", node.getName());
+            if (scratchBytes > 0) {
+                if (scratchtype.equals("ssd") && !nodeScratch.getHasSsd()) {
+                    log.debug("node {} has no scratch_ssd", node.getName());
                     continue;
                 }
-                if (scratchtype.equals("local") && !nodeScratch.getHasFreeLocal()) {
-                    log.debug("node {} has not enough scratch_local={}", node.getName(), scratchKB);
+                if (scratchtype.equals("local") && !nodeScratch.getHasLocal()) {
+                    log.debug("node {} has no scratch_local", node.getName());
                     continue;
                 }
-                if (scratchtype.equals("shared") && !nodeScratch.getHasFreeShared()) {
-                    log.debug("node {} has not enough scratch_shared", node.getName());
+                if (scratchtype.equals("shared") && !nodeScratch.getHasShared()) {
+                    log.debug("node {} has no scratch_shared", node.getName());
                     continue;
                 }
             }
@@ -329,10 +329,10 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
             //musi mit dost volne pameti
             if (node.getFreeMemoryInt() < memBytes) continue;
             //musi mit dost volneho scratche
-            if (scratchKB > 0) {
-                if (scratchtype.equals("ssd") && !nodeScratch.hasSsdFreeKiB(scratchKB)) continue;
-                if (scratchtype.equals("local") && !nodeScratch.hasLocalFreeKiB(scratchKB)) continue;
-                if (scratchtype.equals("shared") && !nodeScratch.hasSharedFreeKiB(scratchKB)) continue;
+            if (scratchBytes > 0) {
+                if (scratchtype.equals("ssd") && !nodeScratch.hasSsdAvailableBytes(scratchBytes)) continue;
+                if (scratchtype.equals("local") && !nodeScratch.hasLocalAvailableBytes(scratchBytes)) continue;
+                if (scratchtype.equals("shared") && !nodeScratch.hasSharedAvailableBytes(scratchBytes)) continue;
             }
 
             //kdyz se to dostalo az, je i ted volny

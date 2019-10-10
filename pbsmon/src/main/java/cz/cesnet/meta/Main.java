@@ -92,16 +92,6 @@ public class Main {
         }
     }
 
-    public static void main6(String[] args) {
-        PbsCacheImpl pbsCache = new PbsCacheImpl();
-        pbsCache.setPbsServers(Arrays.asList(
-                new PbsServerConfig("arien.ics.muni.cz", true, true, true, Collections.<FairshareConfig>emptyList()),
-                new PbsServerConfig("wagap.cerit-sc.cz", false, true, true, Collections.<FairshareConfig>emptyList()),
-                new PbsServerConfig("wagap-devel.cerit-sc.cz", false, true, false, Collections.<FairshareConfig>emptyList())
-        ));
-
-    }
-
     public static void main5(String[] args) throws InterruptedException {
         CloudImpl cloud = new CloudImpl();
         cloud.setDataMaxAgeInMilliseconds(20000l);
