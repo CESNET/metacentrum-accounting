@@ -320,7 +320,8 @@ public class Queue extends PbsInfoObject {
     }
 
     public List<Node> getNodes() {
-        return getPbs().getQueueToNodesMap().get(this.getName());
+        List<Node> nodes = getPbs().getQueueToNodesMap().get(this.getName());
+        return nodes != null ? nodes : Collections.emptyList();
     }
 
     public List<Job> getJobs() {

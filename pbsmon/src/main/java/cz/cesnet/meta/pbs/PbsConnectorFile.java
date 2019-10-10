@@ -211,14 +211,21 @@ public class PbsConnectorFile implements PbsConnector {
         System.out.println("start");
         log.debug("main");
         PbsConnectorFile p = new PbsConnectorFile();
-        PbsServerConfig arienServerConfig = new PbsServerConfig("arien", "arien-pro.ics.muni.cz", true, false, true, Collections.emptyList());
-        PBS arien = p.loadFileToMemory(arienServerConfig, new File("/tmp/pbs.txt"));
-        for(String nodeName : Arrays.asList("perian50", "hildor27")) {
-            Node node = arien.getNodes().get(nodeName);
-            System.out.println(arien.getServer().getShortName() + " node.name: " + node.getName());
-            System.out.println(arien.getServer().getShortName() + " node.scratch: " + node.getScratch());
-            System.out.println(arien.getServer().getShortName() + " node.scratch.available: " + node.getScratch().getAnyAvailableInHumanUnits());
+        PbsServerConfig serverConfig = new PbsServerConfig("wagap", "wagap-pro.cerit-sc.cz", true, false, true, Collections.emptyList());
+        PBS pbs = p.loadFileToMemory(serverConfig, new File("/tmp/wagap.txt"));
+        for (Reservation r : pbs.getReservations().values()) {
+            System.out.println(r.getName()+" r.nodes = " + r.getReservedNodes());
         }
+        pbs.uprav();
+        for (Queue queue : pbs.getQueuesByPriority()) {
+            System.out.println("queue = " + queue);
+        }
+//        for(String nodeName : Arrays.asList("perian50", "hildor27")) {
+//            Node node = arien.getNodes().get(nodeName);
+//            System.out.println(arien.getServer().getShortName() + " node.name: " + node.getName());
+//            System.out.println(arien.getServer().getShortName() + " node.scratch: " + node.getScratch());
+//            System.out.println(arien.getServer().getShortName() + " node.scratch.available: " + node.getScratch().getAnyAvailableInHumanUnits());
+//        }
 //        for (int i = 0; i < 10; i++) {
 //            PBS arien = call(p, arienServerConfig);
 //            System.out.println(arien.getServer().getShortName() + " jobs: " + arien.getJobsById().size());

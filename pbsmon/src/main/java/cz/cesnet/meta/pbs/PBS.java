@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Data about objects as provided by the PBS server.
@@ -273,7 +274,7 @@ public class PBS implements TimeStamped {
         }
 
         //serazena pole
-        queuesByPriority = new ArrayList<>(queues.values());
+        queuesByPriority = queues.values().stream().filter(q -> !q.isReservationQueue()).collect(Collectors.toCollection(ArrayList::new));
         queuesByPriority.sort(PbskyImpl.queuesPriorityComparator);
 
         nodesByName = new ArrayList<>(nodes.values());

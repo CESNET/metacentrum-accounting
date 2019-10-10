@@ -1,11 +1,10 @@
 package cz.cesnet.meta.pbs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Represents a reservation in PBSPro.
@@ -72,12 +71,13 @@ public class Reservation extends PbsInfoObject {
     }
 
     private List<Node> nodes;
+    private List<ReservedNode> reservedNodes;
 
-    public List<Node> getNodes() {
-        if (nodes == null) {
+    public List<ReservedNode> getReservedNodes() {
+        if(reservedNodes==null) {
             String resv_nodes = attrs.get("resv_nodes");
             if (resv_nodes == null) return null;
-            List<Node> nodes = new ArrayList<>();
+            List<ReservedNode> reservedNodes = new ArrayList<>();
             for (String spec : resv_nodes.split("\\+")) {
                 ReservedNode reservedNode = new ReservedNode();
                 spec = spec.substring(1, spec.length() - 1);
@@ -103,15 +103,22 @@ public class Reservation extends PbsInfoObject {
                             break;
                     }
                 }
-                Node node = this.getPbs().getNodes().get(reservedNode.getName());
-                nodes.add(node);
+                reservedNodes.add(reservedNode);
+
             }
-            this.nodes = nodes;
+            this.reservedNodes = reservedNodes;
         }
-        return this.nodes;
+        return reservedNodes;
     }
 
-    public class ReservedNode {
+    public List<Node> getNodes() {
+        if (nodes == null) {
+            this.nodes = getReservedNodes().stream().map(r -> getPbs().getNodes().get(r.getName())).collect(Collectors.toList());
+        }
+        return nodes;
+    }
+
+    public static class ReservedNode {
         private String name;
         private int ncpus;
         private int ngpus;
