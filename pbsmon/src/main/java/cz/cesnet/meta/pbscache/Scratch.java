@@ -140,17 +140,16 @@ public class Scratch {
         return this.sharedAvailable >= scratchBytes;
     }
 
-
     @Override
     public String toString() {
         return "Scratch{" +
                 "node='" + nodeName + '\'' +
+                ", localAssigned=" + localAssigned +
                 ", localAvailable=" + localAvailable +
+                ", ssdAssigned=" + ssdAssigned +
                 ", ssdAvailable=" + ssdAvailable +
+                ", sharedAssigned=" + sharedAssigned +
                 ", sharedAvailable=" + sharedAvailable +
-                ", ssdReservedByJobs=" + ssdAssigned +
-                ", localReservedByJobs=" + localAssigned +
-                ", sharedReservedByJobs=" + sharedAssigned +
                 '}';
     }
 }

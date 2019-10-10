@@ -640,29 +640,21 @@ public class Node extends PbsInfoObject {
         this.outages = outages;
     }
 
+    /*
+        resources_available.scratch_* je kapacita disku mínus binec nepatřící žádné běžící úloze
+        resources_assigned.scratch_* je kolik mají zarezervované úlohy
+     */
     public Scratch getScratch() {
         if (scratch == null) {
-            //happens for nodes that are down
-            log.debug("creating empty scratch for node {}", this.getName());
             scratch = new Scratch(this.getName());
+            scratch.setSsdAvailable(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_ssd")));
+            scratch.setSsdAssigned(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_ssd")));
+            scratch.setLocalAvailable(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_local")));
+            scratch.setLocalAssigned(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_local")));
+            scratch.setSharedAvailable(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_shared")));
+            scratch.setSharedAssigned(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_shared")));
         }
         return scratch;
-    }
-
-    /*
-        resources_available.scratch_* je volného místo = kapacita disku mínus binec nepatřící žádné běžící úloze
-        resources_assigned.scratch_* je kolik mají zarezervované úlohy
-        tato dvě čísla spolu nesouvisí, protože úloha může část zarezervovaného místa zaplnit a tím sníží volné místo
-     */
-    public void setScratchPBSPro() {
-        log.debug("setScratchPBSPro() for node {}", this.getName());
-        scratch = new Scratch(this.getName());
-        scratch.setSsdAvailable(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_ssd")));
-        scratch.setSsdAssigned(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_ssd")));
-        scratch.setLocalAvailable(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_local")));
-        scratch.setLocalAssigned(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_local")));
-        scratch.setSharedAvailable(PbsUtils.parsePbsBytes(attrs.get("resources_available.scratch_shared")));
-        scratch.setSharedAssigned(PbsUtils.parsePbsBytes(attrs.get("resources_assigned.scratch_shared")));
     }
 
     private List<Job.ReservedResources> getResourcesReservedByJobs() {

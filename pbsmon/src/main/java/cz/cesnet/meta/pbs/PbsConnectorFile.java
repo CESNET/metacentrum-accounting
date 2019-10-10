@@ -215,7 +215,6 @@ public class PbsConnectorFile implements PbsConnector {
         PBS arien = p.loadFileToMemory(arienServerConfig, new File("/tmp/pbs.txt"));
         for(String nodeName : Arrays.asList("perian50", "hildor27")) {
             Node node = arien.getNodes().get(nodeName);
-            node.setScratchPBSPro();
             System.out.println(arien.getServer().getShortName() + " node.name: " + node.getName());
             System.out.println(arien.getServer().getShortName() + " node.scratch: " + node.getScratch());
             System.out.println(arien.getServer().getShortName() + " node.scratch.available: " + node.getScratch().getAnyAvailableInHumanUnits());
