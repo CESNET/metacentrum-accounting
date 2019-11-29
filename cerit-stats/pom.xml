@@ -7,7 +7,7 @@
     <parent>
         <groupId>cz.metacentrum</groupId>
         <artifactId>accounting-parent</artifactId>
-        <version>3.14-SNAPSHOT</version>
+        <version>3.15-SNAPSHOT</version>
     </parent>
 
     <artifactId>cerit-stats</artifactId>
