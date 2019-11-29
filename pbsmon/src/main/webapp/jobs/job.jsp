@@ -159,6 +159,12 @@
       <th> <f:message key="job_mtime"/> </th>
       <td colspan="10"><f:formatDate value="${job.timeModified}" type="both" dateStyle="full" /></td>
     </tr>
+    <c:if test="${!empty job.credential}">
+    <tr>
+      <th> <f:message key="job_credential"/> </th>
+      <td colspan="10"><f:formatDate value="${job.credential.validity}" type="both" dateStyle="full" /> (${job.credential.id})</td>
+    </tr>
+    </c:if>
 
     <tr>
       <th> <f:message key="job_comment"/> </th>
@@ -186,12 +192,6 @@
       </tr>
    </c:if>
 
-   <tr><th><f:message key="job_variable_list"/></th>
-       <td colspan="10"><c:forEach items="${job.variables}" var="vl">
-           ${vl.key}=<c:out value="${fn:substring(vl.value,0,75)}"/><br>
-       </c:forEach>
-     </td></tr>
-
    <c:if test="${! empty job.chunks}">
        <tr>
            <th><f:message key="job_scheduled_nodespec"/></th>
@@ -217,7 +217,14 @@
 
            </td>
        </tr>
-   </c:if>    
+   </c:if>
+       <tr>
+           <th><f:message key="job_variable_list"/></th>
+           <td colspan="10"><c:forEach items="${job.variables}" var="vl">
+               ${vl.key}=<c:out value="${fn:substring(vl.value,0,75)}"/><br>
+           </c:forEach>
+           </td>
+       </tr>
    </table>
 
    <br>

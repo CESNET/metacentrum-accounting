@@ -114,6 +114,7 @@ public class Job extends PbsInfoObject {
     private Date executionTime = null;
     private Date planned_start = null;
     private Queue queue = null;
+    private Credential credential = null;
 
     private Map<String, String> orderedAttributes = null;
 
@@ -126,6 +127,7 @@ public class Job extends PbsInfoObject {
         execHostMore = null;
         ctime = etime = mtime = null;
         queue = null;
+        credential = null;
     }
 
 
@@ -246,6 +248,34 @@ public class Job extends PbsInfoObject {
         return comp_time;
     }
 
+    public static class Credential {
+        private String id;
+        private Date validity;
+
+        public Credential(String id, Date validity) {
+            this.id = id;
+            this.validity = validity;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public Date getValidity() {
+            return validity;
+        }
+    }
+
+    public Credential getCredential() {
+        if (credential == null) {
+            String id = attrs.get("credential_id");
+            if (id == null) return null;
+            String validity = attrs.get("credential_validity");
+            if (validity == null) return null;
+            this.credential = new Credential(id, PbsUtils.getJavaTime(validity));
+        }
+        return credential;
+    }
 
     public Date getPlannedStart() {
         if (planned_start == null) {
