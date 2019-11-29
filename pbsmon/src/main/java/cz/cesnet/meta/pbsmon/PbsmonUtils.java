@@ -47,9 +47,9 @@ public class PbsmonUtils {
         //PBS uzly podle OpenNebuly
         CloudPhysicalHost cloudPhysicalHost;
         List<CloudVirtualHost> cloudVirtualHosts;
-        if ((cloudPhysicalHost = cloud.getHostname2HostMap().get(machineName)) != null) {
+        if ((cloudPhysicalHost = cloud.getPhysFqdnToPhysicalHostMap().get(machineName)) != null) {
             //do cloudVirtualHosts seznam virtuálů v OpenNebule
-            if ((cloudVirtualHosts = cloud.getHostName2VirtualHostsMap().get(cloudPhysicalHost.getName())) != null) {
+            if ((cloudVirtualHosts = cloud.getPhysicalHostToVMsMap().get(cloudPhysicalHost.getName())) != null) {
                 for (CloudVirtualHost cloudVirtualHost : cloudVirtualHosts) {
                     Node pbsNode = pbsky.getNodeByFQDN(cloudVirtualHost.getFqdn());
                     if (pbsNode != null) {

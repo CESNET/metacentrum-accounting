@@ -18,8 +18,7 @@
                         <c:when test="${vm.pbsNode}">
                             <td class="cloud-virt nebulapbshost">
                                 <s:link href="/node/${vm.fqdn}"><c:out value="${vm.fqdn}"/>
-                                    (<c:out value="${vm.cpuReservedString}"/> CPU<c:if
-                                            test="${vm.cpu_reserved_x100!=vm.cpu_avail_x100}">/${vm.VCPU}VCPU</c:if>)
+                                    (<c:out value="${vm.cpuReservedString}"/> CPU)
                                 </s:link>
                             </td>
                             <td>
@@ -28,19 +27,17 @@
                         </c:when>
                         <c:when test="${vm.state=='ACTIVE'}">
                             <td class="cloud-virt ACTIVE"><c:out value="${vm.fqdn}"/>
-                                (<c:out value="${vm.cpuReservedString}"/> CPU<c:if
-                                        test="${vm.cpu_reserved_x100!=vm.cpu_avail_x100}">/${vm.VCPU}VCPU</c:if>)
+                                (<c:out value="${vm.cpuReservedString}"/> CPU)
                             </td>
                             <td>
                                 Cloud node "<c:out value="${vm.name}"/>"
                                 running since <f:formatDate value="${vm.startTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
-                                at host <s:link href="/machine/${vm.current_host}">${vm.current_host}</s:link>
+                                at host <s:link href="/machine/${vm.physicalHost}">${vm.physicalHost}</s:link>
                             </td>
                         </c:when>
                         <c:otherwise>
                             <td class="cloud-virt ${vm.state}"><c:out value="${vm.fqdn}"/>
-                                (<c:out value="${vm.cpuReservedString}"/> CPU<c:if
-                                        test="${vm.cpu_reserved_x100!=vm.cpu_avail_x100}">/${vm.VCPU}VCPU</c:if>)
+                                (<c:out value="${vm.cpuReservedString}"/> CPU)
                             </td>
                             <td>
                                 Cloud node "<c:out value="${vm.name}"/>" in state ${vm.state}

@@ -1,12 +1,8 @@
 package cz.cesnet.meta.stripes;
 
 import cz.cesnet.meta.cloud.CloudPhysicalHost;
-import cz.cesnet.meta.cloud.CloudVirtualHost;
 import cz.cesnet.meta.pbs.Node;
-import cz.cesnet.meta.pbs.Pbsky;
 import cz.cesnet.meta.perun.api.Perun;
-import cz.cesnet.meta.pbscache.PbsCache;
-import cz.cesnet.meta.acct.OutageRecord;
 import cz.cesnet.meta.acct.Accounting;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.integration.spring.SpringBean;
@@ -15,8 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,9 +52,9 @@ public class NodeActionBean extends BaseActionBean {
             physicalMachineName = pbsCache.getMapping().getVirtual2physical().get(nodeFQDN);
             //try cloud if not found in previous step
             if(physicalMachineName==null) {
-                CloudPhysicalHost physicalHost = cloud.getVmFqdn2HostMap().get(nodeFQDN);
+                CloudPhysicalHost physicalHost = cloud.getVmFqdnToPhysicalHostMap().get(nodeFQDN);
                 if(physicalHost!=null) {
-                    physicalMachineName = physicalHost.getHostname();
+                    physicalMachineName = physicalHost.getFqdn();
                 }
             }
         } else {

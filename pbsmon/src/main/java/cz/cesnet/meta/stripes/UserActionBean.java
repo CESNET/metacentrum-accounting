@@ -101,7 +101,7 @@ public class UserActionBean extends BaseActionBean {
 
         //VM z cloudu
         userVMs = cloud.getVirtualHosts().stream()
-                .filter(vm -> userName.equals(vm.getOwner().getName()))
+                .filter(vm -> userName.equals(vm.getOwner()))
                 .collect(Collectors.toList());
 
         //groups

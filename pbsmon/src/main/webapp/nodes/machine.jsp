@@ -32,30 +32,22 @@
 
         <%-- OpenNebula --%>
         <% if (actionBean.getCloudPhysicalHost() != null) { %>
-        <h1>OpenNebula cloud <img src="${pageContext.request.contextPath}/img/cloud.png" alt="in OpenNebula"></h1>
+        <h1>Cloud <img src="${pageContext.request.contextPath}/img/cloud.png" alt="in cloud"></h1>
 
         <p><f:message key="machine_jsp_in_cloud"><f:param
-                value="${actionBean.cloudPhysicalHost.hostname}"/></f:message></p>
+                value="${actionBean.cloudPhysicalHost.fqdn}"/></f:message></p>
         <table class="zakladni">
-            <tr>
-                <th>Stav v OpenNebule</th>
-                <td>${actionBean.cloudPhysicalHost.state}</td>
-            </tr>
             <tr>
                 <th>CPU v Perunovi</th>
                 <td>${actionBean.perunMachine.cpuNum} CPU</td>
             </tr>
             <tr>
-                <th>CPU v OpenNebula</th>
+                <th>CPU v cloudu</th>
                 <td>${actionBean.cloudPhysicalHost.cpuAvail} CPU</td>
             </tr>
             <tr>
                 <th>Rezervovaných CPU</th>
-                <td>${actionBean.cloudPhysicalHost.cpuReservedString} CPU</td>
-            </tr>
-            <tr>
-                <th>CPU info</th>
-                <td>${actionBean.cloudPhysicalHost.cpu_info}</td>
+                <td>${actionBean.cloudPhysicalHost.cpuReserved} CPU</td>
             </tr>
         </table>
 
@@ -70,8 +62,7 @@
                         <c:when test="${vm.pbsNode}">
                             <td class="cloud-virt nebulapbshost">
                                 <s:link href="/node/${vm.node.name}"><c:out value="${vm.fqdn}"/>
-                                (<c:out value="${vm.cpuReservedString}"/> CPU<c:if
-                                        test="${vm.cpu_reserved_x100!=vm.cpu_avail_x100}">/${vm.VCPU}VCPU</c:if>)
+                                (<c:out value="${vm.cpuReservedString}"/> CPU)
                                 </s:link>
                             </td>
                             <td>
@@ -80,21 +71,19 @@
                         </c:when>
                         <c:when test="${vm.state=='ACTIVE'}">
                             <td class="cloud-virt ACTIVE"><c:out value="${vm.fqdn}"/>
-                                (<c:out value="${vm.cpuReservedString}"/> CPU<c:if
-                                        test="${vm.cpu_reserved_x100!=vm.cpu_avail_x100}">/${vm.VCPU}VCPU</c:if>)
+                                (<c:out value="${vm.cpuReservedString}"/> CPU)
                             </td>
                             <td>
-                                Cloud node "<c:out value="${vm.name}"/>" of user <t:vmowner owner="${vm.owner}"/>
+                                Cloud node "<c:out value="${vm.name}"/>" of user ${vm.owner}
                                 started <f:formatDate value="${vm.startTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
                             </td>
                         </c:when>
                         <c:otherwise>
                             <td class="cloud-virt ${vm.state}"><c:out value="${vm.fqdn}"/>
-                                (<c:out value="${vm.cpuReservedString}"/> CPU<c:if
-                                        test="${vm.cpu_reserved_x100!=vm.cpu_avail_x100}">/${vm.VCPU}VCPU</c:if>)
+                                (<c:out value="${vm.cpuReservedString}"/> CPU)
                             </td>
                             <td>
-                                Cloud node "<c:out value="${vm.name}"/>" of user <t:vmowner owner="${vm.owner}"/> in
+                                Cloud node "<c:out value="${vm.name}"/>" of user ${vm.owner} in
                                 state ${vm.state}
                             </td>
                         </c:otherwise>

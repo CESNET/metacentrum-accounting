@@ -8,11 +8,11 @@ public interface CloudLoader {
 
     List<CloudVirtualHost> getVirtualHosts();
 
-    Map<String, List<CloudVirtualHost>> getHostName2VirtualHostsMap();
+    Map<String, List<CloudVirtualHost>> getPhysicalHostToVMsMap();
 
-    Map<String, CloudPhysicalHost> getHostname2HostMap();
+    Map<String, CloudPhysicalHost> getPhysFqdnToPhysicalHostMap();
 
-    Map<String, CloudPhysicalHost> getVmFqdn2HostMap();
+    Map<String, CloudPhysicalHost> getVmFqdnToPhysicalHostMap();
 
     void load();
 }

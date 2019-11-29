@@ -77,15 +77,15 @@ public class Stroj {
         return openNebulaUsable;
     }
 
-    public void setOpenNebulaUsable(boolean openNebulaUsable) {
+    public void setCloudUsable(boolean openNebulaUsable) {
         this.openNebulaUsable = openNebulaUsable;
     }
 
-    public void setNebulaPbsHost(boolean nebulaPbsHost) {
+    public void setCloudPbsHost(boolean nebulaPbsHost) {
         this.nebulaPbsHost = nebulaPbsHost;
     }
 
-    public void setOpenNebulaManaged(boolean openNebulaManaged) {
+    public void setCloudManaged(boolean openNebulaManaged) {
         this.openNebulaManaged = openNebulaManaged;
     }
 

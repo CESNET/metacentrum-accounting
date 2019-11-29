@@ -82,7 +82,7 @@ public class PersonActionBean extends BaseActionBean {
 
         //VM z cloudu
         userVMs = cloud.getVirtualHosts().stream()
-                .filter(vm -> user.equals(vm.getOwner().getName()))
+                .filter(vm -> user.equals(vm.getOwner()))
                 .collect(Collectors.toList());
 
         return new ForwardResolution("/nodes/personal.jsp");

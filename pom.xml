@@ -44,7 +44,5 @@
         <module>pbsmon</module><!-- PBSMon - web app showing the state of MetaCentrum -->
         <module>metaacct</module><!-- Accounting server for MetaCentrum -->
         <module>metaacct_cmd</module><!-- Command Line Tools for MetaCentrum Accounting -->
-        <module>cerit-stats</module><!-- Availability a Reliability statistics for CERIT-SC -->
-        <module>nebula-pbs</module><!-- Import tool for correction for Torque machines in CERIT-SC's OpenNebula -->
     </modules>
 </project>

@@ -66,8 +66,8 @@ public class MachineActionBean extends BaseActionBean {
         VyhledavacFrontendu vyhledavacFrontendu = perun.getVyhledavacFrontendu();
 
         //info z OpenNebuly
-        if ((cloudPhysicalHost = cloud.getHostname2HostMap().get(machineName)) != null) {
-            cloudVirtualHosts = cloud.getHostName2VirtualHostsMap().get(cloudPhysicalHost.getName());
+        if ((cloudPhysicalHost = cloud.getPhysFqdnToPhysicalHostMap().get(machineName)) != null) {
+            cloudVirtualHosts = cloud.getPhysicalHostToVMsMap().get(cloudPhysicalHost.getName());
         }
         //všechny PBS uzly
         pbsNodes = PbsmonUtils.getPbsNodesForPhysicalMachine(perunMachine, pbsky, pbsCache, cloud);

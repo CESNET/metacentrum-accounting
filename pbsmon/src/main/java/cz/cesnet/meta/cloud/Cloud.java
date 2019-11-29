@@ -11,14 +11,14 @@ import java.util.Map;
  * Class {@link cz.cesnet.meta.cloud.CloudPhysicalHost} represents physical host, it has two important properties:
  * <ul>
  *     <li>{@link CloudPhysicalHost#getName()}</li> contains DNS name or IP address
- *     <li>{@link CloudPhysicalHost#getHostname()}</li> contains DNS name
+ *     <li>{@link CloudPhysicalHost#getFqdn()}</li> contains DNS name
  * </ul>
  *
  * Class {@link CloudVirtualHost} represents virtual host, it has
  * <ul>
  *     <li>{@link CloudVirtualHost#getName()} any name, like "MyDebian6" </li>
  *     <li>{@link CloudVirtualHost#getFqdn()} fully qualified DNS name </li>
- *     <li>{@link CloudVirtualHost#getCurrent_host()} physical host name linking to {@link CloudPhysicalHost#getName()}</li>
+ *     <li>{@link CloudVirtualHost#getPhysicalHost()} physical host name linking to {@link CloudPhysicalHost#getName()}</li>
  * </ul>
  * @author Martin Kuba makub@ics.muni.cz
  */
@@ -28,11 +28,11 @@ public interface Cloud extends TimeStamped {
 
     List<CloudVirtualHost> getVirtualHosts();
 
-    Map<String,List<CloudVirtualHost>> getHostName2VirtualHostsMap();
+    Map<String,List<CloudVirtualHost>> getPhysicalHostToVMsMap();
 
-    Map<String, CloudPhysicalHost> getHostname2HostMap();
+    Map<String, CloudPhysicalHost> getPhysFqdnToPhysicalHostMap();
 
-    Map<String, CloudPhysicalHost> getVmFqdn2HostMap();
+    Map<String, CloudPhysicalHost> getVmFqdnToPhysicalHostMap();
 
     int getRefreshTime();
 }

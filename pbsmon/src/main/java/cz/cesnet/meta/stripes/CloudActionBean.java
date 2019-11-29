@@ -48,7 +48,7 @@ public class CloudActionBean extends BaseActionBean {
 
         //cloud
         this.physicalHosts = cloud.getPhysicalHosts();
-        this.vms = cloud.getHostName2VirtualHostsMap();
+        this.vms = cloud.getPhysicalHostToVMsMap();
         //assign PBSnodes
         for (List<CloudVirtualHost> hostVMs : vms.values()) {
             for (CloudVirtualHost vm : hostVMs) {
@@ -66,7 +66,7 @@ public class CloudActionBean extends BaseActionBean {
         //zjistit, zda jsou v cloudu
         Set<String> cloudPhysicalHostnames = new HashSet<>();
         for (CloudPhysicalHost cloudPhysicalHost : physicalHosts) {
-            cloudPhysicalHostnames.add(cloudPhysicalHost.getHostname());
+            cloudPhysicalHostnames.add(cloudPhysicalHost.getFqdn());
         }
         int celkemCPU = 0;
         for (VypocetniCentrum centrum : centra) {

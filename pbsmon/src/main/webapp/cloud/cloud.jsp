@@ -171,32 +171,27 @@
 
         <c:forEach items="${actionBean.physicalHosts}" var="ph">
             <div class="cloud-phys">
-                <div class="cloud-phys-title"><c:out value="${ph.hostname}"/> (<c:out value="${ph.cpuAvail}"/> CPU) -
+                <div class="cloud-phys-title"><c:out value="${ph.fqdn}"/> (<c:out value="${ph.cpuAvail}"/> CPU) -
                     reserved <c:out value="${ph.cpuReserved}"/> CPU, state <c:out value="${ph.state}"/></div>
                 <div class="cloud-phys-body">
                     <table class="cloud-virts">
-                        <c:forEach items="${actionBean.vms[ph.name]}" var="vm">
+                        <c:forEach items="${actionBean.vms[ph.fqdn]}" var="vm">
                             <tr class="cloud-virt-line">
                                 <c:choose>
                                     <c:when test="${not empty vm.node}">
                                         <td class="node ${vm.node.state}"><s:link class="${vm.node.state}"
                                                                                   href='/node/${vm.node.name}'>${vm.node.shortName}
-                                            (<c:out value="${vm.cpuReservedString}"/> CPU<c:if
-                                                    test="${vm.cpu_reserved_x100!=vm.cpu_avail_x100}">/${vm.VCPU}VCPU</c:if>)</s:link></td>
-                                        <td><c:choose><c:when
-                                                test="${vm.role=='pbs_mom'}">PBS node</c:when><c:otherwise>role: ${vm.role}</c:otherwise></c:choose></td>
+                                            (<c:out value="${vm.cpuReservedString}"/> CPU)</s:link></td>
+                                        <td><c:if test="${vm.pbsNode}">PBS node</c:if></td>
                                     </c:when>
                                     <c:otherwise>
                                         <td class="cloud-virt ${vm.state}"><c:out value="${vm.fqdn}"/> (<c:out
-                                                value="${vm.cpuReservedString}"/> CPU<c:if
-                                                test="${vm.cpu_reserved_x100!=vm.cpu_avail_x100}">/${vm.VCPU}VCPU</c:if>)
+                                                value="${vm.cpuReservedString}"/> CPU)
                                         </td>
-                                        <td>Cloud node "<c:out value="${vm.name}"/>" of user <t:vmowner
-                                                owner="${vm.owner}"/>
+                                        <td>Cloud node "<c:out value="${vm.name}"/>" of user ${vm.owner}
                                             <c:choose>
                                                 <c:when test="${vm.state=='ACTIVE'}">
-                                                    started <f:formatDate value="${vm.startTime}"
-                                                                          pattern="yyyy-MM-dd HH:mm:ss"/>
+                                                    started <f:formatDate value="${vm.startTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
                                                 </c:when>
                                                 <c:otherwise>
                                                     in state ${vm.state}

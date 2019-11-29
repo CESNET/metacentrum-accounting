@@ -1,4 +1,0 @@
-#specify DB connection details
-postgresql.url=
-postgresql.user=m
-postgresql.password=

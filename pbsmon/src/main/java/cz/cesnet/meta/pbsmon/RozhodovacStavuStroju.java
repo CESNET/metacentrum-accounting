@@ -11,9 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * Rozhoduje o barve v prehledu fyzickych stroju podle stavu virtualnich stroju.
@@ -92,7 +91,7 @@ public class RozhodovacStavuStroju {
             List<String> virtNames = mapping.getPhysical2virtual().get(jmenoStroje);
             if (virtNames != null) {
                 //v pbsCache jsou udaje o virtualich strojich (urga)
-                List<Node> virtNodes = new ArrayList<Node>(virtNames.size());
+                List<Node> virtNodes = new ArrayList<>(virtNames.size());
                 for (String virtName : virtNames) {
                     if (frontendy.jeStrojFrontend(virtName)) {
                         log.debug("fyzicky {} ma virtualni frontend {}", jmenoStroje, virtName);
@@ -113,58 +112,58 @@ public class RozhodovacStavuStroju {
 
     private static String rozhodniCloudovyStroj(Stroj stroj, Pbsky pbsky, Cloud cloud) {
         log.debug("rozhodniCloudovyStroj({})", stroj.getName());
-        CloudPhysicalHost cloudHost = cloud.getHostname2HostMap().get(stroj.getName());
-        if (cloudHost == null) {
+        CloudPhysicalHost cloudPhysicalHost = cloud.getPhysFqdnToPhysicalHostMap().get(stroj.getName());
+        if (cloudPhysicalHost == null) {
             return Node.STATE_UNKNOWN;
         }
-        stroj.setOpenNebulaManaged(true);
+        stroj.setCloudManaged(true);
         //http://docs.opennebula.org/4.14/administration/hosts_and_clusters/host_guide.html#host-life-cycle
-        if(!cloudHost.getState().endsWith("MONITORED")) {
+        if (!cloudPhysicalHost.getState().endsWith("MONITORED")) {
             return Node.STATE_UNKNOWN;
         }
-        List<CloudVirtualHost> cloudVirtualHosts = cloud.getHostName2VirtualHostsMap().get(cloudHost.getName());
-        if (cloudVirtualHosts != null) {
+        List<CloudVirtualHost> cloudVMs = cloud.getPhysicalHostToVMsMap().get(cloudPhysicalHost.getFqdn());
+        if (cloudVMs != null) {
             int cpusAvailable = stroj.getCpuNum();
-            //v OpenNebule jsou udaje o virtualnich strojich
-            for (CloudVirtualHost cloudVM : cloudVirtualHosts) {
-                //podle značky z OpenNebula je to PBS node
+            //v cloudu jsou udaje o virtualnich strojich
+            for (CloudVirtualHost cloudVM : cloudVMs) {
+                //podle značky z cloudu je to PBS node
                 if (cloudVM.isPbsNode()) {
-                    stroj.setNebulaPbsHost(true);
+                    stroj.setCloudPbsHost(true);
                     Node node = pbsky.getNodeByFQDN(cloudVM.getFqdn());
                     if (node != null) {
                         //PBSka ho zná
                         stroj.setPbsName(node.getShortName());
                         if (node.getNoOfCPUInt() >= cpusAvailable) {
                             //fyzický stroj plně obsazený PBSnodem
-                            stroj.setOpenNebulaUsable(false);
-                            return rozhodniStavFyzickehoPodleVirtualnich(stroj, Arrays.asList(node));
+                            stroj.setCloudUsable(false);
+                            return rozhodniStavFyzickehoPodleVirtualnich(stroj, Collections.singletonList(node));
                         }
                     } else {
                         //nekonzistence, v OpenNebule je označen jako PBSnode, ale PBSka ho nezná
                         stroj.setPbsName(stroj.getShortName());
-                        if(cloudVM.getCpu_reserved_x100()>=cpusAvailable*100) {
+                        if (cloudVM.getCpu_reserved_x100() >= cpusAvailable * 100) {
                             //VM plně zabírá stroj
-                            stroj.setOpenNebulaUsable(false);
+                            stroj.setCloudUsable(false);
                             return Node.STATE_JOB_BUSY;
                         }
                     }
                 }
             }
-            stroj.setOpenNebulaUsable(true);
-            if (cloudHost.getCpu_reserved_x100() >= cpusAvailable * 100) {
-                log.debug("cpuUsed>=cpuNum, setting job-busy");
+            stroj.setCloudUsable(true);
+            if (cloudPhysicalHost.getCpuReserved() >= cpusAvailable) {
+                log.debug("cpuReserved>=cpuNum, setting job-busy");
                 return Node.STATE_JOB_BUSY;
-            } else if (cloudHost.getCpu_reserved_x100() == 0) {
-                log.debug("cpuUsed=0, setting FREE");
+            } else if (cloudPhysicalHost.getCpuReserved() == 0) {
+                log.debug("cpuReserved=0, setting FREE");
                 return Node.STATE_FREE;
             } else {
-                stroj.setUsedPercent(cloudHost.getCpu_reserved_x100() / stroj.getCpuNum());
+                stroj.setUsedPercent(cloudPhysicalHost.getCpuReserved() * 100 / stroj.getCpuNum());
                 log.debug("setting PARTIALLY_FREE with {}% used ", stroj.getUsedPercent());
                 return Node.STATE_PARTIALY_FREE;
             }
         } else {
             //fyzicky je v cloudu, nema zadne VM
-            log.debug("cloudHost without VMs {}", cloudHost);
+            log.debug("cloudHost without VMs {}", cloudPhysicalHost);
             return Node.STATE_FREE;
         }
     }
@@ -188,7 +187,7 @@ public class RozhodovacStavuStroju {
             String state = node.getState();
             if (state.equals(Node.STATE_JOB_BUSY) || state.equals(Node.STATE_JOB_EXCLUSIVE) || state.equals(Node.STATE_JOB_FULL)
                     || state.equals(Node.STATE_JOB_SHARING) || state.equals(Node.STATE_RESERVED)
-                    ) {
+            ) {
                 log.debug(" fyzicky {} ma pracujici VM {} ", jmenoStroje, node.getName());
                 return Node.STATE_JOB_BUSY;
             }
