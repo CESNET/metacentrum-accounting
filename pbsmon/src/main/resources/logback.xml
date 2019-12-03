@@ -42,7 +42,7 @@
 
     <logger name="cz.cesnet.meta.cloud.CloudPhysicalHost" level="error"/>
     <logger name="cz.cesnet.meta.cloud.CloudImpl" level="info"/>
-    <logger name="cz.cesnet.meta.cloud.opennebula.NebulaCloudLoader" level="info"/>
+    <logger name="cz.cesnet.meta.cloud.NebulaCloudLoader" level="info"/>
 
     <logger name="cz.cesnet.meta.pbsmon.RozhodovacStavuStroju" level="info"/>
 

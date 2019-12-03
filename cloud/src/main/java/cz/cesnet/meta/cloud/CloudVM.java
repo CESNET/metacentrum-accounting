@@ -13,8 +13,7 @@ import java.util.Objects;
 @SuppressWarnings("UnusedDeclaration")
 public class CloudVM {
 
-    private int id;
-    private String idString; //unique identifier across multiple cloud instances
+    private String id; //unique identifier across multiple cloud instances
     private String name; // any string specified by user, i.e. "MyDebian6", for PBS nodes equal to fqdn
     private String fqdn; // DNS name of the virtual host
     private String physicalHostFqdn; // DNS name of its physical host
@@ -22,20 +21,19 @@ public class CloudVM {
     private String owner;
     private String state;
     private Date startTime;
-    private boolean pbsNode;
     private Object node; //for PBS Node
 
     public String getCpuReservedString() {
         int percent = cpu_reserved_x100;
-        return (percent%100==0) ? Integer.toString(percent / 100) : String.format(Locale.US,"%.2f", ((double)percent/100d));
+        return (percent % 100 == 0) ? Integer.toString(percent / 100) : String.format(Locale.US, "%.2f", ((double) percent / 100d));
     }
 
-    public String getIdString() {
-        return idString;
+    public String getId() {
+        return id;
     }
 
-    public void setIdString(String idString) {
-        this.idString = idString;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public CloudVM() {
@@ -76,14 +74,6 @@ public class CloudVM {
         this.owner = owner;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
@@ -92,9 +82,10 @@ public class CloudVM {
         this.name = name;
     }
 
-     /**
+    /**
      * Number of reserved CPUs as percent. It is an integer, but may not be multiple of 100, because OpenNebula allows reserving
      * CPUs in quantums of 1 percent.
+     *
      * @return integer between 0 and getCpu_avail_x100()
      */
     public int getCpu_reserved_x100() {
@@ -114,21 +105,21 @@ public class CloudVM {
     }
 
     public boolean isPbsNode() {
-        return pbsNode;
-    }
-
-    public void setPbsNode(boolean pbsNode) {
-        this.pbsNode = pbsNode;
+        return node != null;
     }
 
     @Override
     public String toString() {
-        return "CloudVirtualHost{" +
-                "id=" + id +
+        return "CloudVM{" +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", cpu_reserved =" + getCpuReservedString() +
-                ", owner = "+ owner +
                 ", fqdn='" + fqdn + '\'' +
+                ", physicalHostFqdn='" + physicalHostFqdn + '\'' +
+                ", cpu_reserved =" + getCpuReservedString() +
+                ", owner='" + owner + '\'' +
+                ", state='" + state + '\'' +
+                ", startTime=" + startTime +
+                ", node=" + node +
                 '}';
     }
 
@@ -145,11 +136,11 @@ public class CloudVM {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CloudVM cloudVM = (CloudVM) o;
-        return idString.equals(cloudVM.idString);
+        return id.equals(cloudVM.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idString);
+        return Objects.hash(id);
     }
 }

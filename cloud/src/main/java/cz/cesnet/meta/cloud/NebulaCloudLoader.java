@@ -1,9 +1,6 @@
-package cz.cesnet.meta.cloud.opennebula;
+package cz.cesnet.meta.cloud;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import cz.cesnet.meta.cloud.CloudLoader;
-import cz.cesnet.meta.cloud.CloudPhysicalHost;
-import cz.cesnet.meta.cloud.CloudVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
@@ -88,15 +85,13 @@ public class NebulaCloudLoader implements CloudLoader {
         //noinspection ConstantConditions
         for (JsonNode v : rt.getForObject(vmsUrl, JsonNode.class).path("vms")) {
             CloudVM cvh = new CloudVM();
-            cvh.setId(v.path("id").asInt());
+            cvh.setId(this.name + "-H-" + v.path("id").asInt());
             cvh.setName(v.path("name").asText());
             cvh.setFqdn(v.path("fqdn").asText());
             cvh.setCpu_reserved_x100(v.path("cpu_reserved_x100").asInt());
             cvh.setStartTime(new Date(v.path("start_time").asLong() * 1000L));
             cvh.setOwner(v.path("owner").path("name").asText());
             cvh.setPhysicalHostFqdn(v.path("current_host").asText());
-            cvh.setPbsNode("pbs_mom".equals(v.path("role").asText()));
-            cvh.setIdString(this.name + " " + cvh.getId());
             String state = v.path("state").asText();
             if ("ACTIVE".equals(state) || "POWEROFF".equals(state) || "SUSPENDED".equals(state)) {
                 cvh.setState(state);
@@ -114,7 +109,7 @@ public class NebulaCloudLoader implements CloudLoader {
             //noinspection ConstantConditions
             for (JsonNode h : rt.getForObject(hostsUrl, JsonNode.class).path("hosts")) {
                 CloudPhysicalHost cph = new CloudPhysicalHost();
-                cph.setId(h.path("id").asInt());
+                cph.setId(this.getName() + "-VM-" + h.path("id").asInt());
                 cph.setFqdn(h.path("hostname").asText());
                 cph.setState(h.path("state").asText());
                 cph.setCpuAvail(h.path("cpu_avail_x100").asInt() / 100);

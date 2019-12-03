@@ -61,9 +61,9 @@ public class CloudPhysicalHost {
         return parsedName1.getNum() - parsedName2.getNum();
     };
 
-    private static final Pattern HOSTNAME_REGEX = Pattern.compile("(\\D)([0-9]+)([^.]*)(\\..*)");
+    private static final Pattern HOSTNAME_REGEX = Pattern.compile("(\\D*)([0-9]+)([^.]*)(\\..*)");
 
-    private int id;
+    private String id;
     private String fqdn; //mel by byt hostname
     private String state;
     private int cpuAvail;
@@ -127,11 +127,11 @@ public class CloudPhysicalHost {
         this.fqdn = fqdn;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -160,11 +160,11 @@ public class CloudPhysicalHost {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CloudPhysicalHost that = (CloudPhysicalHost) o;
-        return Objects.equals(fqdn, that.fqdn);
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fqdn);
+        return Objects.hash(id);
     }
 }

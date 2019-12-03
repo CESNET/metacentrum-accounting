@@ -1,7 +1,6 @@
 package cz.cesnet.meta.cloud;
 
 import cz.cesnet.meta.RefreshLoader;
-import cz.cesnet.meta.cloud.opennebula.NebulaCloudLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +17,8 @@ public class CloudImpl extends RefreshLoader implements Cloud {
     final static Logger log = LoggerFactory.getLogger(CloudImpl.class);
 
     private List<CloudLoader> cloudLoaders = Arrays.asList(
-            new NebulaCloudLoader("OpenNebula", "http://carach1.ics.muni.cz:12147/exports/hosts.json", "http://carach1.ics.muni.cz:12147/exports/vms.json")
+            new NebulaCloudLoader("OpenNebula", "http://carach1.ics.muni.cz:12147/exports/hosts.json", "http://carach1.ics.muni.cz:12147/exports/vms.json"),
+            new OpenStackCloudLoader("OpenStack", "/home/openstack")
     );
 
     public boolean isDisabled() {
@@ -75,6 +75,8 @@ public class CloudImpl extends RefreshLoader implements Cloud {
                     virtualHosts.addAll(cloudLoader.getVirtualHosts());
                 }
             }
+            //sort
+            physicalHosts.sort(CloudPhysicalHost.CLOUD_PHYSICAL_HOST_COMPARATOR);
             //map names of physical hosts to their objects
             physFqdnToPhysicalHostMap = new HashMap<>(physicalHosts.size() * 2);
             for (CloudPhysicalHost physicalHost : physicalHosts) {

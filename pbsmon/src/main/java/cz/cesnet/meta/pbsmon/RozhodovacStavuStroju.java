@@ -127,25 +127,16 @@ public class RozhodovacStavuStroju {
             //v cloudu jsou udaje o virtualnich strojich
             for (CloudVM cloudVM : cloudVMs) {
                 //podle značky z cloudu je to PBS node
-                if (cloudVM.isPbsNode()) {
+                Node node = pbsky.getNodeByFQDN(cloudVM.getFqdn());
+                if (node != null) {
+                    //PBSka ho zná
+                    cloudVM.setNode(node);
                     stroj.setCloudPbsHost(true);
-                    Node node = pbsky.getNodeByFQDN(cloudVM.getFqdn());
-                    if (node != null) {
-                        //PBSka ho zná
-                        stroj.setPbsName(node.getShortName());
-                        if (node.getNoOfCPUInt() >= cpusAvailable) {
-                            //fyzický stroj plně obsazený PBSnodem
-                            stroj.setCloudUsable(false);
-                            return rozhodniStavFyzickehoPodleVirtualnich(stroj, Collections.singletonList(node));
-                        }
-                    } else {
-                        //nekonzistence, v OpenNebule je označen jako PBSnode, ale PBSka ho nezná
-                        stroj.setPbsName(stroj.getShortName());
-                        if (cloudVM.getCpu_reserved_x100() >= cpusAvailable * 100) {
-                            //VM plně zabírá stroj
-                            stroj.setCloudUsable(false);
-                            return Node.STATE_JOB_BUSY;
-                        }
+                    stroj.setPbsName(node.getShortName());
+                    if (node.getNoOfCPUInt() >= cpusAvailable) {
+                        //fyzický stroj plně obsazený PBSnodem
+                        stroj.setCloudUsable(false);
+                        return rozhodniStavFyzickehoPodleVirtualnich(stroj, Collections.singletonList(node));
                     }
                 }
             }

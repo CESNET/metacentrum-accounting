@@ -23,7 +23,7 @@ public class PbsmonUtils {
      * @param perunMachine - informace z Peruna
      * @param pbsky - informace z Torque
      * @param pbsCache - informace z pbs_cache
-     * @param cloud - informace z OpenNebula
+     * @param cloud - informace z cloudu
      * @return seznam PBs uzlů na fyzickém stroji
      */
     public static List<Node> getPbsNodesForPhysicalMachine(Stroj perunMachine, Pbsky pbsky, PbsCache pbsCache, Cloud cloud) {
@@ -44,11 +44,11 @@ public class PbsmonUtils {
                 }
             }
         }
-        //PBS uzly podle OpenNebuly
+        //PBS uzly podle cloudu
         CloudPhysicalHost cloudPhysicalHost;
         List<CloudVM> cloudVMS;
         if ((cloudPhysicalHost = cloud.getPhysFqdnToPhysicalHostMap().get(machineName)) != null) {
-            //do cloudVirtualHosts seznam virtuálů v OpenNebule
+            //do cloudVirtualHosts seznam virtuálů
             if ((cloudVMS = cloud.getPhysicalHostToVMsMap().get(cloudPhysicalHost.getName())) != null) {
                 for (CloudVM cloudVM : cloudVMS) {
                     Node pbsNode = pbsky.getNodeByFQDN(cloudVM.getFqdn());
