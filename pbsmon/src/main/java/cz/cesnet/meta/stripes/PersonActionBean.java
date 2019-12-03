@@ -1,12 +1,9 @@
 package cz.cesnet.meta.stripes;
 
-import cz.cesnet.meta.cloud.Cloud;
-import cz.cesnet.meta.cloud.CloudVirtualHost;
-import cz.cesnet.meta.pbs.Pbsky;
+import cz.cesnet.meta.cloud.CloudVM;
 import cz.cesnet.meta.pbs.Queue;
 import cz.cesnet.meta.pbs.User;
 import cz.cesnet.meta.pbs.UserAccess;
-import cz.cesnet.meta.pbscache.PbsCache;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 import org.slf4j.Logger;
@@ -16,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,7 +48,7 @@ public class PersonActionBean extends BaseActionBean {
 
     User jobUser;
     List<Queue> queues;
-    List<CloudVirtualHost> userVMs;
+    List<CloudVM> userVMs;
 
     @DefaultHandler
     public Resolution show() throws UnsupportedEncodingException {
@@ -98,7 +94,7 @@ public class PersonActionBean extends BaseActionBean {
         return queues;
     }
 
-    public List<CloudVirtualHost> getUserVMs() {
+    public List<CloudVM> getUserVMs() {
         return userVMs;
     }
 }

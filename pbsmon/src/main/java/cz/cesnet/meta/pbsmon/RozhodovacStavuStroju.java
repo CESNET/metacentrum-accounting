@@ -2,7 +2,7 @@ package cz.cesnet.meta.pbsmon;
 
 import cz.cesnet.meta.cloud.Cloud;
 import cz.cesnet.meta.cloud.CloudPhysicalHost;
-import cz.cesnet.meta.cloud.CloudVirtualHost;
+import cz.cesnet.meta.cloud.CloudVM;
 import cz.cesnet.meta.pbs.Node;
 import cz.cesnet.meta.pbs.Pbsky;
 import cz.cesnet.meta.pbscache.Mapping;
@@ -121,11 +121,11 @@ public class RozhodovacStavuStroju {
         if (!cloudPhysicalHost.getState().endsWith("MONITORED")) {
             return Node.STATE_UNKNOWN;
         }
-        List<CloudVirtualHost> cloudVMs = cloud.getPhysicalHostToVMsMap().get(cloudPhysicalHost.getFqdn());
+        List<CloudVM> cloudVMs = cloud.getPhysicalHostToVMsMap().get(cloudPhysicalHost.getFqdn());
         if (cloudVMs != null) {
             int cpusAvailable = stroj.getCpuNum();
             //v cloudu jsou udaje o virtualnich strojich
-            for (CloudVirtualHost cloudVM : cloudVMs) {
+            for (CloudVM cloudVM : cloudVMs) {
                 //podle značky z cloudu je to PBS node
                 if (cloudVM.isPbsNode()) {
                     stroj.setCloudPbsHost(true);

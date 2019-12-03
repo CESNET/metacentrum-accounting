@@ -2,7 +2,7 @@ package cz.cesnet.meta.stripes;
 
 import cz.cesnet.meta.cloud.Cloud;
 import cz.cesnet.meta.cloud.CloudPhysicalHost;
-import cz.cesnet.meta.cloud.CloudVirtualHost;
+import cz.cesnet.meta.cloud.CloudVM;
 import cz.cesnet.meta.pbs.Node;
 import cz.cesnet.meta.pbscache.Mapping;
 import cz.cesnet.meta.pbscache.PbsCache;
@@ -47,7 +47,7 @@ public class NodesActionBean extends BaseActionBean {
     List<Stroj> fyzicke;
     Mapping mapping;
     Map<String, Node> nodeMap;
-    Map<String, CloudVirtualHost> fqdn2CloudVMMap;
+    Map<String, CloudVM> fqdn2CloudVMMap;
     List<Node> gpuNodes;
 
     /**
@@ -144,9 +144,9 @@ public class NodesActionBean extends BaseActionBean {
         //mapovani z jmen virtualnich stroju na jmena fyzickych stroju a naopak
         mapping = makeUnifiedMapping(this.pbsCache, this.cloud);
         //mapa VM z cloudu
-        List<CloudVirtualHost> virtualHosts = cloud.getVirtualHosts();
+        List<CloudVM> virtualHosts = cloud.getVirtualHosts();
         fqdn2CloudVMMap = new HashMap<>(virtualHosts.size() * 2);
-        for (CloudVirtualHost vm : virtualHosts) {
+        for (CloudVM vm : virtualHosts) {
             fqdn2CloudVMMap.put(vm.getFqdn(), vm);
         }
         //pripravit
@@ -192,10 +192,10 @@ public class NodesActionBean extends BaseActionBean {
         physical2virtual.putAll(unguMapping.getPhysical2virtual());
         virtual2physical.putAll(unguMapping.getVirtual2physical());
         //OpenNebula
-        Map<String, List<CloudVirtualHost>> hostName2VirtualHostsMap = cloud.getPhysicalHostToVMsMap();
+        Map<String, List<CloudVM>> hostName2VirtualHostsMap = cloud.getPhysicalHostToVMsMap();
         for (CloudPhysicalHost host : cloud.getPhysicalHosts()) {
             List<String> vmFqdns = new ArrayList<>();
-            for (CloudVirtualHost vm : hostName2VirtualHostsMap.get(host.getName())) {
+            for (CloudVM vm : hostName2VirtualHostsMap.get(host.getName())) {
                 vmFqdns.add(vm.getFqdn());
                 virtual2physical.put(vm.getFqdn(), host.getFqdn());
             }
@@ -224,7 +224,7 @@ public class NodesActionBean extends BaseActionBean {
         return nodeMap;
     }
 
-    public Map<String, CloudVirtualHost> getFqdn2CloudVMMap() {
+    public Map<String, CloudVM> getFqdn2CloudVMMap() {
         return fqdn2CloudVMMap;
     }
 

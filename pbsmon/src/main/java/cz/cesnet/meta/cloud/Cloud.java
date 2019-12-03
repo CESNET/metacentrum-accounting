@@ -14,11 +14,11 @@ import java.util.Map;
  *     <li>{@link CloudPhysicalHost#getFqdn()}</li> contains DNS name
  * </ul>
  *
- * Class {@link CloudVirtualHost} represents virtual host, it has
+ * Class {@link CloudVM} represents virtual host, it has
  * <ul>
- *     <li>{@link CloudVirtualHost#getName()} any name, like "MyDebian6" </li>
- *     <li>{@link CloudVirtualHost#getFqdn()} fully qualified DNS name </li>
- *     <li>{@link CloudVirtualHost#getPhysicalHost()} physical host name linking to {@link CloudPhysicalHost#getName()}</li>
+ *     <li>{@link CloudVM#getName()} any name, like "MyDebian6" </li>
+ *     <li>{@link CloudVM#getFqdn()} fully qualified DNS name </li>
+ *     <li>{@link CloudVM#getPhysicalHostFqdn()} physical host name linking to {@link CloudPhysicalHost#getName()}</li>
  * </ul>
  * @author Martin Kuba makub@ics.muni.cz
  */
@@ -26,9 +26,9 @@ public interface Cloud extends TimeStamped {
 
     List<CloudPhysicalHost> getPhysicalHosts();
 
-    List<CloudVirtualHost> getVirtualHosts();
+    List<CloudVM> getVirtualHosts();
 
-    Map<String,List<CloudVirtualHost>> getPhysicalHostToVMsMap();
+    Map<String,List<CloudVM>> getPhysicalHostToVMsMap();
 
     Map<String, CloudPhysicalHost> getPhysFqdnToPhysicalHostMap();
 

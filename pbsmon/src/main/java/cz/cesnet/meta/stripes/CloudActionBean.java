@@ -2,7 +2,7 @@ package cz.cesnet.meta.stripes;
 
 import cz.cesnet.meta.cloud.Cloud;
 import cz.cesnet.meta.cloud.CloudPhysicalHost;
-import cz.cesnet.meta.cloud.CloudVirtualHost;
+import cz.cesnet.meta.cloud.CloudVM;
 import cz.cesnet.meta.pbs.Pbsky;
 import cz.cesnet.meta.pbsmon.RozhodovacStavuStroju;
 import cz.cesnet.meta.perun.api.*;
@@ -36,7 +36,7 @@ public class CloudActionBean extends BaseActionBean {
     protected Perun perun;
 
     List<CloudPhysicalHost> physicalHosts;
-    Map<String, List<CloudVirtualHost>> vms;
+    Map<String, List<CloudVM>> vms;
     List<VypocetniCentrum> centra;
     Map<String, Integer> cpuMap;
     Map<String, Boolean> inCloudMap;
@@ -50,8 +50,8 @@ public class CloudActionBean extends BaseActionBean {
         this.physicalHosts = cloud.getPhysicalHosts();
         this.vms = cloud.getPhysicalHostToVMsMap();
         //assign PBSnodes
-        for (List<CloudVirtualHost> hostVMs : vms.values()) {
-            for (CloudVirtualHost vm : hostVMs) {
+        for (List<CloudVM> hostVMs : vms.values()) {
+            for (CloudVM vm : hostVMs) {
                 vm.setNode(pbsky.getNodeByFQDN(vm.getName()));
             }
         }
@@ -97,7 +97,7 @@ public class CloudActionBean extends BaseActionBean {
         return physicalHosts;
     }
 
-    public Map<String, List<CloudVirtualHost>> getVms() {
+    public Map<String, List<CloudVM>> getVms() {
         return vms;
     }
 

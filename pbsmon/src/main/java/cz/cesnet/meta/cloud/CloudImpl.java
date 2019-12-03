@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,11 +17,9 @@ public class CloudImpl extends RefreshLoader implements Cloud {
 
     final static Logger log = LoggerFactory.getLogger(CloudImpl.class);
 
-    private List<CloudServer> servers = Arrays.asList(
-            new CloudServer("OpenNebula", "http://carach1.ics.muni.cz:12147/exports/hosts.json", "http://carach1.ics.muni.cz:12147/exports/vms.json")
+    private List<CloudLoader> cloudLoaders = Arrays.asList(
+            new NebulaCloudLoader("OpenNebula", "http://carach1.ics.muni.cz:12147/exports/hosts.json", "http://carach1.ics.muni.cz:12147/exports/vms.json")
     );
-
-    private CloudLoader cloudLoader;
 
     public boolean isDisabled() {
         return disabled;
@@ -39,18 +38,20 @@ public class CloudImpl extends RefreshLoader implements Cloud {
     }
 
     List<CloudPhysicalHost> physicalHosts;
-    List<CloudVirtualHost> virtualHosts;
+    List<CloudVM> virtualHosts;
     Map<String, CloudPhysicalHost> physFqdnToPhysicalHostMap;
-    Map<String, List<CloudVirtualHost>> physicalHostToVMsMap;
+    Map<String, List<CloudVM>> physicalHostToVMsMap;
     Map<String, CloudPhysicalHost> vmFqdnToPhysicalHostMap;
+
+    private static final Function<String, List<CloudVM>> NEW_LIST = k -> new ArrayList<>(1);
 
     @Override
     protected void load() {
         List<CloudPhysicalHost> physicalHosts = null;
-        List<CloudVirtualHost> virtualHosts = null;
-        Map<String, CloudPhysicalHost> physFqdnToPhysicalHostMap = null;
-        Map<String, List<CloudVirtualHost>> physicalHostToVMsMap = null;
-        Map<String, CloudPhysicalHost> vmFqdnToPhysicalHostMap = null;
+        List<CloudVM> virtualHosts = null;
+        Map<String, CloudPhysicalHost> physFqdnToPhysicalHostMap;
+        Map<String, List<CloudVM>> physicalHostToVMsMap;
+        Map<String, CloudPhysicalHost> vmFqdnToPhysicalHostMap;
         if (disabled) {
             log.debug("cloud is disabled, using empty data");
             physicalHosts = Collections.emptyList();
@@ -59,11 +60,10 @@ public class CloudImpl extends RefreshLoader implements Cloud {
             physicalHostToVMsMap = Collections.emptyMap();
             vmFqdnToPhysicalHostMap = Collections.emptyMap();
         } else {
-            for (CloudServer server : servers) {
-                log.debug("loading cloud from {}", server);
-                CloudLoader cloudLoader = new NebulaCloudLoader(server.getName(), server.getHostsURL(), server.getVmsURL());
+            for (CloudLoader cloudLoader : cloudLoaders) {
+                log.debug("loading cloud from {}", cloudLoader.getName());
                 cloudLoader.load();
-                log.debug("loaded from {}", server);
+                log.debug("loaded from {}", cloudLoader.getName());
                 if (physicalHosts == null) {
                     physicalHosts = cloudLoader.getPhysicalHosts();
                 } else {
@@ -74,21 +74,31 @@ public class CloudImpl extends RefreshLoader implements Cloud {
                 } else {
                     virtualHosts.addAll(cloudLoader.getVirtualHosts());
                 }
-                if (physFqdnToPhysicalHostMap == null) {
-                    physFqdnToPhysicalHostMap = cloudLoader.getPhysFqdnToPhysicalHostMap();
+            }
+            //map names of physical hosts to their objects
+            physFqdnToPhysicalHostMap = new HashMap<>(physicalHosts.size() * 2);
+            for (CloudPhysicalHost physicalHost : physicalHosts) {
+                physFqdnToPhysicalHostMap.put(physicalHost.getFqdn(), physicalHost);
+            }
+            //map physical hosts to virtual hosts
+            physicalHostToVMsMap = new HashMap<>(virtualHosts.size() * 2);
+            for (CloudVM vm : virtualHosts) {
+                physicalHostToVMsMap.computeIfAbsent(vm.getPhysicalHostFqdn(), NEW_LIST).add(vm);
+            }
+            //map VMs to physical hosts, compute reserved CPUs on each physical host
+            vmFqdnToPhysicalHostMap = new HashMap<>(virtualHosts.size() * 2);
+            for (CloudPhysicalHost physicalHost : physicalHosts) {
+                List<CloudVM> vms = physicalHostToVMsMap.get(physicalHost.getFqdn());
+                int cpu_reserved_x100 = 0;
+                if (vms != null) {
+                    for (CloudVM vm : vms) {
+                        vmFqdnToPhysicalHostMap.put(vm.getFqdn(), physicalHost);
+                        cpu_reserved_x100 += vm.getCpu_reserved_x100();
+                    }
                 } else {
-                    physFqdnToPhysicalHostMap.putAll(cloudLoader.getPhysFqdnToPhysicalHostMap());
+                    physicalHostToVMsMap.put(physicalHost.getName(), Collections.emptyList());
                 }
-                if (physicalHostToVMsMap == null) {
-                    physicalHostToVMsMap = cloudLoader.getPhysicalHostToVMsMap();
-                } else {
-                    physicalHostToVMsMap.putAll(cloudLoader.getPhysicalHostToVMsMap());
-                }
-                if (vmFqdnToPhysicalHostMap == null) {
-                    vmFqdnToPhysicalHostMap = cloudLoader.getVmFqdnToPhysicalHostMap();
-                } else {
-                    vmFqdnToPhysicalHostMap.putAll(cloudLoader.getVmFqdnToPhysicalHostMap());
-                }
+                physicalHost.setCpuReserved(cpu_reserved_x100/100);
             }
         }
         this.physicalHosts = physicalHosts;
@@ -98,14 +108,6 @@ public class CloudImpl extends RefreshLoader implements Cloud {
         this.vmFqdnToPhysicalHostMap = vmFqdnToPhysicalHostMap;
     }
 
-    public List<CloudServer> getServers() {
-        return servers;
-    }
-
-    public void setServers(List<CloudServer> servers) {
-        this.servers = servers;
-    }
-
     @Override
     public List<CloudPhysicalHost> getPhysicalHosts() {
         checkLoad();
@@ -113,13 +115,13 @@ public class CloudImpl extends RefreshLoader implements Cloud {
     }
 
     @Override
-    public List<CloudVirtualHost> getVirtualHosts() {
+    public List<CloudVM> getVirtualHosts() {
         checkLoad();
         return virtualHosts;
     }
 
     @Override
-    public Map<String, List<CloudVirtualHost>> getPhysicalHostToVMsMap() {
+    public Map<String, List<CloudVM>> getPhysicalHostToVMsMap() {
         checkLoad();
         return physicalHostToVMsMap;
     }

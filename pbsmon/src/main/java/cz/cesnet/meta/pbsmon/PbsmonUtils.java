@@ -2,7 +2,7 @@ package cz.cesnet.meta.pbsmon;
 
 import cz.cesnet.meta.cloud.Cloud;
 import cz.cesnet.meta.cloud.CloudPhysicalHost;
-import cz.cesnet.meta.cloud.CloudVirtualHost;
+import cz.cesnet.meta.cloud.CloudVM;
 import cz.cesnet.meta.pbs.Node;
 import cz.cesnet.meta.pbs.Pbsky;
 import cz.cesnet.meta.pbscache.PbsCache;
@@ -46,16 +46,16 @@ public class PbsmonUtils {
         }
         //PBS uzly podle OpenNebuly
         CloudPhysicalHost cloudPhysicalHost;
-        List<CloudVirtualHost> cloudVirtualHosts;
+        List<CloudVM> cloudVMS;
         if ((cloudPhysicalHost = cloud.getPhysFqdnToPhysicalHostMap().get(machineName)) != null) {
             //do cloudVirtualHosts seznam virtuálů v OpenNebule
-            if ((cloudVirtualHosts = cloud.getPhysicalHostToVMsMap().get(cloudPhysicalHost.getName())) != null) {
-                for (CloudVirtualHost cloudVirtualHost : cloudVirtualHosts) {
-                    Node pbsNode = pbsky.getNodeByFQDN(cloudVirtualHost.getFqdn());
+            if ((cloudVMS = cloud.getPhysicalHostToVMsMap().get(cloudPhysicalHost.getName())) != null) {
+                for (CloudVM cloudVM : cloudVMS) {
+                    Node pbsNode = pbsky.getNodeByFQDN(cloudVM.getFqdn());
                     if (pbsNode != null) {
                         //virtuál obsahuje PBS Node
                         pbsNodes.add(pbsNode);
-                        cloudVirtualHost.setNode(pbsNode);
+                        cloudVM.setNode(pbsNode);
                     }
                 }
             }

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -152,5 +153,18 @@ public class CloudPhysicalHost {
                 ", cpuReserved=" + cpuReserved +
                 ", parsedName=" + parsedName +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CloudPhysicalHost that = (CloudPhysicalHost) o;
+        return Objects.equals(fqdn, that.fqdn);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fqdn);
     }
 }

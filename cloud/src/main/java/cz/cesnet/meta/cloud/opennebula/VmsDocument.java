@@ -1,6 +1,6 @@
 package cz.cesnet.meta.cloud.opennebula;
 
-import cz.cesnet.meta.cloud.CloudVirtualHost;
+import cz.cesnet.meta.cloud.CloudVM;
 
 import java.util.List;
 
@@ -11,13 +11,13 @@ import java.util.List;
  */
 public class VmsDocument {
 
-    private List<CloudVirtualHost> vms;
+    private List<CloudVM> vms;
 
-    public List<CloudVirtualHost> getVms() {
+    public List<CloudVM> getVms() {
         return vms;
     }
 
-    public void setVms(List<CloudVirtualHost> vms) {
+    public void setVms(List<CloudVM> vms) {
         this.vms = vms;
     }
 }

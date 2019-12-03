@@ -1,5 +1,5 @@
 <%@ tag pageEncoding="utf-8" %>
-<%@ attribute name="vms" type="java.util.List<cz.cesnet.meta.cloud.CloudVirtualHost>" rtexprvalue="true" required="true" %>
+<%@ attribute name="vms" type="java.util.List<cz.cesnet.meta.cloud.CloudVM>" rtexprvalue="true" required="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -32,7 +32,7 @@
                             <td>
                                 Cloud node "<c:out value="${vm.name}"/>"
                                 running since <f:formatDate value="${vm.startTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
-                                at host <s:link href="/machine/${vm.physicalHost}">${vm.physicalHost}</s:link>
+                                at host <s:link href="/machine/${vm.physicalHostFqdn}">${vm.physicalHostFqdn}</s:link>
                             </td>
                         </c:when>
                         <c:otherwise>

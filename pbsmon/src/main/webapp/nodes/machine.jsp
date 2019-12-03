@@ -52,11 +52,11 @@
         </table>
 
 
-        <% if (actionBean.getCloudVirtualHosts() != null && !actionBean.getCloudVirtualHosts().isEmpty()) { %>
+        <% if (actionBean.getCloudVMS() != null && !actionBean.getCloudVMS().isEmpty()) { %>
 
         <p><f:message key="machine_jsp_cloud_vms"/></p>
         <table class="vms">
-            <c:forEach items="${actionBean.cloudVirtualHosts}" var="vm">
+            <c:forEach items="${actionBean.cloudVMS}" var="vm">
                 <tr>
                     <c:choose>
                         <c:when test="${vm.pbsNode}">

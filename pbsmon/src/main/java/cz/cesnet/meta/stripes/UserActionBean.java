@@ -2,7 +2,7 @@ package cz.cesnet.meta.stripes;
 
 import cz.cesnet.meta.acct.Accounting;
 import cz.cesnet.meta.acct.UserInfo;
-import cz.cesnet.meta.cloud.CloudVirtualHost;
+import cz.cesnet.meta.cloud.CloudVM;
 import cz.cesnet.meta.pbs.*;
 import cz.cesnet.meta.perun.api.Perun;
 import cz.cesnet.meta.perun.api.PerunUser;
@@ -49,7 +49,7 @@ public class UserActionBean extends BaseActionBean {
     private JobsSortOrder sort = JobsSortOrder.Id;
     private List<String> usedQueueNames;
     private Map<String,JobsInfo> jobInfosByQueue;
-    private List<CloudVirtualHost> userVMs;
+    private List<CloudVM> userVMs;
     private List<UserAccessImpl.Group> groups;
 
     @DefaultHandler
@@ -156,7 +156,7 @@ public class UserActionBean extends BaseActionBean {
         return jobInfosByQueue;
     }
 
-    public List<CloudVirtualHost> getUserVMs() {
+    public List<CloudVM> getUserVMs() {
         return userVMs;
     }
 

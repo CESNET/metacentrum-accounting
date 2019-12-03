@@ -3,6 +3,7 @@ package cz.cesnet.meta.cloud;
 
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Cloud Virtual Machine.
@@ -10,13 +11,13 @@ import java.util.Locale;
  * @author Martin Kuba makub@ics.muni.cz
  */
 @SuppressWarnings("UnusedDeclaration")
-public class CloudVirtualHost {
+public class CloudVM {
 
     private int id;
     private String idString; //unique identifier across multiple cloud instances
     private String name; // any string specified by user, i.e. "MyDebian6", for PBS nodes equal to fqdn
-    private String fqdn; // FQDN, e.g. DNS name
-    private String physicalHost; // the name of physical node, not the hostname, may be an IP address !
+    private String fqdn; // DNS name of the virtual host
+    private String physicalHostFqdn; // DNS name of its physical host
     private int cpu_reserved_x100; //number of real CPUs assigned to VM, is in percents, thus may not be an integer
     private String owner;
     private String state;
@@ -37,18 +38,18 @@ public class CloudVirtualHost {
         this.idString = idString;
     }
 
-    public CloudVirtualHost() {
+    public CloudVM() {
     }
 
     /**
      * Gets the {@link cz.cesnet.meta.cloud.CloudPhysicalHost#getName()} where the VM runs.
      */
-    public String getPhysicalHost() {
-        return physicalHost;
+    public String getPhysicalHostFqdn() {
+        return physicalHostFqdn;
     }
 
-    public void setPhysicalHost(String physicalHost) {
-        this.physicalHost = physicalHost;
+    public void setPhysicalHostFqdn(String physicalHostFqdn) {
+        this.physicalHostFqdn = physicalHostFqdn;
     }
 
     public String getState() {
@@ -139,4 +140,16 @@ public class CloudVirtualHost {
         return node;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CloudVM cloudVM = (CloudVM) o;
+        return idString.equals(cloudVM.idString);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idString);
+    }
 }

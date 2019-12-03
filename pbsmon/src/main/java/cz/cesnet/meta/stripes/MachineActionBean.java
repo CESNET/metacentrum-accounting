@@ -2,7 +2,7 @@ package cz.cesnet.meta.stripes;
 
 import cz.cesnet.meta.acct.Accounting;
 import cz.cesnet.meta.cloud.CloudPhysicalHost;
-import cz.cesnet.meta.cloud.CloudVirtualHost;
+import cz.cesnet.meta.cloud.CloudVM;
 import cz.cesnet.meta.pbs.Node;
 import cz.cesnet.meta.pbsmon.PbsmonUtils;
 import cz.cesnet.meta.perun.api.Perun;
@@ -50,7 +50,7 @@ public class MachineActionBean extends BaseActionBean {
     private Stroj perunMachine;
     private List<Node> pbsNodes = new ArrayList<>();
     private CloudPhysicalHost cloudPhysicalHost;
-    private List<CloudVirtualHost> cloudVirtualHosts;
+    private List<CloudVM> cloudVMS;
 
     @SuppressWarnings({"UnusedDeclaration"})
     public Resolution show() {
@@ -67,7 +67,7 @@ public class MachineActionBean extends BaseActionBean {
 
         //info z OpenNebuly
         if ((cloudPhysicalHost = cloud.getPhysFqdnToPhysicalHostMap().get(machineName)) != null) {
-            cloudVirtualHosts = cloud.getPhysicalHostToVMsMap().get(cloudPhysicalHost.getName());
+            cloudVMS = cloud.getPhysicalHostToVMsMap().get(cloudPhysicalHost.getName());
         }
         //všechny PBS uzly
         pbsNodes = PbsmonUtils.getPbsNodesForPhysicalMachine(perunMachine, pbsky, pbsCache, cloud);
@@ -93,7 +93,7 @@ public class MachineActionBean extends BaseActionBean {
         return cloudPhysicalHost;
     }
 
-    public List<CloudVirtualHost> getCloudVirtualHosts() {
-        return cloudVirtualHosts;
+    public List<CloudVM> getCloudVMS() {
+        return cloudVMS;
     }
 }
