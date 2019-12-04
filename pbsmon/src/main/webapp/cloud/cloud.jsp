@@ -79,14 +79,14 @@
                 </td>
             </tr>
             <tr>
-                <td class="nebulapbshost">
+                <td class="cloudpbshost">
                     <div style="background: url('${pageContext.request.contextPath}/img/cloud.png') top right no-repeat; text-align: center;">
-                        <f:message key="cloud_state_nebulapbshost_partial"/>&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                        <f:message key="cloud_state_cloudpbshost_partial"/>&nbsp;&nbsp;&nbsp;&nbsp;</div>
                 </td>
             </tr>
             <tr>
-                <td class="nebulapbshost">
-                    <div style="text-align: center;"><f:message key="cloud_state_nebulapbshost_full"/>&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                <td class="cloudpbshost">
+                    <div style="text-align: center;"><f:message key="cloud_state_cloudpbshost_full"/>&nbsp;&nbsp;&nbsp;&nbsp;</div>
                 </td>
             </tr>
 
@@ -124,16 +124,16 @@
                                                     <tr><c:set var="ci" value="${0}"/>
                                                         <c:forEach items="${zdr.stroje}" var="stroj" varStatus="i">
                                                         <c:choose>
-                                                            <c:when test="${stroj.nebulaPbsHost}">
+                                                            <c:when test="${stroj.cloudPbsHost}">
                                                                 <c:set var="ci" value="${ci+1}"/>
-                                                                <td class="node nebulapbshost <c:if test='${stroj.openNebulaUsable}'>opennebulausable</c:if>"
+                                                                <td class="node cloudpbshost <c:if test='${stroj.cloudUsable}'>cloudusable</c:if>"
                                                                     style="height: ${stroj.cpuNum/8}em; padding: 0;">
                                                                     <s:link style="line-height: ${stroj.cpuNum/8}em;"
                                                                             href="/machine/${stroj.name}"><c:out
                                                                             value="${stroj.pbsName}"/>&nbsp;(${stroj.cpuNum}&nbsp;CPU)</s:link>
                                                                 </td>
                                                             </c:when>
-                                                            <c:when test="${stroj.openNebulaManaged}">
+                                                            <c:when test="${stroj.cloudManaged}">
                                                                 <c:set var="ci" value="${ci+1}"/>
                                                                 <t:stroj stroj="${stroj}"/>
                                                             </c:when>

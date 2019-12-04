@@ -10,8 +10,8 @@
     <artifactId>cloud</artifactId>
     <packaging>jar</packaging>
 
-    <name>shared lib for reading OpenNebula State</name>
-    <description>Načítání stavu cloudu z JSON souborů generovaných OpenNebulou</description>
+    <name>shared lib for reading cloud state</name>
+    <description>Načítání stavu cloudu z JSON souborů generovaných cloudem</description>
     <inceptionYear>2013</inceptionYear>
     <organization>
         <name>CESNET</name>

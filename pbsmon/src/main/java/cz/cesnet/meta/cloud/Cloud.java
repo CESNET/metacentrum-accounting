@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * OpenNebula state.
+ * Computing cloud state.
  *
  * Class {@link cz.cesnet.meta.cloud.CloudPhysicalHost} represents physical host, it has two important properties:
  * <ul>

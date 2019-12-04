@@ -30,7 +30,7 @@
         <t:resource resource="${actionBean.perunMachine.vypocetniZdroj}"/>
 
 
-        <%-- OpenNebula --%>
+        <%-- Cloud --%>
         <% if (actionBean.getCloudPhysicalHost() != null) { %>
         <h1>Cloud <img src="${pageContext.request.contextPath}/img/cloud.png" alt="in cloud"></h1>
 
@@ -60,8 +60,8 @@
                 <tr>
                     <c:choose>
                         <c:when test="${vm.pbsNode}">
-                            <td class="cloud-virt nebulapbshost">
-                                <s:link href="/node/${vm.node.name}"><c:out value="${vm.fqdn}"/>
+                            <td class="cloud-virt cloudpbshost">
+                                <s:link href="/node/${vm.node.name}"><c:out value="${vm.node.name}"/>
                                 (<c:out value="${vm.cpuReservedString}"/> CPU)
                                 </s:link>
                             </td>

@@ -50,7 +50,7 @@ public abstract class BaseActionBean implements ActionBean {
         tl.add(new TimeLoaded(cacheLoaded.before(oldTime), null, "PBS cache", cacheLoaded));
         //cloud
         Date cloudLoaded = cloud.getTimeLoaded();
-        tl.add(new TimeLoaded(cloudLoaded.before(oldTime), null, "OpenNebula", cloudLoaded));
+        tl.add(new TimeLoaded(cloudLoaded.before(oldTime), null, "MetaCentrum Cloud", cloudLoaded));
         return tl;
     }
 

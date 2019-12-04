@@ -4,7 +4,7 @@
 <%@ taglib prefix="f" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="s" uri="http://stripes.sourceforge.net/stripes.tld" %>
-<td class="node ${stroj.state} <c:if test='${stroj.openNebulaUsable}'>opennebulausable</c:if>" style="height: ${stroj.cpuNum/8}em; padding: 0;">
+<td class="node ${stroj.state} <c:if test='${stroj.cloudUsable}'>cloudusable</c:if>" style="height: ${stroj.cpuNum/8}em; padding: 0;">
     <c:choose>
         <c:when test="${stroj.state=='partialy-free'}">
             <div class="usedwrapper" style="height: ${stroj.cpuNum/8}em;">

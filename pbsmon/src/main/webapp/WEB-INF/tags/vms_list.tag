@@ -16,7 +16,7 @@
                 <tr>
                     <c:choose>
                         <c:when test="${vm.pbsNode}">
-                            <td class="cloud-virt nebulapbshost">
+                            <td class="cloud-virt cloudpbshost">
                                 <s:link href="/node/${vm.fqdn}"><c:out value="${vm.fqdn}"/>
                                     (<c:out value="${vm.cpuReservedString}"/> CPU)
                                 </s:link>

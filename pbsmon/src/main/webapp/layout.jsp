@@ -13,7 +13,7 @@ response.setHeader("Cache-Control", "no-cache");
     
    <c:import context="/look" url="/metavo/dil1.jsp"/> 
 
-    <link type="text/css" href="${pageContext.request.contextPath}/pbsmon.css?version=201904151652" rel="stylesheet"/>
+    <link type="text/css" href="${pageContext.request.contextPath}/pbsmon.css?version=201912041023" rel="stylesheet"/>
     <s:layout-component name="hlava"/>
    <c:import context="/look" url="/metavo/dil2.jsp"/> 
 <%--<style>

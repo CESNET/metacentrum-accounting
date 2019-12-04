@@ -123,7 +123,7 @@ public class RozhodovacStavuStroju {
         }
         List<CloudVM> cloudVMs = cloud.getPhysicalHostToVMsMap().get(cloudPhysicalHost.getFqdn());
         if (cloudVMs != null) {
-            int cpusAvailable = stroj.getCpuNum();
+            int cpusAvailable = cloudPhysicalHost.getCpuAvail();
             //v cloudu jsou udaje o virtualnich strojich
             for (CloudVM cloudVM : cloudVMs) {
                 //podle značky z cloudu je to PBS node

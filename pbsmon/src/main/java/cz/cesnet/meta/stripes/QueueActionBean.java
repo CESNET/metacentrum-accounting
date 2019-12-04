@@ -69,7 +69,7 @@ public class QueueActionBean extends BaseActionBean {
             String nodeFQDN = node.getFQDN();
             //try mapping
             String machineName = pbsCache.getMapping().getVirtual2physical().get(nodeFQDN);
-            //try OpenNebula
+            //try Cloud
             if (machineName == null) {
                 CloudPhysicalHost physicalHost = cloud.getVmFqdnToPhysicalHostMap().get(nodeFQDN);
                 if (physicalHost != null) {

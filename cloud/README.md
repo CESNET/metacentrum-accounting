@@ -1,3 +1,3 @@
-# API for getting data from MetaCentrum's OpenNebula
+# API for getting data from MetaCentrum's cloud
 
-Classes for mapping JSON data coming from OpenNebula.
+Classes for mapping JSON data coming from cloud.

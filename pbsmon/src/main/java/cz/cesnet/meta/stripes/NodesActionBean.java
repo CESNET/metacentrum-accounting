@@ -191,7 +191,7 @@ public class NodesActionBean extends BaseActionBean {
         Mapping unguMapping = pbsCache.getMapping();
         physical2virtual.putAll(unguMapping.getPhysical2virtual());
         virtual2physical.putAll(unguMapping.getVirtual2physical());
-        //OpenNebula
+        //Cloud
         Map<String, List<CloudVM>> hostName2VirtualHostsMap = cloud.getPhysicalHostToVMsMap();
         for (CloudPhysicalHost host : cloud.getPhysicalHosts()) {
             List<String> vmFqdns = new ArrayList<>();

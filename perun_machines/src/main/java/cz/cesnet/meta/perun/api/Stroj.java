@@ -10,9 +10,9 @@ public class Stroj {
     private String shortName;
     private VypocetniZdroj vypocetniZdroj;
     private int usedPercent = 0;
-    private boolean openNebulaManaged = false; //je v OpenNebule
-    private boolean nebulaPbsHost = false; //je v OpenNebule a obsahuje VM ktery je v PBS
-    private boolean openNebulaUsable = false; //lze na něm spustit uživatelský VM přes OpenNebulu
+    private boolean cloudManaged = false; //je v cloudu
+    private boolean cloudPbsHost = false; //je v cloudu a obsahuje VM ktery je v PBS
+    private boolean cloudUsable = false; //lze na něm spustit další uživatelský VM přes cloud
     private String pbsName;
     private String pbsState;
 
@@ -59,34 +59,34 @@ public class Stroj {
     }
 
     public void setUsedPercent(int usedPercent) {
-        this.usedPercent = usedPercent>100?100:usedPercent;
+        this.usedPercent = Math.min(usedPercent, 100);
     }
 
-    public boolean isOpenNebulaManaged() {
-        return openNebulaManaged;
+    public boolean isCloudManaged() {
+        return cloudManaged;
     }
 
-    public boolean isNebulaPbsHost() {
-        return nebulaPbsHost;
+    public boolean isCloudPbsHost() {
+        return cloudPbsHost;
     }
 
     /**
-     * Vlasta Holer's definition of cloud host -  is in OpenNebula and is not wholy taken by PBS Node
+     * Vlasta Holer's definition of cloud host -  is in cloud and is not wholy taken by PBS Node
      */
-    public boolean isOpenNebulaUsable() {
-        return openNebulaUsable;
+    public boolean isCloudUsable() {
+        return cloudUsable;
     }
 
-    public void setCloudUsable(boolean openNebulaUsable) {
-        this.openNebulaUsable = openNebulaUsable;
+    public void setCloudUsable(boolean cloudUsable) {
+        this.cloudUsable = cloudUsable;
     }
 
-    public void setCloudPbsHost(boolean nebulaPbsHost) {
-        this.nebulaPbsHost = nebulaPbsHost;
+    public void setCloudPbsHost(boolean cloudPbsHost) {
+        this.cloudPbsHost = cloudPbsHost;
     }
 
-    public void setCloudManaged(boolean openNebulaManaged) {
-        this.openNebulaManaged = openNebulaManaged;
+    public void setCloudManaged(boolean cloudManaged) {
+        this.cloudManaged = cloudManaged;
     }
 
     public String getPbsName() {
@@ -156,7 +156,7 @@ public class Stroj {
 
             int compare;
             if (p1.length() > 0 && p2.length() > 0) {
-                compare = Integer.compare(Integer.valueOf(p1), Integer.valueOf(p2));
+                compare = Integer.compare(Integer.parseInt(p1), Integer.parseInt(p2));
             } else {
                 compare = p1.compareToIgnoreCase(p2);
             }

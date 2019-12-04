@@ -68,7 +68,7 @@ public class OpenStackCloudLoader implements CloudLoader {
                         String vmname = vnode.path("name").asText();
                         vm.setId(this.getName() + "-VM-" + vmname);
                         vm.setPhysicalHostFqdn(hypervisor);
-                        vm.setFqdn(vmname);
+                        vm.setFqdn(vmname);//WARNING - a VM may not have a FQDN in OpenStack, but so far the name is always its FQDN
                         vm.setName(vmname);
                         vm.setState(vnode.path("instance_state").asText());
                         vm.setCpu_reserved_x100(vnode.path("CPUs").asInt() * 100);

@@ -39,7 +39,7 @@
     </dependencyManagement>
 
     <modules>
-        <module>cloud</module><!-- API for MetaCentrum OpenNebula State -->
+        <module>cloud</module><!-- API for MetaCentrum cloud state -->
         <module>perun_machines</module><!-- API for reading JSON data about physical machines from Perun -->
         <module>pbsmon</module><!-- PBSMon - web app showing the state of MetaCentrum -->
         <module>metaacct</module><!-- Accounting server for MetaCentrum -->
