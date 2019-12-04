@@ -175,15 +175,12 @@ public class RozhodovacStavuStroju {
         }
         //pokud aspon jeden z VM pracuje, pak fyzicky pracuje
         for (Node node : virtNodes) {
-            String state = node.getState();
-            if (state.equals(Node.STATE_JOB_BUSY) || state.equals(Node.STATE_JOB_EXCLUSIVE) || state.equals(Node.STATE_JOB_FULL)
-                    || state.equals(Node.STATE_JOB_SHARING) || state.equals(Node.STATE_RESERVED)
-            ) {
+            if (node.isWorking()) {
                 log.debug(" fyzicky {} ma pracujici VM {} ", jmenoStroje, node.getName());
                 return Node.STATE_JOB_BUSY;
             }
         }
-        //pokud je nejaky  z VM free, pak fyzicky je free
+        //pokud je nejaky z VM free, pak fyzicky je free
         for (Node node : virtNodes) {
             String state = node.getState();
             if (state.equals(Node.STATE_FREE)) {

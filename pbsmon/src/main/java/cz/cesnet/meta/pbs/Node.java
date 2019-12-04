@@ -101,7 +101,9 @@ public class Node extends PbsInfoObject {
         String pbsState = getPbsState();
         return pbsState.equals(STATE_JOB_BUSY) || pbsState.equals(STATE_JOB_EXCLUSIVE) ||
                 pbsState.equals(STATE_JOB_SHARING) || pbsState.equals(STATE_MAINTENANCE_BUSY) ||
-                pbsState.equals(STATE_PARTIALY_FREE) || pbsState.equals(STATE_JOB_FULL);
+                pbsState.equals(STATE_PARTIALY_FREE) || pbsState.equals(STATE_JOB_FULL) ||
+                pbsState.equals(STATE_RESERVATION_EXCLUSIVE) || pbsState.equals(Node.STATE_RESERVED)
+        ;
 
     }
 
