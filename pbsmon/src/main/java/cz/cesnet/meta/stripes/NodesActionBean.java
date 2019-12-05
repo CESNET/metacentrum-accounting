@@ -19,7 +19,10 @@ import net.sourceforge.stripes.integration.spring.SpringBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -107,11 +110,9 @@ public class NodesActionBean extends BaseActionBean {
         strojeByPbsNodeNames.sort((stroj1, stroj2) -> {
             Node node1 = pbsky.getNodeByName(stroj1.getPbsName());
             Node node2 = pbsky.getNodeByName(stroj2.getPbsName());
-            if(node1==null) {
-                return node2 == null ? 0 : 1;
-            } else {
-                return node2 == null ? -1 : node1.getNumInCluster() - node2.getNumInCluster();
-            }
+            String s1Name = ((node1 == null) ? stroj1.getShortName() : node1.getName());
+            String s2Name = ((node2 == null) ? stroj2.getShortName() : node2.getName());
+            return Stroj.NameComparator.smartCompare(s1Name, s2Name);
         });
         return strojeByPbsNodeNames;
     }
