@@ -94,6 +94,7 @@ public class NodesActionBean extends BaseActionBean {
                 Node node = nodes.get(0);
                 stroj.setPbsName(node.getName());
                 stroj.setPbsState(node.getState());
+                stroj.setUsedPercent(node.getUsedPercent());
             } else {
                 stroj.setPbsName(null);
                 stroj.setPbsState(null);
