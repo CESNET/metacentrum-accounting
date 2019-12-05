@@ -43,16 +43,6 @@ public abstract class PerunAbstractImpl implements Perun {
                         cpuSumCluster += stroj.getCpuNum();
                         fyzickeSet.remove(stroj);
                     }
-                    for (VypocetniZdroj pz : z.getPodclustery()) {
-                        int cpuSumPodcluster = 0;
-                        for (Stroj stroj : pz.getStroje()) {
-                            cpuSumCentrum += stroj.getCpuNum();
-                            cpuSumCluster += stroj.getCpuNum();
-                            cpuSumPodcluster += stroj.getCpuNum();
-                            fyzickeSet.remove(stroj);
-                        }
-                        cpuMap.put(pz.getId(), cpuSumPodcluster);
-                    }
                     cpuMap.put(z.getId(), cpuSumCluster);
                 } else {
                     Stroj stroj = z.getStroj();

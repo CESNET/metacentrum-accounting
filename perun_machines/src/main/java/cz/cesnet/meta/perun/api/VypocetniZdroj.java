@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VypocetniZdroj implements Serializable {
+
     private String id = null;
     private String nazev = null;
     private boolean cluster = false;
@@ -17,7 +18,6 @@ public class VypocetniZdroj implements Serializable {
 
     private Stroj stroj;
     private List<Stroj> stroje;
-    private List<VypocetniZdroj> podclustery;
     private List<String> voNames = new ArrayList<>(1);
 
     public VypocetniZdroj(String id, String nazev, boolean cluster, String popisKey, String urlKey) {
@@ -113,14 +113,6 @@ public class VypocetniZdroj implements Serializable {
     @Override
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
-    }
-
-    public void setPodclustery(List<VypocetniZdroj> podclustery) {
-        this.podclustery = podclustery;
-    }
-
-    public List<VypocetniZdroj> getPodclustery() {
-        return podclustery;
     }
 
     public String getPhoto() {

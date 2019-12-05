@@ -21,7 +21,7 @@ public class PbsmonUtils {
     /**
      * Získá seznam PBS uzlů pro fyzický stroj.
      * @param perunMachine - informace z Peruna
-     * @param pbsky - informace z Torque
+     * @param pbsky - informace z PBS
      * @param pbsCache - informace z pbs_cache
      * @param cloud - informace z cloudu
      * @return seznam PBs uzlů na fyzickém stroji

@@ -74,7 +74,6 @@ public class NebulaCloudLoader implements CloudLoader {
             log.warn("adding {} fake physical hosts: {}", fakeHosts.size(), fakeHosts);
             physicalHosts.addAll(fakeHosts);
         }
-        physicalHosts.sort(CloudPhysicalHost.CLOUD_PHYSICAL_HOST_COMPARATOR);
     }
 
 

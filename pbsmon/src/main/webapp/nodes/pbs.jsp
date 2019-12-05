@@ -45,7 +45,7 @@
                                 <c:if test="${! empty zdr.stroje}">
                                 <table class="nodes" cellspacing="0">
                                 <tr>
-                                <c:forEach items="${zdr.stroje}" var="stroj" varStatus="i">
+                                <c:forEach items="${actionBean.getMachinesSortedByPbsNodeNames(zdr)}" var="stroj" varStatus="i">
                                     <t:stroj_pbs stroj="${stroj}"/>
                                     <c:if test="${i.count%8==0}"></tr><tr></c:if>
                                 </c:forEach>

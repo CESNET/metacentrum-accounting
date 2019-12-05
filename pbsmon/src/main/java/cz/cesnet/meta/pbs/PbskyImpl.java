@@ -75,7 +75,12 @@ public class PbskyImpl extends RefreshLoader implements Pbsky {
             for (PbsServerConfig server : pbsServers) {
                 PBS oldData = findPBSForServer(server, pbsky);
                 try {
+                    long time = System.currentTimeMillis();
                     PBS pbs = pbsConnector.loadData(server);
+                    time = System.currentTimeMillis()- time;
+                    if(time > 20000L) {
+                        log.warn("loading data from PBS {} took {} ms", server.getHost(), time);
+                    }
                     pbs.uprav();
                     pbskyNew.add(pbs);
                     log.debug("got new data "+pbs);

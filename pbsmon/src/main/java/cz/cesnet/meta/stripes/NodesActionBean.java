@@ -51,9 +51,9 @@ public class NodesActionBean extends BaseActionBean {
     List<Node> gpuNodes;
 
     /**
-     * Zobrazuje fyzické stroje.
+     * Shows physical machines grouped by physical clusters and their owners.
      *
-     * @return stránka nodes.jsp
+     * @return page /nodes/nodes.jsp
      */
     @SuppressWarnings("unused")
     @DefaultHandler
@@ -76,6 +76,10 @@ public class NodesActionBean extends BaseActionBean {
         return new ForwardResolution("/nodes/nodes.jsp");
     }
 
+    /**
+     * Shows PBS nodes grouped by physical clusters.
+     * @return page /nodes/pbs.jsp
+     */
     public Resolution pbs() {
         log.debug("pbs({})", ctx.getRequest().getRemoteHost());
         FyzickeStroje fyzickeStroje = perun.getFyzickeStroje();
@@ -96,6 +100,20 @@ public class NodesActionBean extends BaseActionBean {
         //GPU
         gpuNodes = findGpuNodes();
         return new ForwardResolution("/nodes/pbs.jsp");
+    }
+
+    public List<Stroj> getMachinesSortedByPbsNodeNames(VypocetniZdroj zdroj) {
+        List<Stroj> strojeByPbsNodeNames = new ArrayList<>(zdroj.getStroje());
+        strojeByPbsNodeNames.sort((stroj1, stroj2) -> {
+            Node node1 = pbsky.getNodeByName(stroj1.getPbsName());
+            Node node2 = pbsky.getNodeByName(stroj2.getPbsName());
+            if(node1==null) {
+                return node2 == null ? 0 : 1;
+            } else {
+                return node2 == null ? -1 : node1.getNumInCluster() - node2.getNumInCluster();
+            }
+        });
+        return strojeByPbsNodeNames;
     }
 
     private  List<Node> findGpuNodes() {
@@ -135,6 +153,10 @@ public class NodesActionBean extends BaseActionBean {
         return gpuNodes;
     }
 
+    /**
+     * Shows physical nodes with all mapped virtual machines and p
+     * @return page /nodes/mapping.jsp
+     */
     @SuppressWarnings("unused")
     public Resolution virtual() {
         log.debug("virtual()");

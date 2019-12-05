@@ -32,11 +32,6 @@ public class RozhodovacStavuStroju {
                     for (Stroj stroj : z.getStroje()) {
                         rozhodniStav(stroj, pbsky, mapping, frontendy, vyhrazene, cloud);
                     }
-                    for (VypocetniZdroj pz : z.getPodclustery()) {
-                        for (Stroj stroj : pz.getStroje()) {
-                            rozhodniStav(stroj, pbsky, mapping, frontendy, vyhrazene, cloud);
-                        }
-                    }
                 } else {
                     Stroj stroj = z.getStroj();
                     log.debug("rozhodniStavy() stroj={}", stroj);

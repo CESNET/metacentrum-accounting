@@ -47,33 +47,25 @@ public class PerunHwJsonImpl implements Perun {
     @Override
     public List<ComputingResource> getComputingResources() {
         List<ComputingResource> resources = new ArrayList<ComputingResource>();
-        for(VypocetniCentrum centrum : perunJson.najdiVypocetniCentra()) {
-             pridavejRekurzivne(resources,centrum.getZdroje());
-        }
-        return  resources;
-    }
-
-    private static void pridavejRekurzivne(List<ComputingResource> resources,List<VypocetniZdroj> zdroje) {
-        for(VypocetniZdroj zdroj : zdroje) {
-            ComputingResource cr = new ComputingResource(zdroj.getId(),zdroj.getNazev(),zdroj.isCluster());
-            log.debug("zdroj =  {}",zdroj);
-            if(zdroj.isCluster()) {
-                List<Stroj> stroje = zdroj.getStroje();
-                List<Machine> machines = new ArrayList<Machine>(stroje.size());
-                for(Stroj stroj : stroje) {
-                    machines.add(new Machine(stroj.getName(), stroj.getCpuNum()));
+        for (VypocetniCentrum centrum : perunJson.najdiVypocetniCentra()) {
+            for (VypocetniZdroj zdroj : centrum.getZdroje()) {
+                ComputingResource cr = new ComputingResource(zdroj.getId(), zdroj.getNazev(), zdroj.isCluster());
+                log.debug("zdroj =  {}", zdroj);
+                if (zdroj.isCluster()) {
+                    List<Stroj> stroje = zdroj.getStroje();
+                    List<Machine> machines = new ArrayList<>(stroje.size());
+                    for (Stroj stroj : stroje) {
+                        machines.add(new Machine(stroj.getName(), stroj.getCpuNum()));
+                    }
+                    cr.setMachines(machines);
+                } else {
+                    Stroj stroj = zdroj.getStroj();
+                    cr.setMachine(new Machine(stroj.getName(), stroj.getCpuNum()));
                 }
-                cr.setMachines(machines);
-                List<VypocetniZdroj> podclustery = zdroj.getPodclustery();
-                if(podclustery!=null&&!podclustery.isEmpty()) {
-                    pridavejRekurzivne(resources,podclustery);
-                }
-            } else {
-                Stroj stroj = zdroj.getStroj();
-                cr.setMachine(new Machine(stroj.getName(), stroj.getCpuNum()));
+                resources.add(cr);
             }
-            resources.add(cr);
         }
+        return resources;
     }
 
 }

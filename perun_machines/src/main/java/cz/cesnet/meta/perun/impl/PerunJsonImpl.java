@@ -352,16 +352,6 @@ public class PerunJsonImpl extends PerunAbstractImpl {
                 VypocetniZdroj zdroj = nactiVypocetniZdroj(texty, jzdroj, allMachines, zdrojMap);
                 if(zdroj!=null) {
                     centrum.getZdroje().add(zdroj);
-                    if (zdroj.isCluster()) {
-                        zdroj.setPodclustery(new ArrayList<>());
-                        JSONValue subclusters = jzdroj.get("subclusters");
-                        if (subclusters != null) {
-                            for (JSONValue jv3 : ((JSONArray) subclusters).getValue()) {
-                                JSONObject jsubcluster = (JSONObject) jv3;
-                                zdroj.getPodclustery().add(nactiVypocetniZdroj(texty, jsubcluster, allMachines, zdrojMap));
-                            }
-                        }
-                    }
                 }
             }
             if(!centrum.getZdroje().isEmpty()) {
