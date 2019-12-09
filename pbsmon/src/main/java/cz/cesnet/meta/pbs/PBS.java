@@ -271,6 +271,9 @@ public class PBS implements TimeStamped {
                 qresv.setReservation(reservation);
                 reservation.setQueue(qresv);
             }
+            for (Node reservedNode : reservation.getNodes()) {
+                reservedNode.addReservation(reservation);
+            }
         }
 
         //serazena pole

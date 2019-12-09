@@ -53,7 +53,7 @@
             <tr>
                 <td><c:out value="${resv.name}"/></td>
                 <td><c:out value="${resv.reserveName}"/></td>
-                <td><s:link href="/user/${resv.owner}">${resv.owner}</s:link></td>
+                <td><c:out value="${resv.owner}"/></td>
                 <td><f:formatDate value="${resv.reserveStart}" dateStyle="medium" timeStyle="short" type="both"/></td>
                 <td><f:formatDate value="${resv.reserveEnd}" dateStyle="medium" timeStyle="short" type="both"/></td>
                 <td><f:formatDate value="${resv.createdTime}" dateStyle="medium" timeStyle="short" type="both"/></td>

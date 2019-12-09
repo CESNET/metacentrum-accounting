@@ -811,6 +811,16 @@ public class Node extends PbsInfoObject {
         return nodeResources;
     }
 
+    private List<Reservation> reservations = new ArrayList<>();
+
+    public void addReservation(Reservation reservation) {
+        reservations.add(reservation);
+    }
+
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
     public static class NodeResource {
         public enum Type {
             STRING, LONG, BOOLEAN, FLOAT, SIZE, STRING_ARRAY;

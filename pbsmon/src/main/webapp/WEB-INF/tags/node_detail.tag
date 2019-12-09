@@ -85,6 +85,34 @@
 
         </table>
 
+
+<!-- reservations -->
+<c:if test="${! empty node.reservations}">
+    Reservations
+    <table class="reservations">
+        <tr>
+            <th>id</th>
+            <th>name</th>
+            <th>owner</th>
+            <th>start</th>
+            <th>end</th>
+            <th>ctime</th>
+            <th>select</th>
+        </tr>
+        <c:forEach items="${node.reservations}" var="resv">
+            <tr>
+                <td><s:link href="/queue/${resv.queue.name}">${resv.name}</s:link></td>
+                <td><c:out value="${resv.reserveName}"/></td>
+                <td><c:out value="${resv.owner}"/></td>
+                <td><f:formatDate value="${resv.reserveStart}" dateStyle="medium" timeStyle="short" type="both"/></td>
+                <td><f:formatDate value="${resv.reserveEnd}" dateStyle="medium" timeStyle="short" type="both"/></td>
+                <td><f:formatDate value="${resv.createdTime}" dateStyle="medium" timeStyle="short" type="both"/></td>
+                <td><c:out value="${resv.select}"/></td>
+            </tr>
+        </c:forEach>
+    </table>
+</c:if>
+
   <c:choose>
       <c:when test="${node.cloudHost}">
           <p class="cloud_warning"><f:message key="nodejsp_cloud"/></p>
