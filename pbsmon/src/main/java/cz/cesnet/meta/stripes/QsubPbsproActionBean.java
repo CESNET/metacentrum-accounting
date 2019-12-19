@@ -153,6 +153,13 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
             cities.forEach(resourceValues::remove);
             //censored queues for offering the -q parameter
             offerQueues = new ArrayList<>(queues.size());
+            //put default queues first
+            for (Queue q : queues) {
+                if (q.getName().startsWith("default")) {
+                    offerQueues.add(q);
+                }
+            }
+            //then the rest of submitable queues
             for (Queue q : queues) {
                 if (q.isFromRouteOnly()) continue;
                 if (q.getName().startsWith("default")) continue;
@@ -174,7 +181,7 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
 
 
     //formular
-    String fronta = "default@arien-pro.ics.muni.cz";
+    String fronta = "default";
     @Validate(on = {"sestavovac"}, required = true, minvalue = 1)
     long mem = 400;
     String memu = "mb";
