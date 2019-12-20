@@ -132,6 +132,9 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
                         switch (nr.getType()) {
                             case STRING:
                                 foundValues.add(nr.getAvailable());
+                                if(nr.getAvailable().indexOf(',')!=-1) {
+                                    log.warn("node {} has resource {} of type {} but value is {}", node.getName(), nr.getName(), nr.getType(), nr.getAvailable());
+                                }
                                 break;
                             case BOOLEAN:
                                 foundValues.add("True");
