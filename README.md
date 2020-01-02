@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.com/martin-kuba/metacentrum-accounting.svg?branch=master)](https://travis-ci.com/martin-kuba/metacentrum-accounting)
-
-![](https://github.com/martin-kuba/metacentrum-accounting/workflows/Java%20CI/badge.svg)
+![](https://github.com/martin-kuba/metacentrum-accounting/workflows/Java%20Matrix%20CI/badge.svg)
 
 # metacentrum-accounting
 Accounting for MetaCentrum
