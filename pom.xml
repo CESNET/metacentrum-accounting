@@ -13,6 +13,7 @@
     <name>MetaCentrum Accounting Parent Project</name>
 
     <properties>
+        <java.version>8</java.version>
         <taglibs-standard.version>1.2.5</taglibs-standard.version>
         <commons-text.version>1.8</commons-text.version>
         <tomcat.version>8.5.38</tomcat.version>
