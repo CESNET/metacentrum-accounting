@@ -60,4 +60,15 @@ public class AcctUser {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "AcctUser{" +
+                "id=" + id +
+                ", logname='" + logname + '\'' +
+                ", organization='" + organization + '\'' +
+                ", researchGroup='" + researchGroup + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

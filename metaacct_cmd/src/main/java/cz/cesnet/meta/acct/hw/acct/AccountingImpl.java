@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
@@ -88,6 +89,59 @@ public class AccountingImpl implements Accounting {
         for (AcctUser acctUser : acctUsers) {
             jdbc.update("UPDATE acct_user SET organisation=?,skupina=?,status=? WHERE acct_user_id=?", acctUser.getOrganization(), acctUser.getResearchGroup(), acctUser.getStatus(), acctUser.getId());
         }
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void fixDuplicateUsers() {
+        List<String> usernames = jdbc.queryForList("SELECT user_name as num FROM acct_user u GROUP BY user_name HAVING  count(*) > 1 ORDER BY user_name", String.class);
+        for (String username : usernames) {
+            List<AcctUser> acctUsers = jdbc.query("SELECT acct_user_id,user_name,organisation,skupina,status FROM acct_user WHERE user_name = ?",
+                    (rs, i) -> new AcctUser(rs.getInt("acct_user_id"), rs.getString("user_name"), rs.getString("organisation"), rs.getString("skupina"), rs.getString("status")),
+                    username
+            );
+            if(acctUsers.size() !=2 ) {
+                log.error("something is wrong, username {} list size {}", username, acctUsers.size());
+                System.exit(1);
+            }
+            AcctUser a = acctUsers.get(0);
+            AcctUser b = acctUsers.get(1);
+            long aJobsCount = jdbc.queryForObject("SELECT COUNT(*) FROM acct_pbs_record j WHERE j.acct_user_id=?", Long.class,a.getId());
+            long bJobsCount = jdbc.queryForObject("SELECT COUNT(*) FROM acct_pbs_record j WHERE j.acct_user_id=?", Long.class,b.getId());
+
+            AcctUser good = null;
+            AcctUser bad = null;
+            if(a.getStatus() == null) {
+                if(b.getStatus() == null) {
+                    log.warn("BOTH WRONG user {} jobs: a={} b={}", username, aJobsCount, bJobsCount);
+                    if(aJobsCount >= bJobsCount) {
+                        good = a;
+                        bad = b;
+                    }
+                } else {
+                    bad = a;
+                    good = b;
+                    log.info("user {} jobs: good={} bad={}", username, bJobsCount, aJobsCount);
+                }
+            } else {
+                if(b.getStatus() == null) {
+                    good = a;
+                    bad = b;
+                    log.info("user {} jobs: good={} bad={}", username, aJobsCount, bJobsCount);
+                } else {
+                    log.info("BOTH GOOD user {} jobs: a={} b={}", username, aJobsCount, bJobsCount);
+                    if(aJobsCount >= bJobsCount) {
+                        good = a;
+                        bad = b;
+                    }
+                }
+            }
+            //reassign jobs from bad to good user
+            log.info("fixing {}", username);
+            jdbc.update("UPDATE acct_pbs_record SET acct_user_id=? WHERE acct_user_id=?", good.getId(), bad.getId());
+            jdbc.update("DELETE FROM acct_user WHERE acct_user_id=?", bad.getId());
+        }
+
     }
 
 

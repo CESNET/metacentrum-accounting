@@ -25,4 +25,6 @@ public interface Accounting {
     void assignNodes(String node, String machine);
 
     void updateUsers(List<PerunUser> allUsers);
+
+    void fixDuplicateUsers();
 }
