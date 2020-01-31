@@ -50,7 +50,6 @@ public class Job extends PbsInfoObject {
     public static final String ATTRIBUTE_QUEUE = "queue";
     public static final String ATTRIBUTE_COMMENT = "comment";
     public static final String ATTRIBUTE_EXEC_HOST = "exec_host";
-    public static final String ATTRIBUTE_SCHEDULED_NODES_SPECS = "sched_nodespec";
     public static final String ATTRIBUTE_EXEC_VNODE = "exec_vnode";
     public static final String ATTRIBUTE_EXECUTION_TIME = "Execution_Time";
     public static final String ATTRIBUTE_EXIT_STATUS_TORQUE = "exit_status";
@@ -798,8 +797,7 @@ public class Job extends PbsInfoObject {
     // estimated.exec_vnode    (tarkil2:ncpus=16:mem=16777216kb:scratch_local=16777216kb)
     public List<Chunk> getChunks() {
         if (chunks == null) {
-            String spec = attrs.get(pbs.isTorque() ? ATTRIBUTE_SCHEDULED_NODES_SPECS :
-                    ("Q".equals(getState())? "estimated.exec_vnode" : ATTRIBUTE_EXEC_VNODE));
+            String spec = attrs.get("Q".equals(getState())? "estimated.exec_vnode" : ATTRIBUTE_EXEC_VNODE);
             if (spec == null) return Collections.emptyList();
             chunks = new ArrayList<>();
             for (String hostString : spec.split("\\+")) {
@@ -919,7 +917,6 @@ public class Job extends PbsInfoObject {
             this.fairshareRank = fairshareRank;
     }
 
-    static final Pattern pst_torque = Pattern.compile("scratch_type=(\\w+):");
     static final Pattern pst_pbspro = Pattern.compile("scratch_(\\w+)=");
 
     /**
@@ -928,13 +925,20 @@ public class Job extends PbsInfoObject {
      * @return local|ssd|shared
      */
     public String getScratchType() {
-        String spec = attrs.get(pbs.isTorque() ? ATTRIBUTE_SCHEDULED_NODES_SPECS : ATTRIBUTE_EXEC_VNODE);
+        String spec = attrs.get(ATTRIBUTE_EXEC_VNODE);
         if (spec == null) return null;
-        Matcher m = (pbs.isTorque() ? pst_torque : pst_pbspro).matcher(spec);
+        Matcher m = pst_pbspro.matcher(spec);
         return m.find() ? m.group(1) : null;
     }
 
     public String getScratchDir() {
+        //if any of the variables SCRATCHDIR or SCRATCH is present, use it
+        Map<String, String> vars = getVariables();
+        String scratchdir = vars.get("SCRATCHDIR");
+        if (scratchdir != null) return scratchdir;
+        String scratch = vars.get("SCRATCH");
+        if (scratch != null) return scratch;
+        //construct the path itself
         String scratchType = getScratchType();
         switch (scratchType) {
             case "local":
