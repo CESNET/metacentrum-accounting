@@ -100,25 +100,6 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                 </bean>
 
                 <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
-                    <property name="shortName" value="wagap"/>
-                    <property name="host" value="wagap-pro.cerit-sc.cz"/>
-                    <property name="main" value="false"/>
-                    <property name="torque" value="false"/>
-                    <property name="by_queue" value="false"/>
-                    <property name="planbased" value="true"/>
-                    <property name="fairshares">
-                        <list>
-                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
-                                <constructor-arg name="tree" value="default" />
-                                <constructor-arg name="metrics" value="fairshare" />
-                                <constructor-arg name="id" value="wagap" />
-                            </bean>
-                        </list>
-                    </property>
-                    <property name="groupFile" value="/etc/pbsmon/group/wagap-pro"/>
-                </bean>
-
-                <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
                     <property name="shortName" value="elixir"/>
                     <property name="host" value="elixir-pbs.elixir-czech.cz"/>
                     <property name="main" value="false"/>
