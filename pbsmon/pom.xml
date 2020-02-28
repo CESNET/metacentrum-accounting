@@ -4,7 +4,7 @@
     <parent>
         <groupId>cz.metacentrum</groupId>
         <artifactId>accounting-parent</artifactId>
-        <version>3.16-SNAPSHOT</version>
+        <version>3.17-SNAPSHOT</version>
     </parent>
 
     <artifactId>pbsmon</artifactId>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>net.sourceforge.stripes</groupId>
             <artifactId>stripes</artifactId>
-            <version>1.5.7</version>
+            <version>1.5.8</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
