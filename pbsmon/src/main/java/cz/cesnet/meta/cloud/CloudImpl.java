@@ -16,8 +16,7 @@ public class CloudImpl extends RefreshLoader implements Cloud {
 
     final static Logger log = LoggerFactory.getLogger(CloudImpl.class);
 
-    private List<CloudLoader> cloudLoaders = Arrays.asList(
-            new NebulaCloudLoader("OpenNebula", "http://carach1.ics.muni.cz:12147/exports/hosts.json", "http://carach1.ics.muni.cz:12147/exports/vms.json"),
+    private List<CloudLoader> cloudLoaders = Collections.singletonList(
             new OpenStackCloudLoader("OpenStack", "/home/openstack")
     );
 
