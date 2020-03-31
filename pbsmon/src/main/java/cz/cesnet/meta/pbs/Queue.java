@@ -228,18 +228,19 @@ public class Queue extends PbsInfoObject {
         return "True".equals(attrs.get(ATTRIBUTE_ACL_HOSTS_ENABLED));
     }
 
-    /*
-    public String getLockedForKey() {
-        if (isAclUsersEnabled()) return "users";
-        if (isAclGroupsEnabled()) return "groups";
-        if (isAclHostsEnabled()) return "hosts";
-        return null;
-    } */
-
     public String getLockedFor() {
-        if (isAclUsersEnabled()) return getAclUsers().replace(',', ' ');
-        if (isAclGroupsEnabled()) return getAclGroups().replace(',', ' ');
-        if (isAclHostsEnabled()) return getAclHosts().replace(',', ' ');
+        if (isAclUsersEnabled()) {
+            String s = getAclUsers();
+            return (s == null) ? "" : s.replace(',', ' ');
+        }
+        if (isAclGroupsEnabled()) {
+            String s = getAclGroups();
+            return ( s == null ) ? "" : s.replace(',', ' ');
+        }
+        if (isAclHostsEnabled()) {
+            String s = getAclHosts();
+            return ( s == null ) ? "" : s.replace(',', ' ');
+        }
         return "";
     }
 

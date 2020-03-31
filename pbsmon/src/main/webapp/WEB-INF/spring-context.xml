@@ -25,7 +25,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                 <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
                     <property name="shortName" value="meta"/>
                     <property name="host" value="meta-pbs.metacentrum.cz"/>
-                    <property name="main" value="true"/> <!-- nanejvýš jedna může být hlavní, pak jména front neobsahují stroj -->
+                    <property name="main" value="false"/> <!-- nanejvýš jedna může být hlavní, pak jména front neobsahují stroj -->
                     <property name="torque" value="false"/>
                     <property name="by_queue" value="false"/>
                     <property name="planbased" value="true"/>
