@@ -30,17 +30,12 @@ public class StoragesHsmImpl extends RefreshLoader implements Storages {
 
     private StoragesInfo storagesInfo;
 
-    public StoragesHsmImpl() throws NoSuchAlgorithmException, IOException, KeyManagementException {
-        //doNotVerifyCertificates();
+    public StoragesHsmImpl() {
     }
 
     public void setUrl(String url) {
         this.url = url;
     }
-
-//    public void setCerit4File(String cerit4File) {
-//        this.cerit4File = cerit4File;
-//    }
 
     @Override
     public StoragesInfo getStoragesInfo() {
@@ -52,27 +47,8 @@ public class StoragesHsmImpl extends RefreshLoader implements Storages {
     protected void load() {
         List<Storage> storagesList = new ArrayList<>();
         loadDuHsms(storagesList);
-        //loadCeritHsms(storagesList);
         storagesInfo = new StoragesInfo(storagesList);
     }
-
-//    private void loadCeritHsms(List<Storage> storagesList) {
-//        log.info("loading CERIT storages from {}",cerit4File);
-//        try (BufferedReader in = new BufferedReader(new FileReader(cerit4File))) {
-//            String line;
-//            int sizeGB = 0;
-//            int freeGB = 0;
-//            while ((line = in.readLine()) != null) {
-//                String[] ss = line.split(" ", 2);
-//                sizeGB += Storage.parseNum(ss[0]).numGB;
-//                freeGB += Storage.parseNum(ss[1]).numGB;
-//            }
-//            storagesList.add(new Storage((sizeGB / 1024) + "T", (freeGB / 1024) + "T", "/storage/brno4-cerit-hsm"));
-//        } catch (IOException e) {
-//            log.error("cannot read file " + cerit4File, e);
-//        }
-//        log.info("loaded");
-//    }
 
     private void loadDuHsms(List<Storage> storagesList) {
         log.info("Loading DU storages from {}",url);
@@ -87,18 +63,12 @@ public class StoragesHsmImpl extends RefreshLoader implements Storages {
                     //Storage,Size[TiB],Avail[TiB],Used[TiB]
                     String dir;
                     switch (ss[0]) {
-                        case "du1":
-                            dir = "/storage/plzen2-archive";
-                            break;
-                        case "du2":
-                            dir = "/storage/jihlava2-archive";
-                            break;
-                        case "du3":
-                            dir = "/storage/brno5-archive";
-                            break;
                         case "du4":
-                            dir = "/storage/ostrava2-archive";
+                            dir = "/storage/du-cesnet";
                             break;
+//                        case "du5":
+//                            dir = "/storage/ostrava2-archive";
+//                            break;
                         default:
                             continue;
                     }
@@ -111,37 +81,5 @@ public class StoragesHsmImpl extends RefreshLoader implements Storages {
             log.error("cannot parse URL " + this.url, e);
         }
         log.info("loaded");
-    }
-
-
-    void doNotVerifyCertificates() throws IOException, KeyManagementException, NoSuchAlgorithmException {
-        // Install the all-trusting trust manager
-        SSLContext sc = SSLContext.getInstance("SSL");
-        sc.init(null, new TrustManager[]{new AllTrustManager()}, null);
-        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-        HttpsURLConnection.setDefaultHostnameVerifier((urlHostName, session) -> {
-            String peerHost = session.getPeerHost();
-            if(!urlHostName.equals(peerHost)) log.warn("hostname {} and sslPeerHost {} do not match");
-            return true;
-        });
-
-    }
-
-    class AllTrustManager implements X509TrustManager {
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-
-        public void checkClientTrusted(X509Certificate[] certs, String authType) {
-        }
-
-        public void checkServerTrusted(X509Certificate[] certs, String authType) {
-            if(certs!=null&&certs.length>0) {
-                log.info("not checking server cert {}", certs[0].getSubjectDN().toString());
-            } else {
-                log.error("checkServerTrusted() certs empty !");
-            }
-        }
     }
 }

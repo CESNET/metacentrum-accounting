@@ -83,8 +83,8 @@
             <c:forEach items="${actionBean.hsmInfo.storages}" var="s">
                 <tr>
                     <td><c:out value="${s.dir}"/></td>
-                    <td style="text-align: right;"><div style="width: ${600*s.totalGB/4000000}px; background-color: green;">
-                        <div style="width: ${600*s.usedGB/4000000}px; background-color: #6060FF;">
+                    <td style="text-align: right;"><div style="width: ${600*s.totalGB/16000000}px; background-color: green;">
+                        <div style="width: ${600*s.usedGB/16000000}px; background-color: #6060FF;">
                             <div style="padding: 2px;"><b>${s.usedPercent}%</b></div></div>
                     </div>
                     </td>
