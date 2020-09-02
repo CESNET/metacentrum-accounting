@@ -7,9 +7,9 @@
     <packaging>pom</packaging>
 
     <!--
-    Use "mvn versions:set -DnewVersion=3.19-SNAPSHOT; mvn versions:commit" to change version in all modules
+    Use "mvn versions:set -DnewVersion=3.20-SNAPSHOT; mvn versions:commit" to change version in all modules
      -->
-    <version>3.18-SNAPSHOT</version>
+    <version>3.19-SNAPSHOT</version>
     <name>MetaCentrum Accounting Parent Project</name>
 
     <properties>
