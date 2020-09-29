@@ -1,6 +1,7 @@
  h2 { clear: both; }
- td.stroj a:link,td.node a:link,table.nodes a:link,table.job a:link,table.queue a:link,table.prop2node a:link,table.node2prop a:link,table.users a:link { color: black; }
- td.stroj a:visited,td.node a:visited,table.nodes a:visited,table.job a:visited,table.queue a:visited, table.prop2node a:visited, table.node2prop a:visited,table.users a:visited { color: black; }
+ a:link, a:visited { color: black; }
+ /*td.stroj a:link,td.node a:link,table.nodes a:link,table.job a:link,table.queue a:link,table.prop2node a:link,table.node2prop a:link,table.users a:link { color: black; }*/
+ /*td.stroj a:visited,td.node a:visited,table.nodes a:visited,table.job a:visited,table.queue a:visited, table.prop2node a:visited, table.node2prop a:visited,table.users a:visited { color: black; }*/
  td.node a:hover,td.stroj a:hover { color: #ff6600; }
 
  table.node td,table.node th { border-width: 1px; border-style: outset; text-align: center; }
