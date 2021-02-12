@@ -7,7 +7,7 @@
     <parent>
         <groupId>cz.metacentrum</groupId>
         <artifactId>accounting-parent</artifactId>
-        <version>3.19-SNAPSHOT</version>
+        <version>3.20-SNAPSHOT</version>
     </parent>
 
     <artifactId>metaacct</artifactId>
@@ -63,13 +63,6 @@
         <dependency>
             <groupId>net.sourceforge.stripes</groupId>
             <artifactId>stripes</artifactId>
-            <version>1.5.7</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -106,23 +99,7 @@
         <dependency>
             <groupId>com.github.hazendaz</groupId>
             <artifactId>displaytag</artifactId>
-            <version>2.2.3</version>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>displaytag</groupId>-->
-        <!--<artifactId>displaytag</artifactId>-->
-        <!--<version>1.2</version>-->
-        <!--<exclusions>-->
-        <!--<exclusion>-->
-        <!--<groupId>org.slf4j</groupId>-->
-        <!--<artifactId>jcl104-over-slf4j</artifactId>-->
-        <!--</exclusion>-->
-        <!--<exclusion>-->
-        <!--<groupId>org.slf4j</groupId>-->
-        <!--<artifactId>slf4j-log4j12</artifactId>-->
-        <!--</exclusion>-->
-        <!--</exclusions>-->
-        <!--</dependency>-->
 
         <!-- logovani viz http://docs.spring.io/platform/docs/current/reference/htmlsingle/#getting-started-logging -->
         <dependency>
@@ -137,7 +114,6 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.10.6</version>
         </dependency>
         <!-- Jackson JSON processor -->
         <dependency>

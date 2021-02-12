@@ -1,4 +1,10 @@
-<configuration>
+<configuration packagingData="false" debug="false" scan="true" scanPeriod="30 seconds">
+    <!--
+        packagingData="true" ... in stacktrace shows jar files and their versions
+        debug="true" ... prints which logback.xml file is used during startup
+        scan="true" ... changes to this file are dynamically loaded without restaring the app
+        scanPeriod="30 seconds" ... how often are changes scanned
+    -->
     <contextName>pbsmon2</contextName>
 
     <if condition='isDefined("catalina.base")'>
@@ -69,6 +75,7 @@
     <logger name="cz.cesnet.meta.pbs.PbskyImpl" level="debug"/>
     <logger name="cz.cesnet.meta.cloud.CloudImpl" level="debug"/>
     -->
+    <logger name="cz.cesnet.meta.stripes.QsubPbsproActionBean" level="info"/>
 
     <logger name="net.sourceforge.stripes.controller.StripesFilter" level="info"/>
     <logger name="cz.cesnet.meta.cloud.CloudPhysicalHost" level="error"/>

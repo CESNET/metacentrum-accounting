@@ -247,6 +247,7 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
                 Queue dstQueue = pbsky.getQueueByName(dstName);
                 if (dstQueue.getWalltimeMinSeconds() <= walltimeSecs && walltimeSecs <= dstQueue.getWalltimeMaxSeconds()) {
                     finalQueue = dstQueue;
+                    break;
                 }
             }
             if (finalQueue == null) {
