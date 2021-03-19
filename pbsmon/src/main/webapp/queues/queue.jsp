@@ -26,7 +26,9 @@
 <c:choose>
     <c:when test="${actionBean.queue.routing}">
         <p style="clear: right">
-            Fronta je směrovací, rozděluje úlohy podle walltime do následujících front:
+            <t:i18n cs="Fronta je směrovací, rozděluje úlohy podle walltime do následujících front:"
+                    en="The queue is routing, it delivers jobs depending on their walltime to the following queues:"/>
+
         </p>
         <table class="queue">
             <t:queue_heading/>
