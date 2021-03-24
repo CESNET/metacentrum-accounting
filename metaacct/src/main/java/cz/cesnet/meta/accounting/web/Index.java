@@ -10,6 +10,8 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 
+import static org.apache.taglibs.standard.util.EscapeXML.escape;
+
 public class Index extends AccountingWebBase {
     private String username;
     
@@ -26,7 +28,7 @@ public class Index extends AccountingWebBase {
                     + URLEncoder.encode(backurl, "utf-8");
             return new RedirectResolution(url,false);
         } else if (userId == -1L) {
-            username = getContext().getLoggedUser();
+            username = escape(getContext().getLoggedUser());
             return new ForwardResolution("/viewEmptyUser.jsp");
         } else {
             return new RedirectResolution("/PbsRecords.action?viewUser&userId=" + userId + "&number=10");

@@ -7,9 +7,9 @@
     <packaging>pom</packaging>
 
     <!--
-    Use "mvn versions:set -DnewVersion=3.21-SNAPSHOT; mvn versions:commit" to change version in all modules
+    Use "mvn versions:set -DnewVersion=3.22-SNAPSHOT; mvn versions:commit" to change version in all modules
      -->
-    <version>3.20-SNAPSHOT</version>
+    <version>3.21-SNAPSHOT</version>
     <name>MetaCentrum Accounting Parent Project</name>
 
     <properties>
@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.2</version>
+        <version>2.4.4</version>
     </parent>
 
     <!-- specifies versions not defined by the Spring platform-bom -->

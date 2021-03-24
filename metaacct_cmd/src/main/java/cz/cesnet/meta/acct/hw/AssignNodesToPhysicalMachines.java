@@ -18,9 +18,9 @@ public class AssignNodesToPhysicalMachines {
         ApplicationContext springCtx = new ClassPathXmlApplicationContext("spring-context.xml", "perun-config.xml");
 
         Accounting acct = springCtx.getBean("acct", Accounting.class);
-        for(int i=1;i<=18;i++) {
-            String node = "glados"+i;
-            String machine = "ics-gladosag-"+String.format("%03d",i)+"-ostack.priv.cloud.muni.cz";
+        for(int i=1;i<=14;i++) {
+            String node = "gita"+(i+14);
+            String machine = "cerit-hdh-"+String.format("%03d",i)+"-ostack.priv.cloud.muni.cz";
             System.out.println(node+" => "+machine);
             acct.assignNodes(node,machine);
         }
