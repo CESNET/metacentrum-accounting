@@ -16,7 +16,7 @@ import java.util.List;
 public class StoragesDiskArrayMotdImpl extends RefreshLoader implements Storages {
 
     final static Logger log = LoggerFactory.getLogger(StoragesDiskArrayMotdImpl.class);
-    private String file = "/home/makub/motd.storage";
+    private String file = "/home/pbsmon/motd.storage";
     private StoragesInfo storagesInfo;
 
     public StoragesDiskArrayMotdImpl() {
