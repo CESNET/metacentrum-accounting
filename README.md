@@ -4,3 +4,5 @@
 Accounting for MetaCentrum
 
 Code for accounting in [MetaCentrum](http://metavo.metacentrum.cz).
+
+Commit messages by [Commitizen](https://github.com/commitizen/cz-cli)
