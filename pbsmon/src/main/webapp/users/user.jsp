@@ -25,10 +25,10 @@
         <f:param value="${actionBean.userInfo.jobCount}"/>
         <f:param value="${actionBean.userInfo.cpuDaysUsed}"/>
     </f:message>
-    <f:message key="user_jsp_hlaska_publikace">
-      <f:param value="${actionBean.perunUser.publications['MetaCentrum']}"/>
-      <f:param value="${actionBean.perunUser.publications['CERIT-SC']}"/>
-    </f:message>
+    <c:if test="${! empty actionBean.perunUser.publications}">
+        <f:message key="user_jsp_hlaska_publikace_zacatek"/>
+        <c:forEach items="${actionBean.perunUser.publications}" var="pub" varStatus="s"> <f:message key="user_jsp_hlaska_publikace"><f:param value="${pub.key}"/><f:param value="${pub.value}"/></f:message><c:if test="${! s.last}">,</c:if></c:forEach>.
+    </c:if>
     <c:if test="${not empty actionBean.groups}">
         <f:message key="user_jsp_hlaska_groups"/>
         <c:forEach items="${actionBean.groups}" var="g"><s:link href="/group/${g.host}/${g.name}">${g.name}</s:link> </c:forEach>

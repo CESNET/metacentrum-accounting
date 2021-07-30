@@ -59,8 +59,6 @@ public class UserActionBean extends BaseActionBean {
         }
         try {
             perunUser = perun.getUserByName(userName);
-            perunUser.getPublications().putIfAbsent(METACENTRUM, 0);
-            perunUser.getPublications().putIfAbsent(CERIT_SC, 0);
         } catch (Exception ex) {
             log.warn("Nemohu nacist PerunUser {} kvuli {} ", userName, ex.getMessage());
             return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND, "User not found.");

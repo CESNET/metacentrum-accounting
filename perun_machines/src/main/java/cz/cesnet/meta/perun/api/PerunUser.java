@@ -8,26 +8,26 @@ import java.util.Map;
  * Info about a user.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: PerunUser.java,v 1.2 2011/10/27 14:19:55 makub Exp $
  */
 public class PerunUser {
 
     private String logname;
     private String name;
     private String organization;
-    private Map<String,Integer> publications = new HashMap<>(3);
-    private Map<String,Vo> vos = new HashMap<>(3);
+    // publications are filled up in PerunJsonImpl.java on the line 236
+    private final Map<String,Integer> publications = new HashMap<>(3);
+    private final Map<String,Vo> vos = new HashMap<>(3);
     private Vo mainVo;
 
     public PerunUser() {
     }
 
     public static class Vo {
-        private String voName;
+        private final String voName;
         private String status;
         private String organization;
         private Date expires;
-        private Map<String,Integer> statsGroups = new HashMap<>(3);
+        private final Map<String,Integer> statsGroups = new HashMap<>(3);
 
         public Vo(String voName) {
             this.voName = voName;
