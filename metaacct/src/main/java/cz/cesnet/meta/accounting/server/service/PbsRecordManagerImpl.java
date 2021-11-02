@@ -84,14 +84,14 @@ public class PbsRecordManagerImpl extends JdbcDaoSupport implements PbsRecordMan
                 .withTableName("acct_pbs_record")
                 .usingColumns("acct_id_string", "date_time", "jobname", "queue",
                         "create_time", "start_time", "end_time", "exit_status", "acct_user_id", "ci_acct_pbs_server_id",
-                        "req_ncpus", "req_nodes", "req_nodect", "req_mem", "req_walltime",
+                        "req_ncpus", "req_nodes", "req_nodect", "req_mem", "req_walltime", "soft_walltime",
                         "used_ncpus", "used_mem", "used_vmem", "used_walltime", "used_cputime", "used_cpupercent", "req_gpus");
 
         SimpleJdbcInsert insertStartPbsRecord = new SimpleJdbcInsert(dataSource)
                 .withTableName("acct_pbs_record_started")
                 .usingColumns("acct_id_string", "date_time", "jobname", "queue",
                         "create_time", "start_time", "acct_user_id", "ci_acct_pbs_server_id",
-                        "req_ncpus", "req_nodes", "req_nodect", "req_mem", "req_walltime", "req_gpus");
+                        "req_ncpus", "req_nodes", "req_nodect", "req_mem", "req_walltime", "soft_walltime", "req_gpus");
 
         SimpleJdbcInsert insertPbsRecordHostRelation = new SimpleJdbcInsert(dataSource)
                 .withTableName("acct_hosts_logs")
@@ -284,6 +284,7 @@ public class PbsRecordManagerImpl extends JdbcDaoSupport implements PbsRecordMan
         params.put("req_nodect", r.getMessageText().getReqNodect());
         params.put("req_mem", r.getMessageText().getReqMem());
         params.put("req_walltime", r.getMessageText().getReqWalltime());
+        params.put("soft_walltime", r.getMessageText().getSoftWalltime());
         if (PBSRecordType.ENDED.equals(r.getRecordType())) {
             params.put("end_time", r.getMessageText().getEndTime());
             params.put("exit_status", r.getMessageText().getExitStatus());

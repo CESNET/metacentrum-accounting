@@ -118,6 +118,9 @@ public class PBSReader {
                 } else if (s.startsWith("Resource_List.walltime=")) {
                     String walltime = s.substring(s.indexOf('=') + 1);
                     pbsMessage.setReqWalltime(StringUtils.parsePbsLogTimeFormat(walltime));
+                } else if (s.startsWith("Resource_List.soft_walltime=")) {
+                    String walltime = s.substring(s.indexOf('=') + 1);
+                    pbsMessage.setSoftWalltime(StringUtils.parsePbsLogTimeFormat(walltime));
                 } else if (s.startsWith("resc_req_total.mem=")||s.startsWith("Resource_List.mem=")) {
                     String mem = s.substring(s.indexOf('=') + 1);
                     pbsMessage.setReqMem(StringUtils.parsePbsLogSizeFormat(mem));

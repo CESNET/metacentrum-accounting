@@ -32,6 +32,7 @@ public class PBSMessage implements Serializable {
   private long usedCputime;
   private int usedNcpus;
   private int usedCpupercent;
+  private long softWalltime;
 
   private List<PBSHost> execHosts;
   private List<NodeSpec> nodesSpecs;
@@ -209,6 +210,14 @@ public class PBSMessage implements Serializable {
     this.reqGpus = reqGpus;
   }
 
+  public long getSoftWalltime() {
+    return softWalltime;
+  }
+
+  public void setSoftWalltime(long softWalltime) {
+    this.softWalltime = softWalltime;
+  }
+
   @Override
     public String toString() {
         return "PBSMessage{" +
@@ -224,6 +233,7 @@ public class PBSMessage implements Serializable {
                 ", reqNodect=" + reqNodect +
                 ", reqNodes='" + reqNodes + '\'' +
                 ", reqWalltime=" + reqWalltime +
+                ", softWalltime=" + softWalltime +
                 ", reqMem=" + reqMem +
                 ", usedMem=" + usedMem +
                 ", usedVmem=" + usedVmem +
