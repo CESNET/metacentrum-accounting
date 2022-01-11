@@ -63,6 +63,11 @@
             <artifactId>taglibs-standard-impl</artifactId>
             <version>${taglibs-standard.version}</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.glassfish.web</groupId>-->
+<!--            <artifactId>jakarta.servlet.jsp.jstl</artifactId>-->
+<!--            <version>${glassfish-jstl.version}</version>-->
+<!--        </dependency>-->
         <!-- stripes -->
         <dependency>
             <groupId>net.sourceforge.stripes</groupId>

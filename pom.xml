@@ -17,6 +17,7 @@
         <taglibs-standard.version>1.2.5</taglibs-standard.version>
         <commons-text.version>1.8</commons-text.version>
         <tomcat.version>8.5.38</tomcat.version>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <!-- defines compatible versions of many libraries -->
@@ -24,7 +25,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.6</version>
+        <version>2.5.7</version>
     </parent>
 
     <!-- specifies versions not defined by the Spring platform-bom -->
