@@ -7,6 +7,8 @@
 
 extern char *pbs_server;
 
+int process_data(struct batch_status *bs,char* type);
+
 int main(int argc, char **argv) {
     /*PBS variables*/
     int con;
@@ -44,7 +46,7 @@ int main(int argc, char **argv) {
     bs = pbs_statrsc(con, NULL, NULL, NULL);
     process_data(bs,"resources");
     /* get scheduler info */
-    bs = pbs_statsched(con, NULL, NULL, NULL);
+    bs = pbs_statsched(con, NULL, NULL);
     process_data(bs,"schedulers");
     /* get hook info */
     bs = pbs_stathook(con, NULL, NULL, NULL);
