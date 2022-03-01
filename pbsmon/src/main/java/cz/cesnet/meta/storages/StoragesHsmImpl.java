@@ -66,9 +66,6 @@ public class StoragesHsmImpl extends RefreshLoader implements Storages {
                         case "du4":
                             dir = "/storage/du-cesnet";
                             break;
-//                        case "du5":
-//                            dir = "/storage/ostrava2-archive";
-//                            break;
                         default:
                             continue;
                     }

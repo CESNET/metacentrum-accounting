@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -62,10 +63,16 @@ public class PersonActionBean extends BaseActionBean {
         } else {
             user = (String) session.getAttribute(PERSON);
             if (user == null) {
-                //nic nevime, poslat na Osobni, at nam povi, kdo to je
-                String backurl = request.getScheme() + "://" + request.getServerName()
-                        + ":" + request.getServerPort() + request.getContextPath() + "/person";
-                return new RedirectResolution(PERSONALIZE_URL + URLEncoder.encode(backurl, "utf-8"), false);
+                String remoteUser = request.getRemoteUser();
+                log.info("REMOTE_USER {}", remoteUser);
+                if(remoteUser==null||remoteUser.isEmpty()) {
+                    return new ErrorResolution(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "REMOTE_USER not set");
+                }
+                user = remoteUser;
+                session.setAttribute(PERSON, user);
+//                String backurl = request.getScheme() + "://" + request.getServerName()
+//                        + ":" + request.getServerPort() + request.getContextPath() + "/person";
+//                return new RedirectResolution(PERSONALIZE_URL + URLEncoder.encode(backurl, "utf-8"), false);
             }
         }
         //vsechny pristupne fronty
