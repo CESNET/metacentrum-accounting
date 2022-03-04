@@ -5,7 +5,7 @@ import cz.cesnet.meta.pbs.Node.NodeResource;
 import cz.cesnet.meta.pbs.Node.NodeResource.Type;
 import cz.cesnet.meta.pbs.Queue;
 import cz.cesnet.meta.pbscache.PbsCache;
-import cz.cesnet.meta.pbscache.Scratch;
+import cz.cesnet.meta.pbs.Scratch;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 import net.sourceforge.stripes.validation.LocalizableError;

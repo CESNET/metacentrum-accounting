@@ -62,7 +62,7 @@
 
     <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl" level="error"/>
     <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl.gpu" level="info"/>
-    <logger name="cz.cesnet.meta.pbscache.Scratch" level="info"/>
+    <logger name="cz.cesnet.meta.pbs.Scratch" level="info"/>
 
     <logger name="cz.cesnet.meta.stripes.PersonActionBean" level="info"/>
     <logger name="cz.cesnet.meta.stripes.QsubPbsproActionBean" level="info"/>

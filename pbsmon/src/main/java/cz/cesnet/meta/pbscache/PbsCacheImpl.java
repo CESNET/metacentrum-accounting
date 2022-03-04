@@ -73,19 +73,11 @@ public class PbsCacheImpl extends RefreshLoader implements PbsCache {
 
 
     private Mapping mapping;
-    private Map<String, Scratch> scratchSizes;
 
     public Mapping getMapping() {
         checkLoad();
         return this.mapping;
     }
-
-    @Override
-    public Scratch getScratchForNode(Node node) {
-        checkLoad();
-        return this.scratchSizes.get(node.getName());
-    }
-
 
     public PbsCacheImpl() {
     }

@@ -1,4 +1,4 @@
-package cz.cesnet.meta.pbscache;
+package cz.cesnet.meta.pbs;
 
 import cz.cesnet.meta.pbs.PbsUtils;
 

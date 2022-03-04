@@ -17,13 +17,6 @@ public interface PbsCache extends TimeStamped {
      */
     Mapping getMapping();
 
-    /**
-     * Used for Torque only, PBSPro does not use pbs_cache for scratches.
-     * @param node computing node
-     * @return data about scratch
-     */
-    Scratch getScratchForNode(Node node);
-
     List<FairshareConfig> getFairshareConfigs();
 
     Map<String,Integer> getRankMapForFairshareIdAndExistingUsers(String pbsServer, Set<String> userNames);

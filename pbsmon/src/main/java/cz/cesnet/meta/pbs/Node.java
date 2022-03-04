@@ -1,7 +1,6 @@
 package cz.cesnet.meta.pbs;
 
 import cz.cesnet.meta.acct.OutageRecord;
-import cz.cesnet.meta.pbscache.Scratch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
