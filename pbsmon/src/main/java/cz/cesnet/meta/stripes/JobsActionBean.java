@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -235,7 +236,7 @@ public class JobsActionBean extends BaseActionBean {
                                 warnings.put(job.getId(), w);
                                 suspiciousJobs.put(job.getId(), job);
                             } else if (job.getExecutionTime().getTime() <= nowtime) {
-                                String w = "Úloha je ve stavu W, ale Execution_Time je v minulosti (" + sdf.format(job.getExecutionTime() + ")");
+                                String w = "Úloha je ve stavu W, ale Execution_Time je v minulosti (" + sdf.format(job.getExecutionTime()) + ")";
                                 warnings.put(job.getId(), w);
                                 suspiciousJobs.put(job.getId(), job);
                             }
@@ -311,18 +312,20 @@ public class JobsActionBean extends BaseActionBean {
         HttpServletRequest request = ctx.getRequest();
         HttpSession session = request.getSession(true);
         if (user != null) {
-            //prichazime z Osobniho, nastavit
+            //explicitně zadaný uživatel, nastavit
             session.setAttribute(PersonActionBean.PERSON, user);
         } else {
             user = (String) session.getAttribute(PersonActionBean.PERSON);
             if (user == null) {
-                //nic nevime, poslat na Osobni, at nam povi, kdo to je
-                String backurl = request.getScheme() + "://" + request.getServerName()
-                        + ":" + request.getServerPort() + request.getContextPath() + "/jobs/my";
-                return new RedirectResolution(PersonActionBean.PERSONALIZE_URL + URLEncoder.encode(backurl, "utf-8"), false);
+                String remoteUser = request.getRemoteUser();
+                log.info("REMOTE_USER {}", remoteUser);
+                if(remoteUser==null||remoteUser.isEmpty()) {
+                    return new ErrorResolution(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "REMOTE_USER not set");
+                }
+                user = remoteUser;
+                session.setAttribute(PersonActionBean.PERSON, user);
             }
         }
-        log.debug("je to uzivatel {}", user);
         return new RedirectResolution(UserActionBean.class).addParameter("userName", user);
     }
 

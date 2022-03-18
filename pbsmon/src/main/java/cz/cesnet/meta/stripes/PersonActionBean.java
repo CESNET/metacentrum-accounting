@@ -28,8 +28,6 @@ public class PersonActionBean extends BaseActionBean {
 
     final static Logger log = LoggerFactory.getLogger(PersonActionBean.class);
 
-    public static final String PERSONALIZE_URL = "https://metavo.metacentrum.cz/osobniv3/personal/personalize?backurl=";
-
     @SpringBean("userAccess")
     UserAccess userAccess;
 
@@ -58,7 +56,7 @@ public class PersonActionBean extends BaseActionBean {
         HttpSession session = request.getSession(true);
 
         if (user != null) {
-            //prichazime z Osobniho, nastavit
+            //explicitně zadaný uživatel, nastavit
             session.setAttribute(PERSON, user);
         } else {
             user = (String) session.getAttribute(PERSON);
@@ -70,9 +68,6 @@ public class PersonActionBean extends BaseActionBean {
                 }
                 user = remoteUser;
                 session.setAttribute(PERSON, user);
-//                String backurl = request.getScheme() + "://" + request.getServerName()
-//                        + ":" + request.getServerPort() + request.getContextPath() + "/person";
-//                return new RedirectResolution(PERSONALIZE_URL + URLEncoder.encode(backurl, "utf-8"), false);
             }
         }
         //vsechny pristupne fronty
