@@ -16,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,7 +33,6 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
 
     final static Logger log = LoggerFactory.getLogger(QsubPbsproActionBean.class);
 
-    private static final String PERSONALIZE_URL = "https://metavo.metacentrum.cz/osobniv3/personal/personalize?backurl=";
     private static final String JSP_PAGE = "/nodes/qsub_pbspro.jsp";
     public static final String URI_BINDING = "/qsub_pbspro";
     private static final String CPU_FLAG = "cpu_flag";
@@ -46,8 +45,6 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
 
     @SpringBean("userAccess")
     UserAccess userAccess;
-
-    static final String PERSON = "person";
 
     private String user;
 
@@ -81,7 +78,7 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
     }
 
     @Override
-    public Resolution handleValidationErrors(ValidationErrors errors) throws Exception {
+    public Resolution handleValidationErrors(ValidationErrors errors) {
         return data();
     }
 
@@ -90,22 +87,25 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
     //tenhle cirkus je tady proto, ze kdyz jsou ve formulari spatne hodnoty, jde se na person.jsp
     //bez vyvolani actionBeanu. Proto je tu handleValidationError(), ktera se vyvola pri chybach
     //ale aby se data nenacitala dvakrat, je tu vyhybka loaded
-    private Resolution data() throws UnsupportedEncodingException {
+    private Resolution data() {
         log.debug("data(loaded={})", loaded);
         if (!loaded) {
             HttpServletRequest request = ctx.getRequest();
             HttpSession session = request.getSession(true);
 
             if (user != null) {
-                //prichazime z Osobniho, nastavit
-                session.setAttribute(PERSON, user);
+                //explicitně zadaný uživatel, nastavit
+                session.setAttribute(PersonActionBean.PERSON, user);
             } else {
-                user = (String) session.getAttribute(PERSON);
+                user = (String) session.getAttribute(PersonActionBean.PERSON);
                 if (user == null) {
-                    //nic nevime, poslat na Osobni, at nam povi, kdo to je
-                    String backurl = request.getScheme() + "://" + request.getServerName()
-                            + ":" + request.getServerPort() + request.getContextPath() + URI_BINDING;
-                    return new RedirectResolution(PERSONALIZE_URL + URLEncoder.encode(backurl, "utf-8"), false);
+                    String remoteUser = request.getRemoteUser();
+                    log.info("REMOTE_USER {}", remoteUser);
+                    if(remoteUser==null||remoteUser.isEmpty()) {
+                        return new ErrorResolution(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "REMOTE_USER not set");
+                    }
+                    user = remoteUser;
+                    session.setAttribute(PersonActionBean.PERSON, user);
                 }
             }
             log.debug("pripravujeme data pro {}", user);
@@ -219,7 +219,7 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
         return 3600L * wh + 60L * wm + ws;
     }
 
-    public Resolution sestavovac() throws UnsupportedEncodingException {
+    public Resolution sestavovac() {
         log.debug("sestavovac()");
         Resolution r = data();
         if (r != null) return r;
@@ -314,7 +314,7 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
                 String nodeValue = node.getResources().get(resourceName);
                 if(requiredValue.equals("False")) {
                     if("True".equals(nodeValue)) {
-                        log.debug("node {} has resource {}={}, but False was required", node.getName(), resourceName, nodeValue, requiredValue);
+                        log.debug("node {} has resource {}={}, but False was required", node.getName(), resourceName, nodeValue);
                         continue NODES;
                     }
                 } else {
