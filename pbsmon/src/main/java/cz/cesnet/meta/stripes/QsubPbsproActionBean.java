@@ -68,6 +68,7 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
     Map<String, Set<String>> resourceValues;
     List<String> clusters;
     List<String> cities;
+    List<Float> specs;
 
     @DefaultHandler
     public Resolution show() throws UnsupportedEncodingException {
@@ -115,6 +116,9 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
             //a seznam resources
             q2n = new HashMap<>();
             resourceValues = new TreeMap<>();
+            //priprav hodnoty SPECfp2017
+            TreeSet<Float> specs = new TreeSet<>();
+
             for (Queue q : userAccess.getUserQueues(user)) {
                 if (!q.getPbs().isPBSPro()) continue;
                 queues.add(q);
@@ -123,9 +127,11 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
                 q2n.put(q.getName(), nodes);
                 //resources
                 for (Node node : nodes) {
+                    specs.add(node.getSpec());
                     for (NodeResource nr : node.getNodeResources()) {
                         if (nr.getType() == Type.LONG) continue;
                         if (nr.getType() == Type.SIZE) continue;
+                        if (nr.getType() == Type.FLOAT) continue;
                         if (nr.getAvailable() == null) continue;
                         if(nr.getName().equals("queue_list")) continue;
                         Set<String> foundValues = resourceValues.computeIfAbsent(nr.getName(), k -> new TreeSet<>());
@@ -154,6 +160,8 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
             List<String> citynames = Arrays.asList("brno", "budejovice", "olomouc", "liberec", "plzen", "praha");
             cities = resourceValues.keySet().stream().filter(citynames::contains).collect(Collectors.toList());
             cities.forEach(resourceValues::remove);
+            //specs
+            this.specs = new ArrayList<>(specs);
             //censored queues for offering the -q parameter
             offerQueues = new ArrayList<>(queues.size());
             //put default queues first
@@ -197,6 +205,7 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
     String scratchtype = "local";
     String cluster;
     String city;
+    Float spec;
 
     int wm = 0;
     int wh = 1;
@@ -224,8 +233,8 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
         Resolution r = data();
         if (r != null) return r;
         //Sestavovac
-        log.info("sestavovac() user={} -l walltime={}:{}:{}:,q={},nodes={}:ncpus={}:scratch_{}={}{}:mem={}{}: resources= {}:cluster={}:city={}",
-                user, wh, wm, ws, fronta, nodes, ncpus, scratchtype, scratch, scratchu, mem, memu, resources,cluster,city);
+        log.info("sestavovac() user={} -l walltime={}:{}:{}:,q={},nodes={}:ncpus={}:scratch_{}={}{}:mem={}{}: resources= {}:cluster={}:city={}:spec={}",
+                user, wh, wm, ws, fronta, nodes, ncpus, scratchtype, scratch, scratchu, mem, memu, resources,cluster,city,spec);
 
         long memBytes = PbsUtils.parsePbsBytes(this.mem + this.memu);
         long scratchBytes = PbsUtils.parsePbsBytes(this.scratch + this.scratchu);
@@ -305,6 +314,11 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
                     log.debug("node {} has no scratch_shared", node.getName());
                     continue;
                 }
+            }
+            //musí mít dostatečný výkon ve SPECfp2017
+            if (spec != null && node.getSpec() < spec) {
+                log.debug("node {} has low SPECfp: {} < {}", node.getName(), node.getSpec(), spec);
+                continue;
             }
             //resources
             for (Map.Entry<String, String> re : resources.entrySet()) {
@@ -514,5 +528,17 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public List<Float> getSpecs() {
+        return specs;
+    }
+
+    public Float getSpec() {
+        return spec;
+    }
+
+    public void setSpec(Float spec) {
+        this.spec = spec;
     }
 }

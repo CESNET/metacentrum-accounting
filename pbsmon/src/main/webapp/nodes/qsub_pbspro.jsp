@@ -30,6 +30,7 @@
             :scratch_<s:select name="scratchtype"><s:option value="local">local</s:option><s:option value="ssd">ssd</s:option><s:option value="shared">shared</s:option></s:select>=<s:text style="text-align: right;" name="scratch" size="3"/><s:select name="scratchu"><s:option value="mb">mb</s:option><s:option value="gb">gb</s:option></s:select>
             <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>cluster ... <strong><s:select name="cluster"><s:option value=""> </s:option><c:forEach items="${actionBean.clusters}" var="cl"><s:option value="${cl}">:${cl}=True</s:option></c:forEach></s:select>
             <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><t:i18n cs="město" en="city"/> ... <strong> <s:select name="city"><s:option value=""> </s:option><c:forEach items="${actionBean.cities}" var="ct"><s:option value="${ct}">:${ct}=True</s:option></c:forEach></s:select>
+            <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><t:i18n cs="výkon SPECfp2017 na jádro" en="SPECfp2017 per core"/> ... <strong> <s:select name="spec"><s:option value=""> </s:option><c:forEach items="${actionBean.specs}" var="spec"><s:option value="${spec}">:spec=${spec}</s:option></c:forEach></s:select>
             <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><t:i18n cs="jiné zdroje" en="other resources"/> ... <strong>
             <c:forEach items="${actionBean.resourceValues}" var="rv">
             <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :<c:out value="${rv.key}" />=<s:select name="resources.${rv.key}"><s:option value=""> </s:option><c:forEach items="${rv.value}" var="v"><s:option value="${v}">${v}</s:option></c:forEach></s:select>
@@ -46,13 +47,13 @@
         <h4><f:message key="person_qsub_cli"/></h4>
         qsub -l walltime=${actionBean.wh}:${actionBean.wm}:${actionBean.ws}
         <c:choose><c:when test="${actionBean.fronta=='default'}"> </c:when><c:otherwise> -q ${actionBean.fronta} </c:otherwise></c:choose>
-        -l select=${actionBean.nodes}:ncpus=${actionBean.ncpus}<c:if test="${actionBean.ngpus>0}">:ngpus=${actionBean.ngpus}</c:if>:mem=${actionBean.mem}${actionBean.memu}<c:if test="${actionBean.scratch>0}">:scratch_${actionBean.scratchtype}=${actionBean.scratch}${actionBean.scratchu}</c:if><c:forEach items="${actionBean.resources}" var="e"><c:if test="${not empty e.value}">:${e.key}=${e.value}</c:if></c:forEach>
+        -l select=${actionBean.nodes}:ncpus=${actionBean.ncpus}<c:if test="${actionBean.ngpus>0}">:ngpus=${actionBean.ngpus}</c:if>:mem=${actionBean.mem}${actionBean.memu}<c:if test="${actionBean.scratch>0}">:scratch_${actionBean.scratchtype}=${actionBean.scratch}${actionBean.scratchu}</c:if><c:if test="${not empty actionBean.spec}">:spec=${actionBean.spec}</c:if><c:forEach items="${actionBean.resources}" var="e"><c:if test="${not empty e.value}">:${e.key}=${e.value}</c:if></c:forEach>
         <h4><f:message key="person_qsub_bash"/></h4>
 <pre>
 #!/bin/bash
 #PBS -q ${actionBean.fronta}
 #PBS -l walltime=${actionBean.wh}:${actionBean.wm}:${actionBean.ws}
-#PBS -l select=${actionBean.nodes}:ncpus=${actionBean.ncpus}<c:if test="${actionBean.ngpus>0}">:ngpus=${actionBean.ngpus}</c:if>:mem=${actionBean.mem}${actionBean.memu}<c:if test="${actionBean.scratch>0}">:scratch_${actionBean.scratchtype}=${actionBean.scratch}${actionBean.scratchu}</c:if><c:forEach items="${actionBean.resources}" var="e"><c:if test="${not empty e.value}">:${e.key}=${e.value}</c:if></c:forEach>
+#PBS -l select=${actionBean.nodes}:ncpus=${actionBean.ncpus}<c:if test="${actionBean.ngpus>0}">:ngpus=${actionBean.ngpus}</c:if>:mem=${actionBean.mem}${actionBean.memu}<c:if test="${actionBean.scratch>0}">:scratch_${actionBean.scratchtype}=${actionBean.scratch}${actionBean.scratchu}</c:if><c:if test="${not empty actionBean.spec}">:spec=${actionBean.spec}</c:if><c:forEach items="${actionBean.resources}" var="e"><c:if test="${not empty e.value}">:${e.key}=${e.value}</c:if></c:forEach>
 #PBS -N my_awesome_job
 </pre>
         <h3><f:message key="person_vysledek"/></h3>

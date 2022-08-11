@@ -54,6 +54,7 @@ public class Node extends PbsInfoObject {
     public static final String ATTRIBUTE_AVAILABLE_AFTER = "available_after";
     public static final String ATTRIBUTE_PROPERTIES = "properties";
     public static final String ATTRIBUTE_STATUS = "status";
+    public static final String ATTRIBUTE_SPEC = "resources_available.spec";
 
     //node states
     public static final String STATE_FREE = "free";
@@ -810,6 +811,15 @@ public class Node extends PbsInfoObject {
         return nodeResources;
     }
 
+    /**
+     * Gets SPECfp2017 performance for a single core.
+     * @return a number or 0
+     */
+    public float getSpec() {
+        String spec = getAttributes().get(ATTRIBUTE_SPEC);
+        return  spec != null ? Float.parseFloat(spec) : 0.0f;
+    }
+
     private List<Reservation> reservations = new ArrayList<>();
 
     public void addReservation(Reservation reservation) {
@@ -858,6 +868,8 @@ public class Node extends PbsInfoObject {
                 type = Type.BOOLEAN;
             } else if (value.matches("\\d+")) {
                 type = Type.LONG;
+            } else if (value.matches("\\d+\\.\\d+")) {
+                type = Type.FLOAT;
             } else if (value.matches("\\d+[kmg]b")) {
                 type = Type.SIZE;
             } else if (value.contains(",")) {

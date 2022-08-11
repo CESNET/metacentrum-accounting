@@ -4,7 +4,7 @@
     <parent>
         <groupId>cz.metacentrum</groupId>
         <artifactId>accounting-parent</artifactId>
-        <version>3.26</version>
+        <version>3.27</version>
     </parent>
 
     <artifactId>pbsmon</artifactId>

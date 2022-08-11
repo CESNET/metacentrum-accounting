@@ -1,5 +1,6 @@
 package cz.cesnet.meta.pbs;
 
+import cz.cesnet.meta.pbs.Node.NodeResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -211,15 +212,20 @@ public class PbsConnectorFile implements PbsConnector {
         System.out.println("start");
         log.debug("main");
         PbsConnectorFile p = new PbsConnectorFile();
-        PbsServerConfig serverConfig = new PbsServerConfig("wagap", "wagap-pro.cerit-sc.cz", true, false, true, Collections.emptyList());
-        PBS pbs = p.loadFileToMemory(serverConfig, new File("/tmp/wagap.txt"));
-        for (Reservation r : pbs.getReservations().values()) {
-            System.out.println(r.getName()+" r.nodes = " + r.getReservedNodes());
-        }
+        PbsServerConfig serverConfig = new PbsServerConfig("meta", "meta-pbs.metacentrum.cz", false, false, false, Collections.emptyList());
+        PBS pbs = p.loadFileToMemory(serverConfig, new File("meta.txt"));
         pbs.uprav();
-        for (Queue queue : pbs.getQueuesByPriority()) {
-            System.out.println("queue = " + queue);
+
+        HashSet<Float> specvalues = new HashSet<>();
+        List<Node> nodes = pbs.getNodesByName();
+        for (Node node : nodes) {
+                specvalues.add(node.getSpec());
         }
+        System.out.println("specvalues = " + new TreeSet<>(specvalues));
+
+//        for (Queue queue : pbs.getQueuesByPriority()) {
+//            System.out.println("queue = " + queue);
+//        }
 //        for(String nodeName : Arrays.asList("perian50", "hildor27")) {
 //            Node node = arien.getNodes().get(nodeName);
 //            System.out.println(arien.getServer().getShortName() + " node.name: " + node.getName());
