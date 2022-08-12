@@ -34,17 +34,15 @@
              </c:forTokens>
          </tr>
      </table>
+<h3><t:i18n cs="Odkazy" en="Links"/></h3>
+    <ul>
+        <li><s:link href="/user/${actionBean.user}"><f:message key="person_vypis_uloh" /></s:link></li>
+        <li><a href="/${pageContext.request.locale}/myaccount/kvoty"><f:message key="nodes_jsp_person_quotas_link"/></a></li>
+        <li><s:link href="/qsub_pbspro"><t:i18n cs="sestavovač qsub" en="qsub assembler"/></s:link></li>
+    </ul>
 
-    <p><s:link href="/user/${actionBean.user}"><f:message key="person_vypis_uloh" /></s:link></p>
+<t:vms_list vms="${actionBean.userVMs}"/>
 
-    <p><a href="https://metavo.metacentrum.cz/${pageContext.request.locale}/myaccount/kvoty"><f:message key="nodes_jsp_person_quotas_link"/></a>.</p>
-
-     <t:vms_list vms="${actionBean.userVMs}"/>
-
-     <h3><t:i18n cs="Sestavovače qsub" en="Qsub assemblers"/></h3>
-     <ul>
-         <li><s:link href="/qsub_pbspro?user=${actionBean.user}"><t:i18n cs="Sestavovač qsub pro PBSPro" en="Qsub assembler for PBSPro"/></s:link></li>
-     </ul>
 <h3><f:message key="person_accessible_queues"/> <c:out value="${actionBean.user}" /></h3>
 
         <table class="queue">

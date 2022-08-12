@@ -14,7 +14,7 @@
          </tr><tr>
      </c:if>
      <td class="${node.state}"> <s:link class="${node.state}" href="/node/${node.name}">${node.shortName}
-     <c:if test="${node.noOfFreeCPUInt>0}"><span style="font-size: xx-small;">(${node.noOfFreeCPU}&nbsp;CPU, ${node.freeMemoryB} RAM, ${node.scratch.anyAvailableInHumanUnits} HDD)</span></c:if></s:link></td>
+     <c:if test="${node.noOfFreeCPUInt>0}"><span style="font-size: xx-small;">(${node.noOfFreeCPU}&nbsp;CPU, ${node.spec}&nbsp;SPEC, ${node.freeMemoryB}&nbsp;RAM, ${node.scratch.anyAvailableInHumanUnits}&nbsp;HDD)</span></c:if></s:link></td>
      <c:set var="numinrow" value="${numinrow+1}"/>
  </c:forEach>
       </tr>

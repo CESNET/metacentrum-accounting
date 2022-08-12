@@ -51,10 +51,8 @@
                 <td colspan="2" class="${node.state}"><c:out value="${node.ntype}"/></td>
             </tr>
             <tr>
-                <th class="${node.state}"><f:message key="nodejsp_properties"/></th>
-                <td colspan="2" class="${node.state}">
-                    <c:out value="${fn:join(node.properties,':')}"/>
-                </td>
+                <th class="${node.state}"><t:i18n cs="SPECfp2017 na jádro" en="SPECfp2017 per core"/></th>
+                <td colspan="2" class="${node.state}"><c:out value="${node.spec}"/></td>
             </tr>
             <c:if test="${! empty node.requiredQueue}">
                 <tr>
