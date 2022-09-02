@@ -732,7 +732,7 @@ public class Node extends PbsInfoObject {
      * @return null or value of property without prefix
      */
     private String findPrefixedProperty(String prefix) {
-        for (String prop : properties) {
+        for (String prop : getProperties()) {
             if (prop.startsWith(prefix)) {
                 return prop.substring(prefix.length());
             }
