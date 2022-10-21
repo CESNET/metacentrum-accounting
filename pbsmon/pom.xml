@@ -4,7 +4,7 @@
     <parent>
         <groupId>cz.metacentrum</groupId>
         <artifactId>accounting-parent</artifactId>
-        <version>3.28</version>
+        <version>3.29</version>
     </parent>
 
     <artifactId>pbsmon</artifactId>
@@ -72,13 +72,6 @@
         <dependency>
             <groupId>net.sourceforge.stripes</groupId>
             <artifactId>stripes</artifactId>
-            <exclusions>
-                <!--suppress VulnerableLibrariesLocal -->
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>servlets.com</groupId>
