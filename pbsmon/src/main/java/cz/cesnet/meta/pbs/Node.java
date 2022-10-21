@@ -26,10 +26,12 @@ public class Node extends PbsInfoObject {
 
     //used attribute names
     public static final String ATTRIBUTE_STATE = "state";
+    public static final String ATTRIBUTE_STATE_AUXILIARY = "state_aux";
     public static final String ATTRIBUTE_EXCLUSIVELY_ASSIGNED = "exclusively_assigned";
     public static final String ATTRIBUTE_NODE_TYPE = "ntype";
     public static final String ATTRIBUTE_RESOURCES_AVAILABLE_ARCH = "resources_available.arch";
     public static final String ATTRIBUTE_COMMENT = "comment";
+    public static final String ATTRIBUTE_COMMENT_AUXILIARY = "comment_aux";
     public static final String ATTRIBUTE_NOTE = "note";
 
     public static final String ATTRIBUTE_NUMBER_OF_PROCESSORS_TORQUE = "np";
@@ -221,6 +223,12 @@ public class Node extends PbsInfoObject {
         if (this.pbsState == null) {
             this.pbsState = PbsUtils.substringBefore(attrs.get(ATTRIBUTE_STATE), ',');
 
+            String pbsStateAux = PbsUtils.substringBefore(attrs.get(ATTRIBUTE_STATE_AUXILIARY),',');
+            Set<String> unavailableStates = Set.of(STATE_OFFLINE, STATE_DOWN, STATE_UNKNOWN);
+            if(pbsStateAux!=null && unavailableStates.contains(pbsStateAux)) {
+                this.pbsState = pbsStateAux;
+            }
+
             if (this.pbsState.equals(STATE_FREE)) {
                 if (getNoOfUsedCPUInt() >= getNoOfCPUInt()) {
                     this.pbsState = STATE_JOB_FULL;
@@ -282,6 +290,10 @@ public class Node extends PbsInfoObject {
             comment = attrs.get(ATTRIBUTE_NOTE);
         }
         return comment;
+    }
+
+    public String getCommentAux() {
+        return attrs.get(ATTRIBUTE_COMMENT_AUXILIARY);
     }
 
     public String getNoOfCPU() {

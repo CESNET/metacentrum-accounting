@@ -24,7 +24,9 @@
 <c:if test="${node.offline}">
     <p class="comment"><f:message key="nodejsp_offline"><f:param value="${node.comment}"/></f:message></p>
 </c:if>
-
+<c:if test="${not empty(node.commentAux)}">
+    <p class="comment"><c:out value="${node.commentAux}"/></p>
+</c:if>
 
 <%-- barevna tabulka s hlavnimi udaji  --%>
         <table class="node" cellspacing="0">
