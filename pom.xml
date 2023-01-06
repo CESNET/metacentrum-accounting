@@ -7,15 +7,14 @@
     <packaging>pom</packaging>
 
     <!--
-    Use "mvn versions:set -DnewVersion=3.29; mvn versions:commit" to change version in all modules
+    Use "mvn versions:set -DnewVersion=3.31; mvn versions:commit" to change version in all modules
      -->
-    <version>3.29</version>
+    <version>3.30</version>
     <name>MetaCentrum Accounting Parent Project</name>
 
     <properties>
         <java.version>17</java.version>
         <taglibs-standard.version>1.2.5</taglibs-standard.version>
-        <commons-text.version>1.10.0</commons-text.version>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
@@ -33,7 +32,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
-                <version>${commons-text.version}</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>net.sourceforge.stripes</groupId>
