@@ -5,6 +5,7 @@
 <%@ page pageEncoding="utf-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="s" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
@@ -58,13 +59,19 @@
             <!-- duvody cekani -->
             <table class="job">
                 <tr>
-                    <th><f:message key="jobs_queued_duvod"/></th>
                     <th><f:message key="jobs_pocet"/></th>
+                    <th><f:message key="jobs_queued_duvod"/></th>
                 </tr>
                 <c:forEach items="${actionBean.duvody[pbs.server.host]}" var="duvod">
                     <tr>
-                        <td style="text-align: left;"><c:out value="${duvod.text}"/></td>
                         <td style="text-align: right;">${duvod.pocet}x</td>
+                        <td style="text-align: left;">
+                            <c:choose>
+                                <c:when test="${fn:length(duvod.text)>125}"><c:out
+                                        value="${fn:substring(duvod.text, 0, 125)}"/> ...</c:when>
+                                <c:otherwise><c:out value="${duvod.text}"/></c:otherwise>
+                            </c:choose>
+                        </td>
                     </tr>
                 </c:forEach>
 
@@ -81,20 +88,20 @@
         <h3>Server ${pbs.server.host} - <f:message key="server_${pbs.server.host}"/></h3>
 
         <% if (pbs.getServerConfig().isPlanbased()) { %>
-        <a name="<%=pbs.getServer().getName()%>"></a>
+        <a id="<%=pbs.getServer().getName()%>"></a>
         <table class="job">
             <tr>
                 <th><f:message key="jobs_job"/></th>
                 <th><f:message key="jobs_ncpu"/></th>
+                <th>RAM</th>
                 <th><f:message key="job_resource_nodes"/></th>
-                <th><f:message key="jobs_mem_reserved"/></th>
                 <th><f:message key="jobs_user"/></th>
                 <c:if test="${param.showFairshare}">
                     <th><s:link href="/users#fairshare">fairshare*</s:link></th>
                 </c:if>
                 <th colspan="2"><f:message key="jobs_planned_start"/></th>
-                    <%--<th colspan="2"><f:message key="jobs_ctime"/></th>--%>
                 <th><f:message key="job_planned_nodes"/></th>
+                <th colspan="2"><f:message key="jobs_ctime"/></th>
                 <th><f:message key="jobs_waiting_reason"/></th>
             </tr>
 
@@ -102,32 +109,31 @@
                 for (Job job : actionBean.getPlannedJobs().get(pbs.getServer().getHost())) {
             %>
             <tr>
-                <td class="job_plan_name_col"><a href="<%=contextPath+"/job/"+job.getName()%>"
-                                                 style="font-size: xx-small"><%=job.getName()%>
-                </a>
-                <td class="job_plan_cpu_col" align="center"><%=job.getNoOfUsedCPU()%>
+                <td class="job_plan_name_col"><a href="<%=contextPath+"/job/"+job.getName()%>" style="font-size: xx-small"><%=job.getName()%></a></td>
+                <td class="job_plan_cpu_col" style="text-align: center;"><%=job.getNoOfUsedCPU()%></td>
+                <td class="job_plan_mem_col" style="text-align: right;"><%=job.getReservedMemoryTotal()%></td>
+                <td class="job_plan_res_col" style="text-align: left; font-size: xx-small;">
+                    <%=(job.getResourceNodes()!=null&&job.getResourceNodes().length()>50)?job.getResourceNodes().substring(0,50)+"...":job.getResourceNodes()%>
                 </td>
-                <td class="job_plan_res_col" align="left"><%=job.getResourceNodes()%>
-                </td>
-                <td class="job_plan_mem_col" align="right"><%=job.getReservedMemoryTotal()%>
-                </td>
-                <td align="right"><a href="<%=contextPath+"/user/"+job.getUser()%>"><%=job.getUser()%>
-                </a></td>
-                <c:if test="${param.showFairshare}">
-                    <td align="right"><%=job.getFairshareRank()%>
-                    </td>
-                </c:if>
+                <td style="text-align: right;"><a href="<%=contextPath+"/user/"+job.getUser()%>"><%=job.getUser()%></a></td>
+                <c:if test="${param.showFairshare}"><td style="text-align: right;"><%=job.getFairshareRank()%></td></c:if>
                 <% if (job.getPlannedStart() != null) { %>
-                <td align="right"><f:formatDate value="<%=job.getPlannedStart()%>" type="date" dateStyle="short"/></td>
-                <td align="right"><f:formatDate value="<%=job.getPlannedStart()%>" type="time" timeStyle="short"/></td>
+                <td style="text-align: right;"><f:formatDate value="<%=job.getPlannedStart()%>" type="date" dateStyle="short"/></td>
+                <td style="text-align: right;"><f:formatDate value="<%=job.getPlannedStart()%>" type="time" timeStyle="short"/></td>
                 <% } else { %>
                 <td colspan="2"></td>
                 <% } %>
-                <td align="left"><%if (job.getPlannedNodes() != null) {%><a
+                <td style="text-align: left;"><%if (job.getPlannedNodes() != null) {%><a
                         href="<%=contextPath+"/job/"+job.getName()%>"><%=job.getPlannedNodesShort()%>
                 </a><%}%></td>
-                <td class="job_plan_comment_col" align="left" style="font-size: xx-small;"><c:out
-                        value="<%=job.getComment()%>"/></td>
+                <% if (job.getTimeCreated() != null) { %>
+                <td style="text-align: right;"><f:formatDate value="<%=job.getTimeCreated()%>" type="date" dateStyle="short"/></td>
+                <td style="text-align: right;"><f:formatDate value="<%=job.getTimeCreated()%>" type="time" timeStyle="short"/></td>
+                <% } else { %>
+                <td colspan="2"></td>
+                <% } %>
+                <td class="job_plan_comment_col" style="font-size: xx-small; text-align: left;"><c:out
+                        value='<%=(job.getComment()!=null&&job.getComment().length()>60)?job.getComment().substring(0,60)+"...":job.getComment()%>'/></td>
             </tr>
             <%
 
