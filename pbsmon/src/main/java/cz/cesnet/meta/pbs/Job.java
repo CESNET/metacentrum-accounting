@@ -248,8 +248,8 @@ public class Job extends PbsInfoObject {
     }
 
     public static class Credential {
-        private String id;
-        private Date validity;
+        private final String id;
+        private final Date validity;
 
         public Credential(String id, Date validity) {
             this.id = id;
@@ -421,7 +421,7 @@ public class Job extends PbsInfoObject {
 
     public Integer getExitStatus() {
         String s = attrs.get(pbs.isTorque() ? ATTRIBUTE_EXIT_STATUS_TORQUE : ATTRIBUTE_EXIT_STATUS_PBSPRO);
-        if (s != null) return new Integer(s);
+        if (s != null) return Integer.valueOf(s);
         return null;
     }
 
@@ -746,7 +746,7 @@ public class Job extends PbsInfoObject {
         if (execHostFirst == null) {
             String hosts = attrs.get(ATTRIBUTE_EXEC_HOST);
             if (hosts != null) {
-                String sh[] = hosts.split("\\+");
+                String[] sh = hosts.split("\\+");
                 execHostFirst = sh[0];
             } else execHostFirst = null;
         }
@@ -774,7 +774,7 @@ public class Job extends PbsInfoObject {
         if (execHostMore == null) {
             String hosts = attrs.get(ATTRIBUTE_EXEC_HOST);
             if (hosts != null) {
-                String sh[] = hosts.split("\\+");
+                String[] sh = hosts.split("\\+");
                 if (sh.length > 1) {
                     execHostMore = new String[sh.length - 1];
                     System.arraycopy(sh, 1, this.execHostMore, 0, (sh.length - 1));
@@ -940,15 +940,12 @@ public class Job extends PbsInfoObject {
         if (scratch != null) return scratch;
         //construct the path itself
         String scratchType = getScratchType();
-        switch (scratchType) {
-            case "local":
-                return "/scratch/" + getUser() + "/job_" + getId();
-            case "ssd":
-                return "/scratch.ssd/" + getUser() + "/job_" + getId();
-            case "shared":
-                return "/scratch.shared/" + getUser() + "/job_" + getId();
-        }
-        return null;
+        return switch (scratchType) {
+            case "local" -> "/scratch/" + getUser() + "/job_" + getId();
+            case "ssd" -> "/scratch.ssd/" + getUser() + "/job_" + getId();
+            case "shared" -> "/scratch.shared/" + getUser() + "/job_" + getId();
+            default -> null;
+        };
     }
 
     private Map<String, ReservedResources> nodeName2reservedResources;
