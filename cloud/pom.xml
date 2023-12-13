@@ -51,8 +51,8 @@
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>GitHub martin-kuba Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/martin-kuba/metacentrum-accounting</url>
+            <name>GitHub CESNET Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/CESNET/metacentrum-accounting</url>
         </repository>
     </distributionManagement>
 

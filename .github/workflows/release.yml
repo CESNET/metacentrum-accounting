@@ -8,38 +8,25 @@ on:
 
 jobs:
   publish:
-    name: "Build and upload release asset"
+    name: "build and upload release asset"
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: "Check out code"
-        uses: actions/checkout@v3
-      - name: "Set up JDK"
-        uses: actions/setup-java@v3
+      - name: "check out code"
+        uses: actions/checkout@v4
+
+      - name: "set up JDK"
+        uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: "zulu"
           cache: 'maven'
-      - name: "Compile and package"
-        run: mvn -B clean deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: "Create Release"
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "compile and package"
+        run: mvn -B clean install
+
+      - name: "create release and upload assets"
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-      - name: "Upload Release Asset"
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: pbsmon/target/pbsmon2.war
-          asset_name: pbsmon2.war
-          asset_content_type: application/x-webarchive
+            artifacts: "pbsmon/target/pbsmon2.war"

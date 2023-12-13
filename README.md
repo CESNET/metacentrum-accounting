@@ -1,4 +1,4 @@
-![](https://github.com/martin-kuba/metacentrum-accounting/workflows/Java%20Matrix%20CI/badge.svg)
+![](https://github.com/CESNET/metacentrum-accounting/workflows/Java%20Matrix%20CI/badge.svg)
 
 # metacentrum-accounting
 Accounting for MetaCentrum
