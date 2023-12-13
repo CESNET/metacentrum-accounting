@@ -4,7 +4,7 @@
     <parent>
         <groupId>cz.metacentrum</groupId>
         <artifactId>accounting-parent</artifactId>
-        <version>3.30</version>
+        <version>3.31</version>
     </parent>
 
     <artifactId>cloud</artifactId>

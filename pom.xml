@@ -9,12 +9,13 @@
     <!--
     Use "mvn versions:set -DnewVersion=3.31; mvn versions:commit" to change version in all modules
      -->
-    <version>3.30</version>
+    <version>3.31</version>
     <name>MetaCentrum Accounting Parent Project</name>
 
     <properties>
         <java.version>17</java.version>
         <taglibs-standard.version>1.2.5</taglibs-standard.version>
+        <commons-lang3.version>3.14.0</commons-lang3.version><!-- fix for missing Range.of() in commons-lang3 3.12 -->
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
