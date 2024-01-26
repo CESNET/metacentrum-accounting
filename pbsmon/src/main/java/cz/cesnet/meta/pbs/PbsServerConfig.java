@@ -17,6 +17,7 @@ public class PbsServerConfig {
     private boolean by_queue;
     private List<FairshareConfig> fairshares;
     private String groupFile;
+    private String pbsCaller = "pbsprocaller";
     /**
      * If true, server uses plan-based scheduler, thus waiting jobs are sorted by planned_start instead of by queue priority and fairshare.
      */
@@ -90,6 +91,14 @@ public class PbsServerConfig {
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+    public String getPbsCaller() {
+        return pbsCaller;
+    }
+
+    public void setPbsCaller(String pbsCaller) {
+        this.pbsCaller = pbsCaller;
     }
 
     @Override

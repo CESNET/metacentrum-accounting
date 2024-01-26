@@ -33,7 +33,7 @@ public class PbsConnectorFile implements PbsConnector {
             File tempStderrFile = File.createTempFile("stderr", ".txt");
             File tmpDirectory = Paths.get(System.getProperty("java.io.tmpdir", "/tmp")).toFile();
 
-            Process p = new ProcessBuilder("pbsprocaller", serverHost)
+            Process p = new ProcessBuilder(serverConfig.getPbsCaller(), serverHost)
                     .inheritIO()
                     .redirectOutput(tempStdoutFile)
                     .redirectError(tempStderrFile)
