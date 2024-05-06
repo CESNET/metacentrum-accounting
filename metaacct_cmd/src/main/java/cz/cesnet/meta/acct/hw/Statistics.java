@@ -43,11 +43,15 @@ public class Statistics {
 
     public static void manualStatistics() {
         Stats stats = new ClassPathXmlApplicationContext("spring-context.xml").getBean("stats", Stats.class);
+//        generateStats(stats, absoluteDate(2024, 3, 21), relativeDate(-1));
+//        generateStats(stats, absoluteDate(2024, 2, 21), relativeDate(-31));
+//        generateStats(stats, absoluteDate(2023, 12, 21), relativeDate(-93));
+
 //        generateStats(stats, relativeDate(-3), relativeDate(-1));
 //        generateStats(stats, relativeDate(-33), relativeDate(-31));
 //        generateStats(stats, relativeDate(-95), relativeDate(-93));
 
-        recompute("cha.natur.cuni.cz", "2021-02-02", "2021-02-03", stats);
+//        recompute("alfrid.meta.zcu.cz", "2024-03-27", "2024-04-02", stats);
 //        recompute("safedx.metacentrum.cz", "2018-08-24", "2018-08-26", stats);
 //        recompute("elixir-storage1.grid.cesnet.cz", "2017-07-24", "2017-07-24", stats);
 //        recompute("tarkil.grid.cesnet.cz", "2016-11-02", stats);
