@@ -90,30 +90,6 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                     <property name="groupFile" value="/etc/pbsmon/group/cerit-pbs"/>
                 </bean>
 
-                <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
-                    <property name="shortName" value="elixir"/>
-                    <property name="host" value="elixir-pbs.elixir-czech.cz"/>
-                    <property name="main" value="false"/>
-                    <property name="torque" value="false"/>
-                    <property name="by_queue" value="false"/>
-                    <property name="planbased" value="true"/>
-                    <property name="fairshares">
-                        <list>
-                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
-                                <constructor-arg name="tree" value="elixir" />
-                                <constructor-arg name="metrics" value="fairshare.elixir" />
-                                <constructor-arg name="id" value="elixir" />
-                            </bean>
-                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
-                                <constructor-arg name="tree" value="default" />
-                                <constructor-arg name="metrics" value="fairshare" />
-                                <constructor-arg name="id" value="elixir.meta" />
-                            </bean>
-                        </list>
-                    </property>
-                    <property name="groupFile" value="/etc/pbsmon/group/elixir-pbs"/>
-                </bean>
-
             </list>
         </constructor-arg>
     </bean>
