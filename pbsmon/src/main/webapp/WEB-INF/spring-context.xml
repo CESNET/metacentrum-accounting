@@ -43,35 +43,6 @@ http://www.springframework.org/schema/tx/spring-tx.xsd"
                 </bean>
 
                 <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
-                    <property name="shortName" value="meta"/>
-                    <property name="host" value="meta-pbs.metacentrum.cz"/>
-                    <property name="main" value="false"/> <!-- nanejvýš jedna může být hlavní, pak jména front neobsahují stroj -->
-                    <property name="torque" value="false"/>
-                    <property name="by_queue" value="false"/>
-                    <property name="planbased" value="true"/>
-                    <property name="fairshares">
-                        <list>
-                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
-                                <constructor-arg name="tree" value="default" />
-                                <constructor-arg name="metrics" value="fairshare" />
-                                <constructor-arg name="id" value="meta" />
-                            </bean>
-                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
-                                <constructor-arg name="tree" value="ncbr" />
-                                <constructor-arg name="metrics" value="fairshare.ncbr" />
-                                <constructor-arg name="id" value="meta.ncbr" />
-                            </bean>
-                            <bean class="cz.cesnet.meta.pbs.FairshareConfig">
-                                <constructor-arg name="tree" value="elixir" />
-                                <constructor-arg name="metrics" value="fairshare.elixir" />
-                                <constructor-arg name="id" value="meta.elixir" />
-                            </bean>
-                        </list>
-                    </property>
-                    <property name="groupFile" value="/etc/pbsmon/group/meta-pbs"/>
-                </bean>
-
-                <bean class="cz.cesnet.meta.pbs.PbsServerConfig">
                     <property name="shortName" value="cerit"/>
                     <property name="host" value="cerit-pbs.cerit-sc.cz"/>
                     <property name="main" value="false"/>
