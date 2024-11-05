@@ -1,11 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "ignoreDeps": [
     "com.github.hazendaz:displaytag",
-    "net.sourceforge.stripes:stripes"
+    "net.sourceforge.stripes:stripes",
+    "cz.metacentrum:accounting-parent"
   ],
   "packageRules": [
     {

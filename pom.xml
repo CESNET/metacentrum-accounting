@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>cz.metacentrum</groupId>
     <artifactId>accounting-parent</artifactId>
     <packaging>pom</packaging>
 
     <!--
-    Use "mvn versions:set -DnewVersion=3.31; mvn versions:commit" to change version in all modules
+    Use "mvn versions:set -DnewVersion=3.33; mvn versions:commit" to change version in all modules
      -->
-    <version>3.31</version>
+    <version>3.32</version>
     <name>MetaCentrum Accounting Parent Project</name>
 
     <properties>
         <java.version>17</java.version>
         <taglibs-standard.version>1.2.5</taglibs-standard.version>
-        <commons-lang3.version>3.14.0</commons-lang3.version><!-- fix for missing Range.of() in commons-lang3 3.12 -->
+        <commons-lang3.version>3.17.0</commons-lang3.version><!-- fix for missing Range.of() in commons-lang3 3.12 -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <spring.version>5.3.39</spring.version>
+        <logback.version>1.4.14</logback.version>
+        <postgresql.version>42.7.4</postgresql.version>
     </properties>
 
     <!-- defines compatible versions of many libraries -->
@@ -30,6 +33,47 @@
     <!-- specifies versions not defined by the Spring platform-bom -->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-expression</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.16.1</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
