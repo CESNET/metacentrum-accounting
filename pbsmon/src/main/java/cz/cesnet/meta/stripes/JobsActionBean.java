@@ -31,8 +31,8 @@ public class JobsActionBean extends BaseActionBean {
 
     final static Logger log = LoggerFactory.getLogger(JobsActionBean.class);
     final static private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final long MILLIS_IN_HOUR = 3600000l;
-    private static final long MILLIS_IN_15MINS = 10 * 60 * 1000;
+    private static final long MILLIS_IN_HOUR = 3600000L;
+    private static final long MILLIS_IN_15MINS = 15 * 60 * 1000;
     private static final int INTERVALS = 24 * 4;
     int[] runningJobsCountersMins = new int[INTERVALS];
     int[] queuedJobsCountersMins = new int[INTERVALS];
