@@ -34,13 +34,13 @@ public class JobsActionBean extends BaseActionBean {
     private static final long MILLIS_IN_HOUR = 3600000L;
     private static final long MILLIS_IN_15MINS = 15 * 60 * 1000;
     private static final int INTERVALS = 24 * 4;
-    int[] runningJobsCountersMins = new int[INTERVALS];
-    int[] queuedJobsCountersMins = new int[INTERVALS];
-    int[] runningCPUsCountersMins = new int[INTERVALS];
-    int[] queuedCPUsCountersMins = new int[INTERVALS];
-    int[] completedCountersMins = new int[INTERVALS];
-    int[] startedCountersMins = new int[INTERVALS];
-    int[] createdCountersMins = new int[INTERVALS];
+    int[] runningJobsCountersMins;
+    int[] queuedJobsCountersMins;
+    int[] runningCPUsCountersMins;
+    int[] queuedCPUsCountersMins;
+    int[] completedCountersMins;
+    int[] startedCountersMins;
+    int[] createdCountersMins;
     Map<Integer, Integer> jobsCPU = new TreeMap<Integer, Integer>();
     Map<Integer, Integer> waitingHoursJobs = new HashMap<Integer, Integer>();
     LinkedHashMap<String, String> warnings;
@@ -77,6 +77,14 @@ public class JobsActionBean extends BaseActionBean {
         int holdCPUs = 0;
         warnings = new LinkedHashMap<>(40);
         suspiciousJobs = new HashMap<>(40);
+        // zero
+        runningJobsCountersMins = new int[INTERVALS];
+        queuedJobsCountersMins = new int[INTERVALS];
+        runningCPUsCountersMins = new int[INTERVALS];
+        queuedCPUsCountersMins = new int[INTERVALS];
+        completedCountersMins = new int[INTERVALS];
+        startedCountersMins = new int[INTERVALS];
+        createdCountersMins = new int[INTERVALS];
         //ziskame ulohy
         for (PBS pbs : pbsky.getListOfPBS()) {
             for (Job job : pbs.getJobsById()) {
