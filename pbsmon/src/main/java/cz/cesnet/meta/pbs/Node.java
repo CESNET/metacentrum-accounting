@@ -50,6 +50,7 @@ public class Node extends PbsInfoObject {
     public static final String ATTRIBUTE_TOTAL_MEMORY_PBSPRO = "resources_available.mem";
     public static final String ATTRIBUTE_USED_MEMORY_TORQUE = "resources_used.mem";
     public static final String ATTRIBUTE_USED_MEMORY_PBSPRO = "resources_assigned.mem";
+    public static final String ATTRIBUTE_GPU_MEM = "resources_available.gpu_mem";
     public static final String ATTRIBUTE_QUEUE = "queue";
     public static final String ATTRIBUTE_JOBS = "jobs";
     public static final String ATTRIBUTE_AVAILABLE_BEFORE = "available_before";
@@ -451,6 +452,10 @@ public class Node extends PbsInfoObject {
 
     public String getFreeMemoryB() {
         return PbsUtils.formatInHumanUnits(getFreeMemoryInt());
+    }
+
+    public long getGpuMemoryInt() {
+        return PbsUtils.parsePbsBytes(attrs.get(ATTRIBUTE_GPU_MEM));
     }
 
     /**

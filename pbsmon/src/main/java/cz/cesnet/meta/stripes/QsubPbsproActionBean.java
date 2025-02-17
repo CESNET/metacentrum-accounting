@@ -196,6 +196,8 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
     @Validate(on = {"sestavovac"}, required = true, minvalue = 1)
     long mem = 400;
     String memu = "mb";
+    long gpu_mem = 0L;
+    String gpu_memu = "mb";
     int nodes = 1;
     int ncpus = 1;
     int ngpus = 0;
@@ -233,10 +235,11 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
         Resolution r = data();
         if (r != null) return r;
         //Sestavovac
-        log.info("sestavovac() user={} -l walltime={}:{}:{}:,q={},nodes={}:ncpus={}:scratch_{}={}{}:mem={}{}: resources= {}:cluster={}:city={}:spec={}",
-                user, wh, wm, ws, fronta, nodes, ncpus, scratchtype, scratch, scratchu, mem, memu, resources,cluster,city,spec);
+        log.info("sestavovac() user={} -l walltime={}:{}:{}:,q={},nodes={}:ncpus={}:scratch_{}={}{}:mem={}{}:gpu_mem={}{}: resources= {}:cluster={}:city={}:spec={}",
+                user, wh, wm, ws, fronta, nodes, ncpus, scratchtype, scratch, scratchu, mem, memu, gpu_mem, gpu_memu, resources,cluster,city,spec);
 
         long memBytes = PbsUtils.parsePbsBytes(this.mem + this.memu);
+        long gpuMemBytes = PbsUtils.parsePbsBytes(this.gpu_mem + this.gpu_memu);
         long scratchBytes = PbsUtils.parsePbsBytes(this.scratch + this.scratchu);
         long walltimeSecs = walltimeSecs();
 
@@ -297,6 +300,11 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
             //musi mit dost pameti
             if (node.getTotalMemoryInt() < memBytes) {
                 log.debug("node {} has not enough RAM: {}<{}", node.getName(), node.getTotalMemoryInt(), memBytes);
+                continue;
+            }
+            //musi mit dost GPU pameti
+            if (node.getGpuMemoryInt() < gpuMemBytes) {
+                log.debug("node {} has not enough GPU memory: {}<{}", node.getName(), node.getGpuMemoryInt(), gpuMemBytes);
                 continue;
             }
             //musi mit vhodny typ scratche
@@ -420,6 +428,22 @@ public class QsubPbsproActionBean extends BaseActionBean implements ValidationEr
 
     public void setMem(long mem) {
         this.mem = mem;
+    }
+
+    public long getGpu_mem() {
+        return gpu_mem;
+    }
+
+    public void setGpu_mem(long gpu_mem) {
+        this.gpu_mem = gpu_mem;
+    }
+
+    public String getGpu_memu() {
+        return gpu_memu;
+    }
+
+    public void setGpu_memu(String gpu_memu) {
+        this.gpu_memu = gpu_memu;
     }
 
     public int getNodes() {
