@@ -14,6 +14,7 @@ public class VypocetniZdroj implements Serializable {
     private String photo;
     private String thumbnail;
     private String cpuDesc;
+    private String gpuDesc;
     private String memory;
 
     private Stroj stroj;
@@ -96,6 +97,7 @@ public class VypocetniZdroj implements Serializable {
                 ", photo='" + photo + '\'' +
                 ", thumbnail='" + thumbnail + '\'' +
                 ", cpuDesc='" + cpuDesc + '\'' +
+                ", gpuDesc='" + gpuDesc + '\'' +
                 ", memory='" + memory + '\'' +
                 ", voNames=" + voNames +
                 '}';
@@ -137,6 +139,14 @@ public class VypocetniZdroj implements Serializable {
 
     public void setCpuDesc(String cpuDesc) {
         this.cpuDesc = cpuDesc;
+    }
+
+    public String getGpuDesc() {
+        return gpuDesc;
+    }
+
+    public void setGpuDesc(String gpuDesc) {
+        this.gpuDesc = gpuDesc;
     }
 
     public String getMemory() {

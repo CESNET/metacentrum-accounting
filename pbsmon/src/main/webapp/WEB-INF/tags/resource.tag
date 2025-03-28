@@ -13,6 +13,12 @@
         <th>RAM</th>
         <td><c:out value='${resource.memory}'/></td>
     </tr>
+    <c:if test="${not empty resource.gpuDesc}">
+    <tr>
+        <th>GPU</th>
+        <td><c:out value='${resource.gpuDesc}'/></td>
+    </tr>
+    </c:if>
     <tr>
         <th>disk</th>
         <td><f:message key="${resource.diskKey}"/></td>

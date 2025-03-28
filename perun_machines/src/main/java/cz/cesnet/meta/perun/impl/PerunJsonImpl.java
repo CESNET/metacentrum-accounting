@@ -91,8 +91,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         JSONValue value = jsonObject.get(key);
         if (value == null || value.isNull()) return "";
         if (value.isString()) {
-            JSONString jsonString = (JSONString) value;
-            return jsonString.getValue();
+            return ((JSONString) value).getValue();
         }
         throw new RuntimeException("value for key " + key + " must be string, it is " + value);
     }
@@ -170,6 +169,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         zdroj.setPhoto(getString(jzdroj, "photo"));
         zdroj.setThumbnail(getString(jzdroj, "thumbnail"));
         zdroj.setCpuDesc(getString(jzdroj, "cpudesc"));
+        zdroj.setGpuDesc(getString(jzdroj, "gpudesc"));
         zdroj.setMemory(getString(jzdroj, "memory"));
         nactiTexty("resource " + zid, texty, jzdroj, zdroj.getDiskKey(), "disk");
         nactiTexty("resource " + zid, texty, jzdroj, zdroj.getNetworkKey(), "network");
