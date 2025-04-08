@@ -41,24 +41,24 @@
 
 <hr/>
 
-<p><f:message key="nodes_jsp_celkem_cpu"/>: ${actionBean.cpuMap['vsechny']}</p>
+<p><f:message key="nodes_jsp_celkem_cpu"/>: ${actionBean.cpuMap['all']}</p>
 
-        <c:forEach items="${actionBean.centra}" var="centrum">
-            <h3><strong><f:message key="${centrum.nazevKey}"/></strong>
-                <c:set value="${actionBean.cpuCountMap[centrum.id]}" var="c"/>
+        <c:forEach items="${actionBean.centra}" var="ownerOrganisation">
+            <h3><strong><f:message key="${ownerOrganisation.nameKey}"/></strong>
+                <c:set value="${actionBean.cpuCountMap[ownerOrganisation.id]}" var="c"/>
             (<f:message key="stats_vyuziti"/> ${c.used}/${c.total}
                 = <f:formatNumber type="percent" maxFractionDigits="1" value="${c.used/c.total}"/>)
             </h3>
 
-            <p style="font-size: smaller; padding-left: 5px;"><f:message key="${centrum.specKey}"/></p>
+            <p style="font-size: smaller; padding-left: 5px;"><f:message key="${ownerOrganisation.specKey}"/></p>
             <table width="90%">
-                <c:forEach var="zdr" items="${centrum.zdroje}" varStatus="s">
+                <c:forEach var="zdr" items="${ownerOrganisation.perunComputingResources}" varStatus="s">
                     <tr>
                         <td colspan="2">
-                            ${zdr.nazev}
+                            ${zdr.name}
                             <c:choose>
-                                <c:when test="${zdr.cluster}"><f:message key="stats_cluster"><f:param value="${fn:length(zdr.stroje)}"/><f:param value="${actionBean.cpuMap[zdr.id]}"/></f:message></c:when>
-                                <c:otherwise><f:message key="stats_samostatny_stroj"><f:param value="${zdr.stroj.cpuNum}"/></f:message></c:otherwise>
+                                <c:when test="${zdr.cluster}"><f:message key="stats_cluster"><f:param value="${fn:length(zdr.perunMachines)}"/><f:param value="${actionBean.cpuMap[zdr.id]}"/></f:message></c:when>
+                                <c:otherwise><f:message key="stats_samostatny_stroj"><f:param value="${zdr.perunMachine.cpuNum}"/></f:message></c:otherwise>
                             </c:choose>
                             <c:set value="${actionBean.cpuCountMap[zdr.id]}" var="c"/>
                             (<f:message key="stats_vyuziti"/> ${c.used}/${c.total}
@@ -68,14 +68,14 @@
                             <c:choose>
                             <c:when test="${zdr.cluster}">
                                 <tr>
-                                <c:forEach items="${zdr.stroje}" var="stroj" varStatus="i">
-                                    <td class="node ${stroj.state}"><s:link href="/machine/${stroj.name}"><c:out value="${stroj.shortName}"/>&nbsp;(${actionBean.cpuCountMap[stroj.name].used}/${actionBean.cpuCountMap[stroj.name].total})</s:link></td>
+                                <c:forEach items="${zdr.perunMachines}" var="perunMachine" varStatus="i">
+                                    <td class="node ${perunMachine.state}"><s:link href="/machine/${perunMachine.name}"><c:out value="${perunMachine.shortName}"/>&nbsp;(${actionBean.cpuCountMap[perunMachine.name].used}/${actionBean.cpuCountMap[perunMachine.name].total})</s:link></td>
                                     <c:if test="${i.count%7==0}"></tr><tr></c:if>
                                 </c:forEach>
                                 </tr>
                             </c:when>
                             <c:otherwise>
-                                <tr><td class="node ${zdr.stroj.state}"><s:link href="/machine/${zdr.stroj.name}"><c:out value="${zdr.stroj.shortName}"/>&nbsp;(${actionBean.cpuCountMap[zdr.stroj.name].used}/${actionBean.cpuCountMap[zdr.stroj.name].total})</s:link></td></tr>
+                                <tr><td class="node ${zdr.perunMachine.state}"><s:link href="/machine/${zdr.perunMachine.name}"><c:out value="${zdr.perunMachine.shortName}"/>&nbsp;(${actionBean.cpuCountMap[zdr.perunMachine.name].used}/${actionBean.cpuCountMap[zdr.perunMachine.name].total})</s:link></td></tr>
                             </c:otherwise>
                         </c:choose>
                     </table>

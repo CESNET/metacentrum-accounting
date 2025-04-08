@@ -1,18 +1,13 @@
 package cz.cesnet.meta.stripes;
 
-import cz.cesnet.meta.pbsmon.RozhodovacStavuStroju;
-import cz.cesnet.meta.perun.api.FyzickeStroje;
+import cz.cesnet.meta.perun.api.PhysicalMachines;
 import cz.cesnet.meta.perun.api.Perun;
-import cz.cesnet.meta.perun.api.VypocetniZdroj;
-import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Displayes a computing resource, cluster or machine.
@@ -28,14 +23,14 @@ public class HardwareActionBean extends BaseActionBean {
     @SpringBean("perun")
     protected Perun perun;
 
-    private FyzickeStroje fyzickeStroje;
+    private PhysicalMachines physicalMachines;
 
     public Resolution show() {
-        fyzickeStroje = perun.getFyzickeStroje();
+        physicalMachines = perun.getPhysicalMachines();
         return new ForwardResolution("/nodes/hardware.jsp");
     }
 
-    public FyzickeStroje getFyzickeStroje() {
-        return fyzickeStroje;
+    public PhysicalMachines getFyzickeStroje() {
+        return physicalMachines;
     }
 }

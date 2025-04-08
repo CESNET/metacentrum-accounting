@@ -1,10 +1,10 @@
 package cz.cesnet.meta.acct.hw.perun;
 
 import cz.cesnet.meta.acct.hw.Perun;
+import cz.cesnet.meta.perun.api.PerunMachine;
 import cz.cesnet.meta.perun.api.PerunUser;
-import cz.cesnet.meta.perun.api.Stroj;
-import cz.cesnet.meta.perun.api.VypocetniCentrum;
-import cz.cesnet.meta.perun.api.VypocetniZdroj;
+import cz.cesnet.meta.perun.api.OwnerOrganisation;
+import cz.cesnet.meta.perun.api.PerunComputingResource;
 import cz.cesnet.meta.perun.impl.PerunJsonImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +31,12 @@ public class PerunHwJsonImpl implements Perun {
 
     @Override
     public Set<String> getFrontendNames() {
-        return this.perunJson.getVyhledavacFrontendu().getMnozinaJmen();
+        return this.perunJson.getFrontendFinder().getNames();
     }
 
     @Override
     public Set<String> getReservedMachinesNames() {
-        return this.perunJson.getVyhledavacVyhrazenychStroju().getMnozinaJmen();
+        return this.perunJson.getReservedMachinesFinder().getNames();
     }
 
     @Override
@@ -47,20 +47,20 @@ public class PerunHwJsonImpl implements Perun {
     @Override
     public List<ComputingResource> getComputingResources() {
         List<ComputingResource> resources = new ArrayList<ComputingResource>();
-        for (VypocetniCentrum centrum : perunJson.najdiVypocetniCentra()) {
-            for (VypocetniZdroj zdroj : centrum.getZdroje()) {
-                ComputingResource cr = new ComputingResource(zdroj.getId(), zdroj.getNazev(), zdroj.isCluster());
+        for (OwnerOrganisation centrum : perunJson.findOwnerOrganisations()) {
+            for (PerunComputingResource zdroj : centrum.getPerunComputingResources()) {
+                ComputingResource cr = new ComputingResource(zdroj.getId(), zdroj.getName(), zdroj.isCluster());
                 log.debug("zdroj =  {}", zdroj);
                 if (zdroj.isCluster()) {
-                    List<Stroj> stroje = zdroj.getStroje();
+                    List<PerunMachine> stroje = zdroj.getPerunMachines();
                     List<Machine> machines = new ArrayList<>(stroje.size());
-                    for (Stroj stroj : stroje) {
-                        machines.add(new Machine(stroj.getName(), stroj.getCpuNum()));
+                    for (PerunMachine perunMachine : stroje) {
+                        machines.add(new Machine(perunMachine.getName(), perunMachine.getCpuNum()));
                     }
                     cr.setMachines(machines);
                 } else {
-                    Stroj stroj = zdroj.getStroj();
-                    cr.setMachine(new Machine(stroj.getName(), stroj.getCpuNum()));
+                    PerunMachine perunMachine = zdroj.getPerunMachine();
+                    cr.setMachine(new Machine(perunMachine.getName(), perunMachine.getCpuNum()));
                 }
                 resources.add(cr);
             }

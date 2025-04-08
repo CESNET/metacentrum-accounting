@@ -39,7 +39,7 @@
     <logger name="org.springframework" level="warn"/>
     <logger name="org.springframework.web.context.ContextLoader" level="info"/>
 
-    <logger name="cz.cesnet.meta.perun.api.FyzickeStroje" level="info"/>
+    <logger name="cz.cesnet.meta.perun.api.PhysicalMachinesnes" level="info"/>
 
     <logger name="cz.cesnet.meta.perun.impl" level="info"/>
     <logger name="cz.cesnet.meta.perun.impl.PerunResourceBundle" level="info"/>
@@ -48,9 +48,7 @@
 
     <logger name="cz.cesnet.meta.cloud.CloudPhysicalHost" level="error"/>
     <logger name="cz.cesnet.meta.cloud.CloudImpl" level="info"/>
-    <logger name="cz.cesnet.meta.cloud.NebulaCloudLoader" level="info"/>
-
-    <logger name="cz.cesnet.meta.pbsmon.RozhodovacStavuStroju" level="info"/>
+    <logger name="cz.cesnet.meta.pbsmon.MachineStateDeciderlevel="info"/>
 
     <logger name="cz.cesnet.meta.pbs" level="info"/>
     <logger name="cz.cesnet.meta.pbs.PBS" level="info"/>

@@ -6,7 +6,7 @@ import cz.cesnet.meta.cloud.CloudVM;
 import cz.cesnet.meta.pbs.Node;
 import cz.cesnet.meta.pbs.Pbsky;
 import cz.cesnet.meta.pbscache.PbsCache;
-import cz.cesnet.meta.perun.api.Stroj;
+import cz.cesnet.meta.perun.api.PerunMachine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ public class PbsmonUtils {
      * @param cloud - informace z cloudu
      * @return seznam PBs uzlů na fyzickém stroji
      */
-    public static List<Node> getPbsNodesForPhysicalMachine(Stroj perunMachine, Pbsky pbsky, PbsCache pbsCache, Cloud cloud) {
+    public static List<Node> getPbsNodesForPhysicalMachine(PerunMachine perunMachine, Pbsky pbsky, PbsCache pbsCache, Cloud cloud) {
         String machineName = perunMachine.getName();
         List<Node> pbsNodes = new ArrayList<>();
         //PBS uzel odpovídající jménu fyzického stroje (bez virtualizace)

@@ -38,14 +38,14 @@
            </tr>
          </thead>
          <tbody>
-         <c:forEach items="${actionBean.fyzicke}" var="stroj" varStatus="i">
+         <c:forEach items="${actionBean.fyzicke}" var="perunMachine" varStatus="i">
              <tr>
                  <td>${i.count}</td>
-                 <td class="stroj name"><span class="${stroj.state}">&nbsp;</span>
-                     <a name="${stroj.name}"> </a><s:link href="/machine/${stroj.name}">${stroj.shortName}</s:link>
+                 <td class="perunMachine name"><span class="${perunMachine.state}">&nbsp;</span>
+                     <a name="${perunMachine.name}"> </a><s:link href="/machine/${perunMachine.name}">${perunMachine.shortName}</s:link>
                  </td>
-                 <td class="stroj cpuDesc">${stroj.cpuNum}&nbsp;CPU</td>
-                 <c:set var="snode" value="${actionBean.nodeMap[stroj.name]}"/>
+                 <td class="perunMachine cpuDesc">${perunMachine.cpuNum}&nbsp;CPU</td>
+                 <c:set var="snode" value="${actionBean.nodeMap[perunMachine.name]}"/>
                  <c:choose>
                      <c:when test="${! empty snode}">
                          <td class="node pbs1 ${snode.state}"><s:link href="/node/${snode.name}" class="${snode.state}">${snode.noOfCPU} CPU</s:link></td>
@@ -62,7 +62,7 @@
                  </c:choose>
 
 
-                 <c:forEach items="${actionBean.mapping.physical2virtual[stroj.name]}" var="jmenoVirtualniho">
+                 <c:forEach items="${actionBean.mapping.physical2virtual[perunMachine.name]}" var="jmenoVirtualniho">
                      <c:set var="vnode" value="${actionBean.nodeMap[jmenoVirtualniho]}"/>
                      <c:choose>
                          <c:when test="${! empty vnode}">
@@ -85,7 +85,7 @@
                      </c:choose>
 
                  </c:forEach>
-                 <c:forEach begin="1" end="${actionBean.maxVirtual - fn:length(actionBean.mapping.physical2virtual[stroj.name])}">
+                 <c:forEach begin="1" end="${actionBean.maxVirtual - fn:length(actionBean.mapping.physical2virtual[perunMachine.name])}">
                      <td colspan="4" class="e1"> </td>
                  </c:forEach>
 

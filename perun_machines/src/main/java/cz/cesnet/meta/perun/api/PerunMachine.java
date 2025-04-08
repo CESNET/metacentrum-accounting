@@ -3,12 +3,12 @@ package cz.cesnet.meta.perun.api;
 
 import java.util.Comparator;
 
-public class Stroj {
+public class PerunMachine {
 
-    private String name;
-    private int cpuNum;
-    private String shortName;
-    private VypocetniZdroj vypocetniZdroj;
+    private final String name;
+    private final int cpuNum;
+    private final String shortName;
+    private final PerunComputingResource perunComputingResource;
     private int usedPercent = 0;
     private boolean cloudManaged = false; //je v cloudu
     private boolean cloudPbsHost = false; //je v cloudu a obsahuje VM ktery je v PBS
@@ -18,8 +18,8 @@ public class Stroj {
 
     private String state;
 
-    public Stroj(VypocetniZdroj vypocetniZdroj, String name, int cpuNum) {
-        this.vypocetniZdroj = vypocetniZdroj;
+    public PerunMachine(PerunComputingResource perunComputingResource, String name, int cpuNum) {
+        this.perunComputingResource = perunComputingResource;
         this.name = name;
         this.cpuNum = cpuNum;
 
@@ -38,8 +38,8 @@ public class Stroj {
         this.state = state;
     }
 
-    public VypocetniZdroj getVypocetniZdroj() {
-        return vypocetniZdroj;
+    public PerunComputingResource getVypocetniZdroj() {
+        return perunComputingResource;
     }
 
     public String getName() {
@@ -109,8 +109,8 @@ public class Stroj {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Stroj stroj = (Stroj) o;
-        return !(name != null ? !name.equals(stroj.name) : stroj.name != null);
+        PerunMachine perunMachine = (PerunMachine) o;
+        return !(name != null ? !name.equals(perunMachine.name) : perunMachine.name != null);
     }
 
     @Override
@@ -120,7 +120,7 @@ public class Stroj {
 
     @Override
     public String toString() {
-        return "Stroj{" +
+        return "PerunMachine{" +
                 "name='" + name + '\'' +
                 ", cpuNum=" + cpuNum +
                 '}';
@@ -132,11 +132,11 @@ public class Stroj {
      */
     public static final NameComparator NAME_COMPARATOR = new NameComparator();
 
-    public static class NameComparator implements Comparator<Stroj> {
+    public static class NameComparator implements Comparator<PerunMachine> {
 
         @Override
-        public int compare(Stroj stroj1, Stroj stroj2) {
-            return smartCompare(stroj1.getName(), stroj2.getName());
+        public int compare(PerunMachine perunMachine1, PerunMachine perunMachine2) {
+            return smartCompare(perunMachine1.getName(), perunMachine2.getName());
         }
 
         public static int smartCompare(String s1, String s2) {
@@ -155,7 +155,7 @@ public class Stroj {
             String p2 = parseDigitPrefix(s2);
 
             int compare;
-            if (p1.length() > 0 && p2.length() > 0) {
+            if (!p1.isEmpty() && !p2.isEmpty()) {
                 compare = Integer.compare(Integer.parseInt(p1), Integer.parseInt(p2));
             } else {
                 compare = p1.compareToIgnoreCase(p2);

@@ -10,7 +10,6 @@ import java.util.*;
  * Created by IntelliJ IDEA.
  *
  * @author Martin Kuba makub@ics.muni.cz
- * @version $Id: PerunAbstractImpl.java,v 1.1 2011/10/27 14:19:55 makub Exp $
  */
 public abstract class PerunAbstractImpl implements Perun {
 
@@ -23,57 +22,57 @@ public abstract class PerunAbstractImpl implements Perun {
      * @return složitá struktura
      */
     @Override
-    public FyzickeStroje getFyzickeStroje() {
-        List<VypocetniCentrum> centra;
-        List<Stroj> zbyle;
+    public PhysicalMachines getPhysicalMachines() {
+        List<OwnerOrganisation> ownerOrganisations;
+        List<PerunMachine> remaining;
         Map<String, Integer> cpuMap;
 
-        List<Stroj> vsechnyStroje = this.getMetacentroveStroje();
-        Set<Stroj> fyzickeSet = new HashSet<>(vsechnyStroje);
+        List<PerunMachine> perunMachines = this.getPerunMachines();
+        Set<PerunMachine> machineSet = new HashSet<>(perunMachines);
         cpuMap = new HashMap<>();
 
-        centra = this.najdiVypocetniCentra();
-        for (VypocetniCentrum c : centra) {
-            int cpuSumCentrum = 0;
-            for (VypocetniZdroj z : c.getZdroje()) {
-                if (z.isCluster()) {
+        ownerOrganisations = this.findOwnerOrganisations();
+        for (OwnerOrganisation ownerOrganisation : ownerOrganisations) {
+            int cpuSumOrg = 0;
+            for (PerunComputingResource perunComputingResource : ownerOrganisation.getPerunComputingResources()) {
+                if (perunComputingResource.isCluster()) {
                     int cpuSumCluster = 0;
-                    for (Stroj stroj : z.getStroje()) {
-                        cpuSumCentrum += stroj.getCpuNum();
-                        cpuSumCluster += stroj.getCpuNum();
-                        fyzickeSet.remove(stroj);
+                    for (PerunMachine perunMachine : perunComputingResource.getPerunMachines()) {
+                        cpuSumOrg += perunMachine.getCpuNum();
+                        cpuSumCluster += perunMachine.getCpuNum();
+                        machineSet.remove(perunMachine);
                     }
-                    cpuMap.put(z.getId(), cpuSumCluster);
+                    cpuMap.put(perunComputingResource.getId(), cpuSumCluster);
                 } else {
-                    Stroj stroj = z.getStroj();
-                    if (stroj == null) {
-                        log.error("zdroj " + z.getNazev() + " z VypocentiCentrum " + c.getId() + " nema Stroj, takze nevime pocet CPU");
+                    PerunMachine perunMachine = perunComputingResource.getPerunMachine();
+                    if (perunMachine == null) {
+                        log.error("computing resource " + perunComputingResource.getName() + " from OwnerOrganisation " + ownerOrganisation.getId() + " has no PerunMachine");
                     } else {
-                        cpuSumCentrum += stroj.getCpuNum();
-                        fyzickeSet.remove(stroj);
-                        cpuMap.put(z.getId(),stroj.getCpuNum());
+                        cpuSumOrg += perunMachine.getCpuNum();
+                        machineSet.remove(perunMachine);
+                        cpuMap.put(perunComputingResource.getId(), perunMachine.getCpuNum());
                     }
                 }
             }
-            cpuMap.put(c.getId(), cpuSumCentrum);
+            cpuMap.put(ownerOrganisation.getId(), cpuSumOrg);
         }
 
-        zbyle = new ArrayList<>(fyzickeSet);
-        zbyle.sort(Stroj.NAME_COMPARATOR);
+        remaining = new ArrayList<>(machineSet);
+        remaining.sort(PerunMachine.NAME_COMPARATOR);
 
         int cpuSum = 0;
-        for (Stroj s : zbyle) {
+        for (PerunMachine s : remaining) {
             cpuSum += s.getCpuNum();
         }
-        cpuMap.put("zbyle", cpuSum);
+        cpuMap.put("remaining", cpuSum);
         cpuSum = 0;
 
-        for (Stroj s : vsechnyStroje) {
+        for (PerunMachine s : perunMachines) {
             cpuSum += s.getCpuNum();
 
         }
-        cpuMap.put("vsechny", cpuSum);
-        return new FyzickeStroje(centra, zbyle, cpuMap);
+        cpuMap.put("all", cpuSum);
+        return new PhysicalMachines(ownerOrganisations, remaining, cpuMap);
     }
 
 

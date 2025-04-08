@@ -1,5 +1,5 @@
 <%@ tag %>
-<%@ attribute name="resource" type="cz.cesnet.meta.perun.api.VypocetniZdroj" rtexprvalue="true" required="true" %>
+<%@ attribute name="resource" type="cz.cesnet.meta.perun.api.PerunComputingResource" rtexprvalue="true" required="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>

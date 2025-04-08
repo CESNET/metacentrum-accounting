@@ -6,8 +6,8 @@ import cz.cesnet.meta.cloud.CloudVM;
 import cz.cesnet.meta.pbs.Node;
 import cz.cesnet.meta.pbscache.Mapping;
 import cz.cesnet.meta.pbscache.PbsCache;
+import cz.cesnet.meta.pbsmon.MachineStateDecider;
 import cz.cesnet.meta.pbsmon.PbsmonUtils;
-import cz.cesnet.meta.pbsmon.RozhodovacStavuStroju;
 import cz.cesnet.meta.perun.api.*;
 import cz.cesnet.meta.storages.Storages;
 import cz.cesnet.meta.storages.StoragesInfo;
@@ -42,12 +42,12 @@ public class NodesActionBean extends BaseActionBean {
 
     StoragesInfo storagesInfo;
     StoragesInfo hsmInfo;
-    List<VypocetniCentrum> centra;
-    List<Stroj> zbyle;
+    List<OwnerOrganisation> ownerOrganisations;
+    List<PerunMachine> zbyle;
     Map<String, Integer> cpuMap;
     int jobsQueuedCount;
     int maxVirtual = 0;
-    List<Stroj> fyzicke;
+    List<PerunMachine> fyzicke;
     Mapping mapping;
     Map<String, Node> nodeMap;
     Map<String, CloudVM> fqdn2CloudVMMap;
@@ -62,12 +62,12 @@ public class NodesActionBean extends BaseActionBean {
     @DefaultHandler
     public Resolution physical() {
         log.debug("physical({})", ctx.getRequest().getRemoteHost());
-        FyzickeStroje fyzickeStroje = perun.getFyzickeStroje();
-        centra = fyzickeStroje.getCentra();
-        zbyle = fyzickeStroje.getZbyle();
-        cpuMap = fyzickeStroje.getCpuMap();
-        RozhodovacStavuStroju.rozhodniStavy(pbsky, perun.getVyhledavacFrontendu(),
-                pbsCache.getMapping(), perun.getVyhledavacVyhrazenychStroju(), centra, cloud);
+        PhysicalMachines physicalMachines = perun.getPhysicalMachines();
+        ownerOrganisations = physicalMachines.getOwnerOrganisations();
+        zbyle = physicalMachines.getRemaining();
+        cpuMap = physicalMachines.getCpuMap();
+        MachineStateDecider.decideStates(pbsky, perun.getFrontendFinder(),
+                pbsCache.getMapping(), perun.getReservedMachinesFinder(), ownerOrganisations, cloud);
         jobsQueuedCount = pbsky.getJobsQueuedCount();
         //diskova pole
         storagesInfo = diskArraysLoader.getStoragesInfo();
@@ -85,19 +85,19 @@ public class NodesActionBean extends BaseActionBean {
      */
     public Resolution pbs() {
         log.debug("pbs({})", ctx.getRequest().getRemoteHost());
-        FyzickeStroje fyzickeStroje = perun.getFyzickeStroje();
-        centra = fyzickeStroje.getCentra();
-        cpuMap = fyzickeStroje.getCpuMap();
-        for (Stroj stroj : perun.getMetacentroveStroje()) {
-            List<Node> nodes = PbsmonUtils.getPbsNodesForPhysicalMachine(stroj, pbsky, pbsCache, cloud);
+        PhysicalMachines physicalMachines = perun.getPhysicalMachines();
+        ownerOrganisations = physicalMachines.getOwnerOrganisations();
+        cpuMap = physicalMachines.getCpuMap();
+        for (PerunMachine perunMachine : perun.getPerunMachines()) {
+            List<Node> nodes = PbsmonUtils.getPbsNodesForPhysicalMachine(perunMachine, pbsky, pbsCache, cloud);
             if(nodes.size()>0) {
                 Node node = nodes.get(0);
-                stroj.setPbsName(node.getName());
-                stroj.setPbsState(node.getState());
-                stroj.setUsedPercent(node.getUsedPercent());
+                perunMachine.setPbsName(node.getName());
+                perunMachine.setPbsState(node.getState());
+                perunMachine.setUsedPercent(node.getUsedPercent());
             } else {
-                stroj.setPbsName(null);
-                stroj.setPbsState(null);
+                perunMachine.setPbsName(null);
+                perunMachine.setPbsState(null);
             }
         }
         jobsQueuedCount = pbsky.getJobsQueuedCount();
@@ -106,22 +106,22 @@ public class NodesActionBean extends BaseActionBean {
         return new ForwardResolution("/nodes/pbs.jsp");
     }
 
-    public List<Stroj> getMachinesSortedByPbsNodeNames(VypocetniZdroj zdroj) {
-        List<Stroj> strojeByPbsNodeNames = new ArrayList<>(zdroj.getStroje());
+    public List<PerunMachine> getMachinesSortedByPbsNodeNames(PerunComputingResource zdroj) {
+        List<PerunMachine> strojeByPbsNodeNames = new ArrayList<>(zdroj.getPerunMachines());
         strojeByPbsNodeNames.sort((stroj1, stroj2) -> {
             Node node1 = pbsky.getNodeByName(stroj1.getPbsName());
             Node node2 = pbsky.getNodeByName(stroj2.getPbsName());
             String s1Name = ((node1 == null) ? stroj1.getShortName() : node1.getName());
             String s2Name = ((node2 == null) ? stroj2.getShortName() : node2.getName());
-            return Stroj.NameComparator.smartCompare(s1Name, s2Name);
+            return PerunMachine.NameComparator.smartCompare(s1Name, s2Name);
         });
         return strojeByPbsNodeNames;
     }
 
     private  List<Node> findGpuNodes() {
-        return centra.stream()
-                .flatMap(centrum -> centrum.getZdroje().stream())
-                .flatMap(zdroj -> zdroj.isCluster()?zdroj.getStroje().stream():Stream.of(zdroj.getStroj()))
+        return ownerOrganisations.stream()
+                .flatMap(centrum -> centrum.getPerunComputingResources().stream())
+                .flatMap(zdroj -> zdroj.isCluster()?zdroj.getPerunMachines().stream():Stream.of(zdroj.getPerunMachine()))
                 .flatMap(stroj -> PbsmonUtils.getPbsNodesForPhysicalMachine(stroj,pbsky, pbsCache, cloud).stream())
                 .filter(Node::getHasGPU)
                 .collect(Collectors.toList());
@@ -139,11 +139,11 @@ public class NodesActionBean extends BaseActionBean {
         return cpuMap;
     }
 
-    public List<VypocetniCentrum> getCentra() {
-        return centra;
+    public List<OwnerOrganisation> getOwnerOrganisations() {
+        return ownerOrganisations;
     }
 
-    public List<Stroj> getZbyle() {
+    public List<PerunMachine> getZbyle() {
         return zbyle;
     }
 
@@ -162,7 +162,7 @@ public class NodesActionBean extends BaseActionBean {
     @SuppressWarnings("unused")
     public Resolution virtual() {
         log.debug("virtual()");
-        fyzicke = this.perun.getMetacentroveStroje();
+        fyzicke = this.perun.getPerunMachines();
         //mapa z hostname PBS uzlu na PBS uzel
         nodeMap = new HashMap<>(fyzicke.size());
         //mapovani z jmen virtualnich stroju na jmena fyzickych stroju a naopak
@@ -174,7 +174,7 @@ public class NodesActionBean extends BaseActionBean {
             fqdn2CloudVMMap.put(vm.getFqdn(), vm);
         }
         //pripravit
-        for (Stroj s : fyzicke) {
+        for (PerunMachine s : fyzicke) {
             String strojName = s.getName();
             //PBs uzel primo na fyzickem - nevirtualizovane
             Node pbsNode = pbsky.getNodeByFQDN(strojName);
@@ -198,8 +198,8 @@ public class NodesActionBean extends BaseActionBean {
         }
 
         //rozhodni stav podle virtualnich
-        for (Stroj stroj : fyzicke) {
-            RozhodovacStavuStroju.rozhodniStav(stroj, pbsky, pbsCache.getMapping(), perun.getVyhledavacFrontendu(), perun.getVyhledavacVyhrazenychStroju(), cloud);
+        for (PerunMachine perunMachine : fyzicke) {
+            MachineStateDecider.decideState(perunMachine, pbsky, pbsCache.getMapping(), perun.getFrontendFinder(), perun.getReservedMachinesFinder(), cloud);
         }
 
         return new ForwardResolution("/nodes/mapping.jsp");
@@ -228,7 +228,7 @@ public class NodesActionBean extends BaseActionBean {
         return m;
     }
 
-    public List<Stroj> getFyzicke() {
+    public List<PerunMachine> getFyzicke() {
         return fyzicke;
     }
 

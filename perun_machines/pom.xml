@@ -5,7 +5,7 @@
     <parent>
         <groupId>cz.metacentrum</groupId>
         <artifactId>accounting-parent</artifactId>
-        <version>3.33</version>
+        <version>3.34</version>
     </parent>
 
     <artifactId>perun_machines</artifactId>

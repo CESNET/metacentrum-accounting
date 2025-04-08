@@ -12,24 +12,24 @@
 
 
 
-        <p><f:message key="nodes_jsp_celkem_cpu"/>: <s:link href="/hardware">${actionBean.cpuMap['vsechny']}</s:link></p>
+        <p><f:message key="nodes_jsp_celkem_cpu"/>: <s:link href="/hardware">${actionBean.cpuMap['all']}</s:link></p>
 
         <p><f:message key="nodes_jsp_waiting_text1"/>
             <s:link href="/queues/jobsQueued"><strong><f:message key="nodes_jsp_waiting_jobs"><f:param value="${actionBean.jobsQueuedCount}"/></f:message></strong></s:link>
             <f:message key="nodes_jsp_waiting_text3"/>
         </p>
 
-        <c:forEach items="${actionBean.centra}" var="centrum">
+        <c:forEach items="${actionBean.ownerOrganisations}" var="ownerOrganisation">
 
-            <h3><a name="${centrum.id}"></a><strong><f:message key="${centrum.nazevKey}"/></strong> (${actionBean.cpuMap[centrum.id]} CPU)</h3>
+            <h3><a name="${ownerOrganisation.id}"></a><strong><f:message key="${ownerOrganisation.nameKey}"/></strong> (${actionBean.cpuMap[ownerOrganisation.id]} CPU)</h3>
             <table width="90%">
-                <c:forEach var="zdr" items="${centrum.zdroje}" varStatus="s">
+                <c:forEach var="zdr" items="${ownerOrganisation.perunComputingResources}" varStatus="s">
                     <c:if test="${!s.first}"><tr><td colspan="2">&nbsp;</td></tr></c:if>
                     <tr>
                         <td colspan="2"><a name="${zdr.id}"></a>
-                            <s:link href="/resource/${zdr.id}"><c:out value="${zdr.nazev}"/></s:link>
+                            <s:link href="/resource/${zdr.id}"><c:out value="${zdr.name}"/></s:link>
                             <c:if test="${zdr.cluster}">(${actionBean.cpuMap[zdr.id]} CPU)</c:if>
-                            - <f:message key="${zdr.popisKey}"/></td>
+                            - <f:message key="${zdr.descriptionKey}"/></td>
                     </tr>
                     <f:message key="${zdr.specKey}" var="chunk"/>
                     <c:if test="${! empty chunk}">
@@ -42,11 +42,11 @@
 
                         <c:choose>
                             <c:when test="${zdr.cluster}">
-                                <c:if test="${! empty zdr.stroje}">
+                                <c:if test="${! empty zdr.perunMachines}">
                                 <table class="nodes" cellspacing="0">
                                 <tr>
-                                <c:forEach items="${actionBean.getMachinesSortedByPbsNodeNames(zdr)}" var="stroj" varStatus="i">
-                                    <t:stroj_pbs stroj="${stroj}"/>
+                                <c:forEach items="${actionBean.getMachinesSortedByPbsNodeNames(zdr)}" var="perunMachine" varStatus="i">
+                                    <t:stroj_pbs perunMachine="${perunMachine}"/>
                                     <c:if test="${i.count%8==0}"></tr><tr></c:if>
                                 </c:forEach>
                                 </tr>
@@ -55,7 +55,7 @@
                             </c:when>
                             <c:otherwise>
                                 <table class="nodes" cellspacing="0">
-                                <tr><t:stroj_pbs stroj="${zdr.stroj}"/></tr>
+                                <tr><t:stroj_pbs perunMachine="${zdr.perunMachine}"/></tr>
                                 </table>
                             </c:otherwise>
                         </c:choose>

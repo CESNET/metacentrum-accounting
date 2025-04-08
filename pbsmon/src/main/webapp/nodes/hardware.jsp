@@ -13,12 +13,12 @@
     <s:layout-component name="telo">
 
         <ul>
-        <c:forEach items="${actionBean.fyzickeStroje.centra}" var="centrum">
-            <li> <strong><f:message key="${centrum.nazevKey}"/></strong> (${actionBean.fyzickeStroje.cpuMap[centrum.id]} CPU)
+        <c:forEach items="${actionBean.physicalMachines.centra}" var="ownerOrganisation">
+            <li> <strong><f:message key="${ownerOrganisation.nazevKey}"/></strong> (${actionBean.physicalMachines.cpuMap[ownerOrganisation.id]} CPU)
                 <ul>
-            <c:forEach var="zdr" items="${centrum.zdroje}" varStatus="s">
+            <c:forEach var="zdr" items="${ownerOrganisation.zdroje}" varStatus="s">
                 <li><a href="#<c:out value='${zdr.id}'/>"><c:out value="${zdr.nazev}"/></a>
-                    (${actionBean.fyzickeStroje.cpuMap[zdr.id]} CPU<c:if test="${zdr.cluster}">,
+                    (${actionBean.physicalMachines.cpuMap[zdr.id]} CPU<c:if test="${zdr.cluster}">,
                          <f:message key="hardware.uzlu"><f:param value="${fn:length(zdr.stroje)}"/></f:message></c:if>)
                 </li>
             </c:forEach>
@@ -28,13 +28,13 @@
         </ul>
         <hr>
 
-        <c:forEach items="${actionBean.fyzickeStroje.centra}" var="centrum">
+        <c:forEach items="${actionBean.physicalMachines.centra}" var="ownerOrganisation">
 
-            <c:forEach var="zdr" items="${centrum.zdroje}" varStatus="s">
+            <c:forEach var="zdr" items="${ownerOrganisation.zdroje}" varStatus="s">
                 <div id="<c:out value='${zdr.id}'/>">
                 <s:link href="/resource/${zdr.id}"><c:out value="${zdr.nazev}"/></s:link>
                 <c:if test="${zdr.cluster}">
-                    (${actionBean.fyzickeStroje.cpuMap[zdr.id]} CPU, <f:message key="hardware.uzlu"><f:param value="${fn:length(zdr.stroje)}"/></f:message> )
+                    (${actionBean.physicalMachines.cpuMap[zdr.id]} CPU, <f:message key="hardware.uzlu"><f:param value="${fn:length(zdr.stroje)}"/></f:message> )
                 </c:if>
                 - <f:message key="${zdr.popisKey}"/><br>
                 <table>

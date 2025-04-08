@@ -22,7 +22,7 @@
             </c:if>
         </div>
 
-        <p><f:message key="${actionBean.resource.popisKey}"/></p>
+        <p><f:message key="${actionBean.resource.descriptionKey}"/></p>
 
         <f:message key="${actionBean.resource.specKey}" var="chunk"/>
         <c:if test="${! empty chunk}">
@@ -30,7 +30,7 @@
         </c:if>
 
         <% if(actionBean.getResource().isCluster()) { %>
-           <p><f:message key="resource.cluster.nadpis" ><f:param value="${actionBean.resourceName}"/><f:param value="${fn:length(actionBean.resource.stroje)}"/></f:message></p>
+           <p><f:message key="resource.cluster.nadpis" ><f:param value="${actionBean.resourceName}"/><f:param value="${fn:length(actionBean.resource.perunMachines)}"/></f:message></p>
         <% } else { %>
 
         <%} %>
@@ -38,11 +38,11 @@
         <t:resource resource="${actionBean.resource}"/>
 
         <% if(actionBean.getResource().isCluster()) { %>
-        <c:if test="${! empty actionBean.resource.stroje}">
+        <c:if test="${! empty actionBean.resource.perunMachines}">
             <table class="nodes" cellspacing="0">
                 <tr>
-                    <c:forEach items="${actionBean.resource.stroje}" var="stroj" varStatus="i">
-                    <t:stroj stroj="${stroj}"/>
+                    <c:forEach items="${actionBean.resource.perunMachines}" var="perunMachine" varStatus="i">
+                    <t:perunMachine perunMachine="${perunMachine}"/>
                     <c:if test="${i.count%7==0}"></tr><tr></c:if>
                 </c:forEach>
             </tr>
@@ -50,7 +50,7 @@
         </c:if>
         <% } else { %>
           <table class="nodes" cellspacing="0">
-              <tr><t:stroj stroj="${actionBean.resource.stroj}"/></tr>
+              <tr><t:perunMachine perunMachine="${actionBean.resource.perunMachine}"/></tr>
           </table>
         <%} %>
 

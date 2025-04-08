@@ -6,8 +6,8 @@ import cz.cesnet.meta.cloud.CloudVM;
 import cz.cesnet.meta.pbs.Node;
 import cz.cesnet.meta.pbsmon.PbsmonUtils;
 import cz.cesnet.meta.perun.api.Perun;
-import cz.cesnet.meta.perun.api.Stroj;
-import cz.cesnet.meta.perun.api.VyhledavacFrontendu;
+import cz.cesnet.meta.perun.api.PerunMachine;
+import cz.cesnet.meta.perun.api.FrontendFinder;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -47,7 +47,7 @@ public class MachineActionBean extends BaseActionBean {
     @SpringBean("accounting")
     protected Accounting accounting;
 
-    private Stroj perunMachine;
+    private PerunMachine perunMachine;
     private List<Node> pbsNodes = new ArrayList<>();
     private CloudPhysicalHost cloudPhysicalHost;
     private List<CloudVM> cloudVMS;
@@ -57,13 +57,13 @@ public class MachineActionBean extends BaseActionBean {
         if (machineName == null || machineName.length() == 0) {
             return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND, "Machine name is needed in the URL.");
         }
-        perunMachine = perun.getStrojByName(machineName);
+        perunMachine = perun.getMachineByName(machineName);
         if (perunMachine == null) {
             log.warn("Machine {} not found ", machineName);
             return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND, "Machine " + machineName + " not found in Perun.");
         }
         //frontendy z peruna - v Perun 3 se nepoužívá
-        VyhledavacFrontendu vyhledavacFrontendu = perun.getVyhledavacFrontendu();
+        FrontendFinder frontendFinder = perun.getFrontendFinder();
 
         //info z OpenNebuly
         if ((cloudPhysicalHost = cloud.getPhysFqdnToPhysicalHostMap().get(machineName)) != null) {
@@ -81,7 +81,7 @@ public class MachineActionBean extends BaseActionBean {
     }
 
 
-    public Stroj getPerunMachine() {
+    public PerunMachine getPerunMachine() {
         return perunMachine;
     }
 

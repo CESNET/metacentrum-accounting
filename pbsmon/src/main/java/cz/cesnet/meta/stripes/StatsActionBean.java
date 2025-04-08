@@ -4,7 +4,7 @@ import cz.cesnet.meta.cloud.Cloud;
 import cz.cesnet.meta.pbs.*;
 import cz.cesnet.meta.pbscache.Mapping;
 import cz.cesnet.meta.pbscache.PbsCache;
-import cz.cesnet.meta.pbsmon.RozhodovacStavuStroju;
+import cz.cesnet.meta.pbsmon.MachineStateDecider;
 import cz.cesnet.meta.perun.api.*;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -42,8 +42,8 @@ public class StatsActionBean extends BaseActionBean {
     private List<User> users;
     private JobsInfo jobsInfo;
 
-    private List<VypocetniCentrum> centra;
-    private List<Stroj> zbyle;
+    private List<OwnerOrganisation> centra;
+    private List<PerunMachine> zbyle;
     private Map<String, Integer> cpuMap;
     private Map<String, CpuCount> cpuCountMap;
 
@@ -53,42 +53,42 @@ public class StatsActionBean extends BaseActionBean {
         users = pbsky.getSortedUsers(UsersSortOrder.cpusStateR);
         jobsInfo = pbsky.getJobsInfo();
 
-        FyzickeStroje fyzickeStroje = perun.getFyzickeStroje();
-        centra = fyzickeStroje.getCentra();
-        zbyle = fyzickeStroje.getZbyle();
-        cpuMap = fyzickeStroje.getCpuMap();
-        VyhledavacVyhrazenychStroju vyhrazene = perun.getVyhledavacVyhrazenychStroju();
-        VyhledavacFrontendu frontendy = perun.getVyhledavacFrontendu();
+        PhysicalMachines physicalMachines = perun.getPhysicalMachines();
+        centra = physicalMachines.getOwnerOrganisations();
+        zbyle = physicalMachines.getRemaining();
+        cpuMap = physicalMachines.getCpuMap();
+        ReservedMachinesFinder vyhrazene = perun.getReservedMachinesFinder();
+        FrontendFinder frontendy = perun.getFrontendFinder();
         Mapping mapping = pbsCache.getMapping();
 
-        RozhodovacStavuStroju.rozhodniStavy(pbsky, frontendy, mapping, vyhrazene, centra, cloud);
+        MachineStateDecider.decideStates(pbsky, frontendy, mapping, vyhrazene, centra, cloud);
 
         cpuCountMap = new HashMap<String, CpuCount>();
 
-        for (VypocetniCentrum centrum : centra) {
+        for (OwnerOrganisation centrum : centra) {
             int centrumCpuTotal = 0;
             int centrumCpuUsed = 0;
-            for (VypocetniZdroj zdroj : centrum.getZdroje()) {
+            for (PerunComputingResource zdroj : centrum.getPerunComputingResources()) {
                 int zdrojCpuTotal = 0;
                 int zdrojCpuAvailable = 0;
                 int zdrojCpuUsed = 0;
-                List<Stroj> stroje = zdroj.isCluster() ? zdroj.getStroje() : Collections.singletonList(zdroj.getStroj());
-                for (Stroj stroj : stroje) {
-                    int strojCpuTotal = stroj.getCpuNum();
+                List<PerunMachine> stroje = zdroj.isCluster() ? zdroj.getPerunMachines() : Collections.singletonList(zdroj.getPerunMachine());
+                for (PerunMachine perunMachine : stroje) {
+                    int strojCpuTotal = perunMachine.getCpuNum();
                     int strojCpuUsed = 0;
                     //vyhrazene a fyzicke frontendy zapocitat jako plne vytizene
-                    if (vyhrazene.jeStrojVyhrazeny(stroj) || frontendy.jeStrojFrontend(stroj.getName())) {
+                    if (vyhrazene.isMachineReserved(perunMachine) || frontendy.isFrontend(perunMachine.getName())) {
                         strojCpuUsed = strojCpuTotal;
                     } else {
                         //shromazdit vsechny nody z PBSky
-                        String jmenoStroje = stroj.getName();
+                        String jmenoStroje = perunMachine.getName();
                         List<Node> nodes = new ArrayList<Node>(2);
                         Node physNode = pbsky.getNodeByFQDN(jmenoStroje);
                         if (physNode != null) nodes.add(physNode);
                         List<String> virtNames = mapping.getPhysical2virtual().get(jmenoStroje);
                         if (virtNames != null) {
                             for (String virtName : virtNames) {
-                                if (frontendy.jeStrojFrontend(virtName)) {
+                                if (frontendy.isFrontend(virtName)) {
                                     strojCpuUsed = strojCpuTotal;
                                     continue;
                                 }
@@ -114,7 +114,7 @@ public class StatsActionBean extends BaseActionBean {
                             strojCpuUsed = strojCpuTotal;
                         }
                     }
-                    cpuCountMap.put(stroj.getName(), new CpuCount(strojCpuTotal, strojCpuUsed));
+                    cpuCountMap.put(perunMachine.getName(), new CpuCount(strojCpuTotal, strojCpuUsed));
                     zdrojCpuTotal += strojCpuTotal;
                     zdrojCpuUsed += strojCpuUsed;
                 }
@@ -143,11 +143,11 @@ public class StatsActionBean extends BaseActionBean {
         return jobsInfo;
     }
 
-    public List<VypocetniCentrum> getCentra() {
+    public List<OwnerOrganisation> getCentra() {
         return centra;
     }
 
-    public List<Stroj> getZbyle() {
+    public List<PerunMachine> getZbyle() {
         return zbyle;
     }
 

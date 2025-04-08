@@ -8,10 +8,9 @@ import cz.cesnet.meta.pbs.Node;
 import cz.cesnet.meta.pbs.PBS;
 import cz.cesnet.meta.pbs.User;
 import cz.cesnet.meta.pbscache.Mapping;
-import cz.cesnet.meta.perun.api.FyzickeStroje;
 import cz.cesnet.meta.perun.api.Perun;
 import cz.cesnet.meta.perun.api.PerunUser;
-import cz.cesnet.meta.perun.api.Stroj;
+import cz.cesnet.meta.perun.api.PerunMachine;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -112,18 +111,18 @@ public class ApiActionBean extends BaseActionBean {
 
     @SuppressWarnings("unused")
     public Resolution machines() {
-        List<Stroj> vsechnyStroje = perun.getMetacentroveStroje();
-        List<String> pbsNodeNames = new ArrayList<>(vsechnyStroje.size()*2);
+        List<PerunMachine> perunMachines = perun.getPerunMachines();
+        List<String> pbsNodeNames = new ArrayList<>(perunMachines.size()*2);
         Mapping mapping  = NodesActionBean.makeUnifiedMapping(this.pbsCache, this.cloud);
-        for (Stroj s : vsechnyStroje) {
-            String strojName = s.getName();
+        for (PerunMachine s : perunMachines) {
+            String machineName = s.getName();
             //PBs uzel primo na fyzickem - nevirtualizovane
-            Node pbsNode = pbsky.getNodeByFQDN(strojName);
+            Node pbsNode = pbsky.getNodeByFQDN(machineName);
             if (pbsNode != null && !pbsNode.isDown()) {
-                pbsNodeNames.add(strojName);
+                pbsNodeNames.add(machineName);
             }
             //virtualni podle mappingu
-            List<String> virtNames = mapping.getPhysical2virtual().get(strojName);
+            List<String> virtNames = mapping.getPhysical2virtual().get(machineName);
             if (virtNames != null) {
                 for (String virtName : virtNames) {
                     Node vn = pbsky.getNodeByFQDN(virtName);

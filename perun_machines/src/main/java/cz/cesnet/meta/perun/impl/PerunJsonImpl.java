@@ -37,19 +37,18 @@ public class PerunJsonImpl extends PerunAbstractImpl {
     public static final String PUBLICATIONS = "publications";
     public static final String META_CENTRUM_VO_NAME = "MetaCentrum";
 
-    static Map<String, Map<String, String>> texty;
+    static Map<String, Map<String, String>> texts;
     List<File> machineFiles;
     List<File> userFiles;
     Map<File, Long> loadedTimes = new HashMap<>();
-    List<VypocetniCentrum> centra;
+    List<OwnerOrganisation> ownerOrganisations;
     Map<String, PerunUser> users;
-    List<Stroj> allMachines;
-    Map<String, Stroj> allMachinesMap;
-    Map<String, VypocetniZdroj> zdrojMap;
-    VyhledavacVyhrazenychStroju vyhledavacVyhrazenychStroju;
-    VyhledavacFrontendu vyhledavacFrontendu;
+    List<PerunMachine> allMachines;
+    Map<String, PerunMachine> allMachinesMap;
+    Map<String, PerunComputingResource> resourcesMap;
+    ReservedMachinesFinder reservedMachinesFinder;
+    FrontendFinder frontendFinder;
     private long lastCheckTime = 0L;
-    private String filterVo=null;
 
     public PerunJsonImpl(List<String> machineFiles, List<String> userFiles) {
         log.debug("init machineFiles={}, userFiles={}", machineFiles, userFiles);
@@ -57,7 +56,7 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         for (String s : machineFiles) {
             File f = new File(s);
             if (!f.exists()) {
-                log.error("file {} does not exist !");
+                log.error("file {} does not exist !", f);
             }
             this.machineFiles.add(f);
         }
@@ -65,26 +64,16 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         for (String s : userFiles) {
             File f = new File(s);
             if (!f.exists()) {
-                log.error("file {} does not exist !");
+                log.error("file {} does not exist !", f);
             }
             this.userFiles.add(f);
         }
         checkFiles();
     }
 
-    @SuppressWarnings("unused")
-    public String getFilterVo() {
-        return filterVo;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFilterVo(String filterVo) {
-        this.filterVo = filterVo;
-    }
-
     //tohle je trochu prasárna, ale jak jinak se mám k tomu dostat ze třídy PerunResourceBundle ?
-    public static Map<String, Map<String, String>> getTexty() {
-        return texty;
+    public static Map<String, Map<String, String>> getTexts() {
+        return texts;
     }
 
     private static String getString(JSONObject jsonObject, String key) {
@@ -121,80 +110,76 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         throw new RuntimeException("value for key " + key + " must be boolean or string, i.e. true or \"true\", it is " + value.toString());
     }
 
-    private static void nactiTexty(String pozice, Map<String, Map<String, String>> texty, JSONObject jsonObject, String bundleKey, String jsonKey) {
+    private static void loadTexts(String position, Map<String, Map<String, String>> texts, JSONObject jsonObject, String bundleKey, String jsonKey) {
         JSONValue jsonValue = jsonObject.get(jsonKey);
         if (jsonValue != null && jsonValue.isObject()) {
             JSONObject jtexty = (JSONObject) jsonValue;
-            if (log.isDebugEnabled()) log.debug("Loading " + pozice + " jtexty=" + jtexty);
+            if (log.isDebugEnabled()) log.debug("Loading " + position + " jtexty=" + jtexty);
             for (String lang : jtexty.getValue().keySet()) {
-                Map<String, String> map = texty.get(lang.trim());
+                Map<String, String> map = texts.get(lang.trim());
                 if (map == null) {
                     map = new HashMap<>(100);
-                    texty.put(lang.trim(), map);
+                    texts.put(lang.trim(), map);
                     log.warn("Created text bundle for language '{}'", lang.trim());
                 }
                 map.put(bundleKey, getString(jtexty, lang));
             }
         } else {
-            log.warn("for " + pozice + " value for key " + jsonKey + " is not a map of i18n texts, it is " + (jsonValue == null ? "null" : jsonValue.render(false)));
+            log.warn("for " + position + " value for key " + jsonKey + " is not a map of i18n texts, it is " + (jsonValue == null ? "null" : jsonValue.render(false)));
         }
-        texty.get("cs").putIfAbsent(bundleKey, "");
-        texty.get("en").putIfAbsent(bundleKey, "");
+        texts.get("cs").putIfAbsent(bundleKey, "");
+        texts.get("en").putIfAbsent(bundleKey, "");
     }
 
     private static <T> Iterable<T> iterable(final Iterator<T> it) {
         return () -> it;
     }
 
-    private VypocetniZdroj nactiVypocetniZdroj(Map<String, Map<String, String>> texty, JSONObject jzdroj, List<Stroj> allMachines, HashMap<String, VypocetniZdroj> zdrojMap) {
-        String zid = getString(jzdroj, "id");
-        boolean clust = getBoolean(jzdroj, "cluster");
+    private PerunComputingResource loadComputingResource(Map<String, Map<String, String>> texts, JSONObject jres, List<PerunMachine> allMachines, HashMap<String, PerunComputingResource> resourcesMap) {
+        String zid = getString(jres, "id");
+        boolean clust = getBoolean(jres, "cluster");
         log.debug("loading resource {}", zid);
-        VypocetniZdroj zdroj = new VypocetniZdroj(zid, getString(jzdroj, "name"), clust);
+        PerunComputingResource perunComputingResource = new PerunComputingResource(zid, getString(jres, "name"), clust);
 
-        JSONArray vos = (JSONArray) jzdroj.get("vos");
+        JSONArray vos = (JSONArray) jres.get("vos");
         if(vos!=null)  {
             for(JSONValue jv : vos.getValue()) {
-                if(jv.isString()) zdroj.getVoNames().add(((JSONString) jv).getValue());
+                if(jv.isString()) perunComputingResource.getVoNames().add(((JSONString) jv).getValue());
             }
         }
-        if(filterVo!=null&& !zdroj.getVoNames().contains(filterVo)) {
-            log.debug("skipping {}, not in vo {}",zid,filterVo);
-            return null;
-        }
 
-        nactiTexty("resource " + zid, texty, jzdroj, zdroj.getPopisKey(), "desc");
-        nactiTexty("resource " + zid, texty, jzdroj, zdroj.getSpecKey(), "spec");
+        loadTexts("resource " + zid, texts, jres, perunComputingResource.getDescriptionKey(), "desc");
+        loadTexts("resource " + zid, texts, jres, perunComputingResource.getSpecKey(), "spec");
 
-        zdroj.setPhoto(getString(jzdroj, "photo"));
-        zdroj.setThumbnail(getString(jzdroj, "thumbnail"));
-        zdroj.setCpuDesc(getString(jzdroj, "cpudesc"));
-        zdroj.setGpuDesc(getString(jzdroj, "gpudesc"));
-        zdroj.setMemory(getString(jzdroj, "memory"));
-        nactiTexty("resource " + zid, texty, jzdroj, zdroj.getDiskKey(), "disk");
-        nactiTexty("resource " + zid, texty, jzdroj, zdroj.getNetworkKey(), "network");
-        nactiTexty("resource " + zid, texty, jzdroj, zdroj.getCommentKey(), "comment");
-        nactiTexty("resource " + zid, texty, jzdroj, zdroj.getOwnerKey(), "owner");
+        perunComputingResource.setPhoto(getString(jres, "photo"));
+        perunComputingResource.setThumbnail(getString(jres, "thumbnail"));
+        perunComputingResource.setCpuDesc(getString(jres, "cpudesc"));
+        perunComputingResource.setGpuDesc(getString(jres, "gpudesc"));
+        perunComputingResource.setMemory(getString(jres, "memory"));
+        loadTexts("resource " + zid, texts, jres, perunComputingResource.getDiskKey(), "disk");
+        loadTexts("resource " + zid, texts, jres, perunComputingResource.getNetworkKey(), "network");
+        loadTexts("resource " + zid, texts, jres, perunComputingResource.getCommentKey(), "comment");
+        loadTexts("resource " + zid, texts, jres, perunComputingResource.getOwnerKey(), "owner");
 
 
 
-        if (zdroj.isCluster()) {
-            zdroj.setStroje(new ArrayList<>());
-            for (JSONValue jv2 : ((JSONArray) jzdroj.get("machines")).getValue()) {
+        if (perunComputingResource.isCluster()) {
+            perunComputingResource.setPerunMachines(new ArrayList<>());
+            for (JSONValue jv2 : ((JSONArray) jres.get("machines")).getValue()) {
                 JSONObject jstroj = (JSONObject) jv2;
-                Stroj stroj = new Stroj(zdroj, getString(jstroj, "name"), getInt(jstroj, "cpu"));
-                zdroj.getStroje().add(stroj);
-                allMachines.add(stroj);
+                PerunMachine perunMachine = new PerunMachine(perunComputingResource, getString(jstroj, "name"), getInt(jstroj, "cpu"));
+                perunComputingResource.getPerunMachines().add(perunMachine);
+                allMachines.add(perunMachine);
             }
-            zdroj.getStroje().sort(Stroj.NAME_COMPARATOR);
+            perunComputingResource.getPerunMachines().sort(PerunMachine.NAME_COMPARATOR);
         } else {
-            Stroj stroj = new Stroj(zdroj, zdroj.getNazev(), getInt(jzdroj, "cpu"));
-            zdroj.setStroj(stroj);
-            zdroj.setStroje(Collections.singletonList(stroj));
-            allMachines.add(stroj);
+            PerunMachine perunMachine = new PerunMachine(perunComputingResource, perunComputingResource.getName(), getInt(jres, "cpu"));
+            perunComputingResource.setPerunMachine(perunMachine);
+            perunComputingResource.setPerunMachines(Collections.singletonList(perunMachine));
+            allMachines.add(perunMachine);
         }
-        zdrojMap.put(zdroj.getId(), zdroj);
-        return zdroj;
+        resourcesMap.put(perunComputingResource.getId(), perunComputingResource);
+        return perunComputingResource;
     }
 
     private synchronized void checkFiles() {
@@ -285,14 +270,14 @@ public class PerunJsonImpl extends PerunAbstractImpl {
     }
 
     private void loadMachineFiles() {
-        List<VypocetniCentrum> centra = new ArrayList<>();
-        List<Stroj> allMachines = new ArrayList<>(500);
-        HashSet<String> reserved_names = new HashSet<>();
-        HashSet<String> frontend_names = new HashSet<>();
-        HashMap<String, Map<String, String>> texty = new HashMap<>(2);
-        HashMap<String, VypocetniZdroj> zdrojMap = new LinkedHashMap<>(40);
-        texty.put("cs", new HashMap<>(100));
-        texty.put("en", new HashMap<>(100));
+        List<OwnerOrganisation> ownerOrganisations = new ArrayList<>();
+        List<PerunMachine> allMachines = new ArrayList<>(500);
+        HashSet<String> reservedNames = new HashSet<>();
+        HashSet<String> frontendNames = new HashSet<>();
+        HashMap<String, Map<String, String>> texts = new HashMap<>(2);
+        HashMap<String, PerunComputingResource> computingResourcesMap = new LinkedHashMap<>(40);
+        texts.put("cs", new HashMap<>(100));
+        texts.put("en", new HashMap<>(100));
 
         for (File f : machineFiles) {
             log.info("loading {}", f);
@@ -303,16 +288,16 @@ public class PerunJsonImpl extends PerunAbstractImpl {
                 in.close();
                 //fyzicke stroje
                 JSONArray physical_machines = (JSONArray) perun_machines.get("physical_machines");
-                loadVypocetniCentra(centra, texty, physical_machines, allMachines, zdrojMap);
+                loadOwnerOrganisations(ownerOrganisations, texts, physical_machines, allMachines, computingResourcesMap);
                 //vyhrazene
                 JSONArray reserved_machines = (JSONArray) perun_machines.get("reserved_machines");
                 for (JSONValue jv : reserved_machines.getValue()) {
-                    reserved_names.add(((JSONString) jv).getValue());
+                    reservedNames.add(((JSONString) jv).getValue());
                 }
                 //frontendy
                 JSONArray frontends = (JSONArray) perun_machines.get("frontends");
                 for (JSONValue jv : frontends.getValue()) {
-                    frontend_names.add(((JSONString) jv).getValue());
+                    frontendNames.add(((JSONString) jv).getValue());
                 }
             } catch (Exception e) {
                 log.error("error parsing " + f, e);
@@ -320,59 +305,50 @@ public class PerunJsonImpl extends PerunAbstractImpl {
             loadedTimes.put(f, System.currentTimeMillis());
         }
         //mapa pro rychlejší vyhledávání strojů podle jména
-        Map<String, Stroj> allMachinesMap = new HashMap<>(allMachines.size() * 2);
-        for (Stroj stroj : allMachines) {
-            allMachinesMap.put(stroj.getName(), stroj);
+        Map<String, PerunMachine> allMachinesMap = new HashMap<>(allMachines.size() * 2);
+        for (PerunMachine perunMachine : allMachines) {
+            allMachinesMap.put(perunMachine.getName(), perunMachine);
         }
-        allMachines.sort(Stroj.NAME_COMPARATOR);
-        this.vyhledavacVyhrazenychStroju = new JsonVyhledavacVyhrazenychStroju(reserved_names);
-        this.vyhledavacFrontendu = new JsonVyhledavacFrontendu(frontend_names);
-        PerunJsonImpl.texty = texty;
-        this.centra = centra;
+        allMachines.sort(PerunMachine.NAME_COMPARATOR);
+        this.reservedMachinesFinder = new JsonReservedMachinesFinder(reservedNames);
+        this.frontendFinder = new JsonFrontendFinder(frontendNames);
+        PerunJsonImpl.texts = texts;
+        this.ownerOrganisations = ownerOrganisations;
         this.allMachines = allMachines;
         this.allMachinesMap = allMachinesMap;
-        this.zdrojMap = zdrojMap;
+        this.resourcesMap = computingResourcesMap;
         PerunResourceBundle.refresh();
     }
 
-    private void loadVypocetniCentra(List<VypocetniCentrum> centra, HashMap<String, Map<String, String>> texty, JSONArray physical_machines, List<Stroj> allMachines, HashMap<String, VypocetniZdroj> zdrojMap) {
+    private void loadOwnerOrganisations(List<OwnerOrganisation> owners, HashMap<String, Map<String, String>> texts, JSONArray physical_machines, List<PerunMachine> allMachines, HashMap<String, PerunComputingResource> resourcesMap) {
 
         for (JSONValue cv : physical_machines.getValue()) {
-            JSONObject jcentrum = (JSONObject) cv;
-            String id = getString(jcentrum, "id");
-            log.debug("loading centrum {}", id);
-            VypocetniCentrum centrum = new VypocetniCentrum(id, "centrum-" + id + "-name", "centrum-" + id + "-url");
-            nactiTexty("centrum " + id, texty, jcentrum, centrum.getNazevKey(), "name");
-            nactiTexty("centrum " + id, texty, jcentrum, centrum.getUrlKey(), "url");
-            nactiTexty("centrum " + id, texty, jcentrum, centrum.getSpecKey(), "spec");
+            JSONObject jorg = (JSONObject) cv;
+            String id = getString(jorg, "id");
+            OwnerOrganisation ownerOrganisation = new OwnerOrganisation(id, "centrum-" + id + "-name", "centrum-" + id + "-url");
+            loadTexts("centrum " + id, texts, jorg, ownerOrganisation.getNameKey(), "name");
+            loadTexts("centrum " + id, texts, jorg, ownerOrganisation.getUrlKey(), "url");
+            loadTexts("centrum " + id, texts, jorg, ownerOrganisation.getSpecKey(), "spec");
 
-            centrum.setZdroje(new ArrayList<>());
-            for (JSONValue jv : ((JSONArray) jcentrum.get("resources")).getValue()) {
-                JSONObject jzdroj = (JSONObject) jv;
-                VypocetniZdroj zdroj = nactiVypocetniZdroj(texty, jzdroj, allMachines, zdrojMap);
-                if(zdroj!=null) {
-                    centrum.getZdroje().add(zdroj);
-                }
+            ownerOrganisation.setPerunComputingResources(new ArrayList<>());
+            for (JSONValue jv : ((JSONArray) jorg.get("resources")).getValue()) {
+                PerunComputingResource perunComputingResource = loadComputingResource(texts, (JSONObject) jv, allMachines, resourcesMap);
+                ownerOrganisation.getPerunComputingResources().add(perunComputingResource);
             }
-            if(!centrum.getZdroje().isEmpty()) {
-                centra.add(centrum);
+            if(!ownerOrganisation.getPerunComputingResources().isEmpty()) {
+                owners.add(ownerOrganisation);
             }
         }
     }
 
     @Override
-    public Map<String, String> nactiVsechnyTexty(Locale locale) {
-        return texty.get(locale.toString());
-    }
-
-    @Override
-    public List<VypocetniCentrum> najdiVypocetniCentra() {
+    public List<OwnerOrganisation> findOwnerOrganisations() {
         checkFiles();
-        return centra;
+        return ownerOrganisations;
     }
 
     @Override
-    public List<Stroj> getMetacentroveStroje() {
+    public List<PerunMachine> getPerunMachines() {
         return allMachines;
     }
 
@@ -383,29 +359,22 @@ public class PerunJsonImpl extends PerunAbstractImpl {
 
     @Override
     public boolean isNodeVirtual(String nodeName) {
-        boolean b = !isNodePhysical(nodeName);
-        log.debug("isNodeVirtual({}) returns {}",nodeName,b);
-        return b;
+        return !isNodePhysical(nodeName);
     }
 
     @Override
     public boolean isNodePhysical(String nodeName) {
-        Stroj stroj = getStrojByName(nodeName);
-        boolean b = stroj != null;
-        log.debug("isNodePhysical({}) returns {}",nodeName,b);
-        return b;
+        return getMachineByName(nodeName) != null;
     }
 
     @Override
-    public Stroj getStrojByName(String machineName) {
-        Stroj stroj = allMachinesMap.get(machineName);
-        log.debug("getStrojByName({}) returns {}",machineName,stroj);
-        return stroj;
+    public PerunMachine getMachineByName(String machineName) {
+        return allMachinesMap.get(machineName);
     }
 
     @Override
-    public VypocetniZdroj getVypocetniZdrojByName(String zdrojName) {
-        return zdrojMap.get(zdrojName);
+    public PerunComputingResource getPerunComputingResourceByName(String name) {
+        return resourcesMap.get(name);
     }
 
     /**
@@ -414,13 +383,13 @@ public class PerunJsonImpl extends PerunAbstractImpl {
      * @return vyhledavac
      */
     @Override
-    public VyhledavacVyhrazenychStroju getVyhledavacVyhrazenychStroju() {
-        return vyhledavacVyhrazenychStroju;
+    public ReservedMachinesFinder getReservedMachinesFinder() {
+        return reservedMachinesFinder;
     }
 
     @Override
-    public VyhledavacFrontendu getVyhledavacFrontendu() {
-        return vyhledavacFrontendu;
+    public FrontendFinder getFrontendFinder() {
+        return frontendFinder;
     }
 
     @Override
@@ -428,25 +397,25 @@ public class PerunJsonImpl extends PerunAbstractImpl {
         return new ArrayList<>(users.values());
     }
 
-    private static class JsonVyhledavacVyhrazenychStroju extends VyhledavacJmen implements VyhledavacVyhrazenychStroju {
-        public JsonVyhledavacVyhrazenychStroju(Set<String> mnozinaJmen) {
-            super(mnozinaJmen);
+    private static class JsonReservedMachinesFinder extends NameFinder implements ReservedMachinesFinder {
+        public JsonReservedMachinesFinder(Set<String> names) {
+            super(names);
         }
 
         @Override
-        public boolean jeStrojVyhrazeny(Stroj stroj) {
-            return this.jeTam(stroj.getName());
+        public boolean isMachineReserved(PerunMachine perunMachine) {
+            return this.found(perunMachine.getName());
         }
     }
 
-    private static class JsonVyhledavacFrontendu extends VyhledavacJmen implements VyhledavacFrontendu {
-        public JsonVyhledavacFrontendu(Set<String> mnozinaJmen) {
+    private static class JsonFrontendFinder extends NameFinder implements FrontendFinder {
+        public JsonFrontendFinder(Set<String> mnozinaJmen) {
             super(mnozinaJmen);
         }
 
         @Override
-        public boolean jeStrojFrontend(String dlouheJmeno) {
-            return this.jeTam(dlouheJmeno);
+        public boolean isFrontend(String longName) {
+            return this.found(longName);
         }
     }
 }

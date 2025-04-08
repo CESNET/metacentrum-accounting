@@ -16,18 +16,18 @@
         <%-- variantní hláška o clusteru nebo SMP stroji --%>
         <% if (actionBean.getPerunMachine().getVypocetniZdroj().isCluster()) {%>
         <f:message key="machine_jsp_soucast_clusteru1"/>
-        <s:link href="/resource/${actionBean.perunMachine.vypocetniZdroj.id}"><c:out
-                value="${actionBean.perunMachine.vypocetniZdroj.nazev}"/></s:link>
+        <s:link href="/resource/${actionBean.perunMachine.perunComputingResource.id}"><c:out
+                value="${actionBean.perunMachine.perunComputingResource.nazev}"/></s:link>
         <f:message key="machine_jsp_soucast_clusteru2"/>
         <% } else { %>
         <f:message key="machine_jsp_smp_stroj1"/>
-        <s:link href="/resource/${actionBean.perunMachine.vypocetniZdroj.id}"><c:out
-                value="${actionBean.perunMachine.vypocetniZdroj.nazev}"/></s:link>
+        <s:link href="/resource/${actionBean.perunMachine.perunComputingResource.id}"><c:out
+                value="${actionBean.perunMachine.perunComputingResource.nazev}"/></s:link>
         <f:message key="machine_jsp_smp_stroj2"/>
         <% } %>
 
         <%-- tabulka s popisem hardware z Peruna --%>
-        <t:resource resource="${actionBean.perunMachine.vypocetniZdroj}"/>
+        <t:resource resource="${actionBean.perunMachine.perunComputingResource}"/>
 
 
         <%-- Cloud --%>

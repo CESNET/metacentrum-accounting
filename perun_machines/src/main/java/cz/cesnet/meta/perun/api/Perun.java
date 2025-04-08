@@ -1,29 +1,24 @@
 package cz.cesnet.meta.perun.api;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 public interface Perun {
 
     // primarni data
 
-    Map<String, String> nactiVsechnyTexty(Locale locale);
+    List<OwnerOrganisation> findOwnerOrganisations();
 
-    List<VypocetniCentrum> najdiVypocetniCentra();
-
-    List<Stroj> getMetacentroveStroje();
+    List<PerunMachine> getPerunMachines();
 
     List<PerunUser> getAllUsers();
 
     /**
-     * Vrací třídu, která rohoduje, zda má být daný stroj označen jako modrý protože je mimo PBS záměrně.
+     * Vrací třídu, která rozhoduje, zda má být daný stroj označen jako modrý protože je mimo PBS záměrně.
      * @return vyhledavac
      */
-    VyhledavacVyhrazenychStroju getVyhledavacVyhrazenychStroju();
+    ReservedMachinesFinder getReservedMachinesFinder();
 
-    VyhledavacFrontendu getVyhledavacFrontendu();
+    FrontendFinder getFrontendFinder();
 
 
     //odvozena data
@@ -32,11 +27,11 @@ public interface Perun {
 
     boolean isNodeVirtual(String nodeName);
 
-    Stroj getStrojByName(String machineName);
+    PerunMachine getMachineByName(String machineName);
 
-    FyzickeStroje getFyzickeStroje();
+    PhysicalMachines getPhysicalMachines();
 
-    VypocetniZdroj getVypocetniZdrojByName(String zdrojName);
+    PerunComputingResource getPerunComputingResourceByName(String name);
 
     boolean isNodePhysical(String nodeName);
 }

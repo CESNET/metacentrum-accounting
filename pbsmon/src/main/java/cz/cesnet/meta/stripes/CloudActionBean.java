@@ -4,7 +4,7 @@ import cz.cesnet.meta.cloud.Cloud;
 import cz.cesnet.meta.cloud.CloudPhysicalHost;
 import cz.cesnet.meta.cloud.CloudVM;
 import cz.cesnet.meta.pbs.Pbsky;
-import cz.cesnet.meta.pbsmon.RozhodovacStavuStroju;
+import cz.cesnet.meta.pbsmon.MachineStateDecider;
 import cz.cesnet.meta.perun.api.*;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -37,7 +37,7 @@ public class CloudActionBean extends BaseActionBean {
 
     List<CloudPhysicalHost> physicalHosts;
     Map<String, List<CloudVM>> vms;
-    List<VypocetniCentrum> centra;
+    List<OwnerOrganisation> centra;
     Map<String, Integer> cpuMap;
     Map<String, Boolean> inCloudMap;
 
@@ -57,38 +57,38 @@ public class CloudActionBean extends BaseActionBean {
         }
 
         //hw
-        FyzickeStroje fyzickeStroje = perun.getFyzickeStroje();
-        centra = fyzickeStroje.getCentra();
+        PhysicalMachines physicalMachines = perun.getPhysicalMachines();
+        centra = physicalMachines.getOwnerOrganisations();
         cpuMap = new HashMap<>();
-        RozhodovacStavuStroju.rozhodniStavy(pbsky, perun.getVyhledavacFrontendu(),
-                pbsCache.getMapping(), perun.getVyhledavacVyhrazenychStroju(), centra, cloud);
+        MachineStateDecider.decideStates(pbsky, perun.getFrontendFinder(),
+                pbsCache.getMapping(), perun.getReservedMachinesFinder(), centra, cloud);
         inCloudMap = new HashMap<>();
         //zjistit, zda jsou v cloudu
         Set<String> cloudPhysicalHostnames = new HashSet<>();
         for (CloudPhysicalHost cloudPhysicalHost : physicalHosts) {
             cloudPhysicalHostnames.add(cloudPhysicalHost.getFqdn());
         }
-        int celkemCPU = 0;
-        for (VypocetniCentrum centrum : centra) {
-            for (VypocetniZdroj zdroj : centrum.getZdroje()) {
-                int zdrojCPU = 0;
+        int totalCPU = 0;
+        for (OwnerOrganisation centrum : centra) {
+            for (PerunComputingResource perunComputingResource : centrum.getPerunComputingResources()) {
+                int resourceCPUs = 0;
                 boolean anyInCloud = false;
-                for (Stroj stroj : zdroj.getStroje()) {
-                    String name = stroj.getName();
+                for (PerunMachine perunMachine : perunComputingResource.getPerunMachines()) {
+                    String name = perunMachine.getName();
                     boolean inCloud = cloudPhysicalHostnames.contains(name);
                     anyInCloud |= inCloud;
                     inCloudMap.put(name, inCloud);
                     if (inCloud) {
-                        zdrojCPU += stroj.getCpuNum();
-                        cpuMap.put(stroj.getName(), stroj.getCpuNum());
+                        resourceCPUs += perunMachine.getCpuNum();
+                        cpuMap.put(perunMachine.getName(), perunMachine.getCpuNum());
                     }
                 }
-                inCloudMap.put(zdroj.getId(), anyInCloud);
-                cpuMap.put(zdroj.getId(), zdrojCPU);
-                celkemCPU += zdrojCPU;
+                inCloudMap.put(perunComputingResource.getId(), anyInCloud);
+                cpuMap.put(perunComputingResource.getId(), resourceCPUs);
+                totalCPU += resourceCPUs;
             }
         }
-        cpuMap.put("vsechny",celkemCPU);
+        cpuMap.put("all",totalCPU);
 
         return new ForwardResolution("/cloud/cloud.jsp");
     }
@@ -101,7 +101,7 @@ public class CloudActionBean extends BaseActionBean {
         return vms;
     }
 
-    public List<VypocetniCentrum> getCentra() {
+    public List<OwnerOrganisation> getCentra() {
         return centra;
     }
 

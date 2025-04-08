@@ -5,8 +5,8 @@ import cz.cesnet.meta.cloud.CloudVM;
 import cz.cesnet.meta.cloud.OpenStackCloudLoader;
 import cz.cesnet.meta.pbs.*;
 import cz.cesnet.meta.perun.api.Perun;
-import cz.cesnet.meta.perun.api.Stroj;
-import cz.cesnet.meta.perun.api.VypocetniZdroj;
+import cz.cesnet.meta.perun.api.PerunComputingResource;
+import cz.cesnet.meta.perun.api.PerunMachine;
 import cz.cesnet.meta.perun.impl.PerunJsonImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +39,10 @@ public class Main {
     }
     public static void main2(String[] args) {
         Perun perun = new PerunJsonImpl(Arrays.asList("/etc/pbsmon/pbsmon_machines.json"), Collections.emptyList());
-        VypocetniZdroj bofurA = perun.getVypocetniZdrojByName("cerit-hde-ostack.priv.cloud.muni.cz");
-        List<Stroj> stroje = bofurA.getStroje();
-        for (Stroj stroj : stroje) {
-            System.out.println("stroj = " + stroj);
+        PerunComputingResource bofurA = perun.getPerunComputingResourceByName("cerit-hde-ostack.priv.cloud.muni.cz");
+        List<PerunMachine> stroje = bofurA.getPerunMachines();
+        for (PerunMachine perunMachine : stroje) {
+            System.out.println("perunMachine = " + perunMachine);
         }
 
     }

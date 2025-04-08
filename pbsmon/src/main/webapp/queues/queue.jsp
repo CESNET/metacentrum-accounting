@@ -131,8 +131,8 @@
         <h3><f:message key="q_machines" /></h3>
         <table class="nodes" cellspacing="0">
             <tr>
-                <c:forEach items="${actionBean.machines}" var="stroj" varStatus="i">
-                <td class="node ${stroj.state}"><s:link href="/machine/${stroj.name}"><c:out value="${stroj.shortName}"/>&nbsp;(${stroj.cpuNum}&nbsp;CPU)</s:link></td>
+                <c:forEach items="${actionBean.machines}" var="perunMachine" varStatus="i">
+                <td class="node ${perunMachine.state}"><s:link href="/machine/${perunMachine.name}"><c:out value="${perunMachine.shortName}"/>&nbsp;(${perunMachine.cpuNum}&nbsp;CPU)</s:link></td>
                 <c:if test="${i.count%7==0}"></tr><tr></c:if>
             </c:forEach>
         </tr>

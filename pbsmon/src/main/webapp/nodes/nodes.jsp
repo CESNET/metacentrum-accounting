@@ -110,7 +110,7 @@
 
         <h2><a name="computing_machines"></a><f:message key="nodes_jsp_computing_machines"/></h2>
 
-        <p><f:message key="nodes_jsp_celkem_cpu"/>: <s:link href="/hardware">${actionBean.cpuMap['vsechny']}</s:link></p>
+        <p><f:message key="nodes_jsp_celkem_cpu"/>: <s:link href="/hardware">${actionBean.cpuMap['all']}</s:link></p>
 
         <p><f:message key="nodes_jsp_waiting_text1"/>
             <s:link href="/queues/jobsQueued"><strong><f:message key="nodes_jsp_waiting_jobs"><f:param value="${actionBean.jobsQueuedCount}"/></f:message></strong></s:link>
@@ -127,18 +127,18 @@
                 <span style="padding: 2px;" class="maintenance"><f:message key="nodesjsp_state_gray"/></span>
         </p>
 
-        <c:forEach items="${actionBean.centra}" var="centrum">
+        <c:forEach items="${actionBean.ownerOrganisations}" var="ownerOrganisation">
 
-            <h3><a name="${centrum.id}"></a><strong><f:message key="${centrum.nazevKey}"/></strong> (${actionBean.cpuMap[centrum.id]} CPU)</h3>
+            <h3><a name="${ownerOrganisation.id}"></a><strong><f:message key="${ownerOrganisation.nameKey}"/></strong> (${actionBean.cpuMap[ownerOrganisation.id]} CPU)</h3>
             <%--<p style="font-size: smaller; padding-left: 5px;"><f:message key="${centrum.specKey}"/></p>--%>
             <table width="90%">
-                <c:forEach var="zdr" items="${centrum.zdroje}" varStatus="s">
+                <c:forEach var="zdr" items="${ownerOrganisation.perunComputingResources}" varStatus="s">
                     <c:if test="${!s.first}"><tr><td colspan="2">&nbsp;</td></tr></c:if>
                     <tr>
                         <td colspan="2"><a name="${zdr.id}"></a>
-                            <s:link href="/resource/${zdr.id}"><c:out value="${zdr.nazev}"/></s:link>
+                            <s:link href="/resource/${zdr.id}"><c:out value="${zdr.name}"/></s:link>
                             <c:if test="${zdr.cluster}">(${actionBean.cpuMap[zdr.id]} CPU)</c:if>
-                            - <f:message key="${zdr.popisKey}"/></td>
+                            - <f:message key="${zdr.descriptionKey}"/></td>
                     </tr>
                     <f:message key="${zdr.specKey}" var="chunk"/>
                     <c:if test="${! empty chunk}">
@@ -151,11 +151,11 @@
 
                         <c:choose>
                             <c:when test="${zdr.cluster}">
-                                <c:if test="${! empty zdr.stroje}">
+                                <c:if test="${! empty zdr.perunMachines}">
                                 <table class="nodes" cellspacing="0">
                                 <tr>
-                                <c:forEach items="${zdr.stroje}" var="stroj" varStatus="i">
-                                    <t:stroj stroj="${stroj}"/>
+                                <c:forEach items="${zdr.perunMachines}" var="perunMachine" varStatus="i">
+                                    <t:perunMachine perunMachine="${perunMachine}"/>
                                     <c:if test="${i.count%8==0}"></tr><tr></c:if>
                                 </c:forEach>
                                 </tr>
@@ -164,7 +164,7 @@
                             </c:when>
                             <c:otherwise>
                                 <table class="nodes" cellspacing="0">
-                                <tr><t:stroj stroj="${zdr.stroj}"/></tr>
+                                <tr><t:perunMachine perunMachine="${zdr.perunMachine}"/></tr>
                                 </table>
                             </c:otherwise>
                         </c:choose>
@@ -180,8 +180,8 @@
         <h2><f:message key="nodes_jsp_nezarazene"/> (${actionBean.cpuMap['zbyle']} CPU)</h2>
         <table class="nodes">
             <tr><c:set var="numinrow" value="${1}"/>
-                <c:forEach items="${actionBean.zbyle}" var="stroj">
-                <td><c:out value="${stroj.shortName}"/> (${stroj.cpuNum} CPU)</td>
+                <c:forEach items="${actionBean.zbyle}" var="perunMachine">
+                <td><c:out value="${perunMachine.shortName}"/> (${perunMachine.cpuNum} CPU)</td>
                 <c:if test="${numinrow%6==0}"></tr>
             <tr></c:if>
                     <c:set var="numinrow" value="${numinrow+1}"/>

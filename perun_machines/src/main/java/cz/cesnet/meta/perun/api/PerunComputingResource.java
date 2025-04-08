@@ -4,12 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VypocetniZdroj implements Serializable {
+public class PerunComputingResource implements Serializable {
 
     private String id = null;
-    private String nazev = null;
+    private String name = null;
     private boolean cluster = false;
-    private String popisKey = null;
+    private String descriptionKey = null;
 
     private String photo;
     private String thumbnail;
@@ -17,30 +17,30 @@ public class VypocetniZdroj implements Serializable {
     private String gpuDesc;
     private String memory;
 
-    private Stroj stroj;
-    private List<Stroj> stroje;
+    private PerunMachine perunMachine;
+    private List<PerunMachine> perunMachines;
     private List<String> voNames = new ArrayList<>(1);
 
-    public VypocetniZdroj(String id, String nazev, boolean cluster, String popisKey, String urlKey) {
+    public PerunComputingResource(String id, String name, boolean cluster, String descriptionKey) {
         this.id = id;
-        this.nazev = nazev;
+        this.name = name;
         this.cluster = cluster;
-        this.popisKey = popisKey;
-        if (popisKey == null)
-            this.popisKey = "";
+        this.descriptionKey = descriptionKey;
+        if (descriptionKey == null)
+            this.descriptionKey = "";
 
     }
 
-    public VypocetniZdroj(String id, String nazev, boolean cluster) {
-        this(id,nazev,cluster,"resource-" +id+ "-desc","resource-" + id + "-url");
+    public PerunComputingResource(String id, String name, boolean cluster) {
+        this(id, name,cluster,"resource-" +id+ "-desc");
     }
 
     public String getId() {
         return this.id;
     }
 
-    public String getNazev() {
-        return this.nazev;
+    public String getName() {
+        return this.name;
     }
 
     public boolean isCluster() {
@@ -51,8 +51,8 @@ public class VypocetniZdroj implements Serializable {
         return cluster?""+id+"-clust-spec":""+id+"-host-spec";
     }
 
-    public String getPopisKey() {
-        return this.popisKey;
+    public String getDescriptionKey() {
+        return this.descriptionKey;
     }
 
     public String getDiskKey() {
@@ -72,27 +72,27 @@ public class VypocetniZdroj implements Serializable {
     }
 
 
-    public Stroj getStroj() {
-        return stroj;
+    public PerunMachine getPerunMachine() {
+        return perunMachine;
     }
 
-    public void setStroj(Stroj stroj) {
-        this.stroj = stroj;
+    public void setPerunMachine(PerunMachine perunMachine) {
+        this.perunMachine = perunMachine;
     }
 
-    public List<Stroj> getStroje() {
-        return stroje;
+    public List<PerunMachine> getPerunMachines() {
+        return perunMachines;
     }
 
-    public void setStroje(List<Stroj> stroje) {
-        this.stroje = stroje;
+    public void setPerunMachines(List<PerunMachine> perunMachines) {
+        this.perunMachines = perunMachines;
     }
 
     @Override
     public String toString() {
-        return "VypocetniZdroj{" +
+        return "PerunComputingResource{" +
                 "id='" + id + '\'' +
-                ", nazev='" + nazev + '\'' +
+                ", nazev='" + name + '\'' +
                 ", cluster=" + cluster +
                 ", photo='" + photo + '\'' +
                 ", thumbnail='" + thumbnail + '\'' +
@@ -107,7 +107,7 @@ public class VypocetniZdroj implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        VypocetniZdroj that = (VypocetniZdroj) o;
+        PerunComputingResource that = (PerunComputingResource) o;
         return !(id != null ? !id.equals(that.id) : that.id != null);
 
     }

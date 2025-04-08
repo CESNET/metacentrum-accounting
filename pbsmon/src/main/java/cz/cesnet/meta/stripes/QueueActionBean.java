@@ -4,9 +4,9 @@ import cz.cesnet.meta.cloud.CloudPhysicalHost;
 import cz.cesnet.meta.pbs.Job;
 import cz.cesnet.meta.pbs.Node;
 import cz.cesnet.meta.pbs.Queue;
-import cz.cesnet.meta.pbsmon.RozhodovacStavuStroju;
+import cz.cesnet.meta.pbsmon.MachineStateDecider;
 import cz.cesnet.meta.perun.api.Perun;
-import cz.cesnet.meta.perun.api.Stroj;
+import cz.cesnet.meta.perun.api.PerunMachine;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class QueueActionBean extends BaseActionBean {
     private Queue queue;
     private List<Node> nodes;
     private List<Job> jobs;
-    private List<Stroj> machines;
+    private List<PerunMachine> machines;
     private int cpus;
     private List<Queue> destinations;
 
@@ -82,19 +82,19 @@ public class QueueActionBean extends BaseActionBean {
         }
         cpus = 0;
         for (String machineName : machineNames) {
-            Stroj stroj = perun.getStrojByName(machineName);
-            if (stroj != null) {
-                machines.add(stroj);
-                cpus += stroj.getCpuNum();
+            PerunMachine perunMachine = perun.getMachineByName(machineName);
+            if (perunMachine != null) {
+                machines.add(perunMachine);
+                cpus += perunMachine.getCpuNum();
             } else {
                 log.warn("findMachinesForNodes() no machine for machineName {}", machineName);
             }
         }
         //sort physical machines by name
-        machines.sort(Stroj.NAME_COMPARATOR);
+        machines.sort(PerunMachine.NAME_COMPARATOR);
         //update their state
-        for (Stroj stroj : machines) {
-            RozhodovacStavuStroju.rozhodniStav(stroj, pbsky, pbsCache.getMapping(), perun.getVyhledavacFrontendu(), perun.getVyhledavacVyhrazenychStroju(), cloud);
+        for (PerunMachine perunMachine : machines) {
+            MachineStateDecider.decideState(perunMachine, pbsky, pbsCache.getMapping(), perun.getFrontendFinder(), perun.getReservedMachinesFinder(), cloud);
         }
     }
 
@@ -102,7 +102,7 @@ public class QueueActionBean extends BaseActionBean {
         return destinations;
     }
 
-    public List<Stroj> getMachines() {
+    public List<PerunMachine> getMachines() {
         return machines;
     }
 

@@ -53,7 +53,7 @@
             </c:choose>
         </p>
 
-        <p><f:message key="cloud_jsp_celkem_cpu"/>: ${actionBean.cpuMap['vsechny']}</p>
+        <p><f:message key="cloud_jsp_celkem_cpu"/>: ${actionBean.cpuMap['all']}</p>
 
         <h2><f:message key="cloud_jsp_headline_physical_machines"/></h2>
 
@@ -92,8 +92,8 @@
 
         </table>
 
-        <c:forEach items="${actionBean.centra}" var="centrum">
-            <c:forEach var="zdr" items="${centrum.zdroje}" varStatus="s">
+        <c:forEach items="${actionBean.centra}" var="ownerOrganisation">
+            <c:forEach var="zdr" items="${ownerOrganisation.perunComputingResources}" varStatus="s">
                 <c:choose>
                     <c:when test="${actionBean.inCloudMap[zdr.id]}">
                         <table width="90%">
@@ -104,9 +104,9 @@
                             </c:if>
                             <tr>
                                 <td colspan="2"><a name="${zdr.id}"></a>
-                                    <s:link href="/resource/${zdr.id}"><c:out value="${zdr.nazev}"/></s:link>
+                                    <s:link href="/resource/${zdr.id}"><c:out value="${zdr.name}"/></s:link>
                                     <c:if test="${zdr.cluster}">(${actionBean.cpuMap[zdr.id]} CPU)</c:if>
-                                    - <f:message key="${zdr.popisKey}"/></td>
+                                    - <f:message key="${zdr.descriptionKey}"/></td>
                             </tr>
                             <f:message key="${zdr.specKey}" var="chunk"/>
                             <c:if test="${! empty chunk}">
@@ -119,26 +119,26 @@
                                 <td colspan="2" style="padding-left: 20px;">
                                     <c:choose>
                                         <c:when test="${zdr.cluster}">
-                                            <c:if test="${! empty zdr.stroje}">
+                                            <c:if test="${! empty zdr.perunMachines}">
                                                 <table class="nodes" cellspacing="0">
                                                     <tr><c:set var="ci" value="${0}"/>
-                                                        <c:forEach items="${zdr.stroje}" var="stroj" varStatus="i">
+                                                        <c:forEach items="${zdr.perunMachines}" var="perunMachine" varStatus="i">
                                                         <c:choose>
-                                                            <c:when test="${stroj.cloudPbsHost}">
+                                                            <c:when test="${perunMachine.cloudPbsHost}">
                                                                 <c:set var="ci" value="${ci+1}"/>
-                                                                <td class="node cloudpbshost <c:if test='${stroj.cloudUsable}'>cloudusable</c:if>"
-                                                                    style="height: ${stroj.cpuNum/8}em; padding: 0;">
-                                                                    <s:link style="line-height: ${stroj.cpuNum/8}em;"
-                                                                            href="/machine/${stroj.name}"><c:out
-                                                                            value="${stroj.pbsName}"/>&nbsp;(${stroj.cpuNum}&nbsp;CPU)</s:link>
+                                                                <td class="node cloudpbshost <c:if test='${perunMachine.cloudUsable}'>cloudusable</c:if>"
+                                                                    style="height: ${perunMachine.cpuNum/8}em; padding: 0;">
+                                                                    <s:link style="line-height: ${perunMachine.cpuNum/8}em;"
+                                                                            href="/machine/${perunMachine.name}"><c:out
+                                                                            value="${perunMachine.pbsName}"/>&nbsp;(${perunMachine.cpuNum}&nbsp;CPU)</s:link>
                                                                 </td>
                                                             </c:when>
-                                                            <c:when test="${stroj.cloudManaged}">
+                                                            <c:when test="${perunMachine.cloudManaged}">
                                                                 <c:set var="ci" value="${ci+1}"/>
-                                                                <t:stroj stroj="${stroj}"/>
+                                                                <t:perunMachine perunMachine="${perunMachine}"/>
                                                             </c:when>
                                                             <c:otherwise>
-                                                                <!-- stroj ${stroj.name} neni v cloudu -->
+                                                                <!-- perunMachine ${perunMachine.name} neni v cloudu -->
                                                             </c:otherwise>
                                                         </c:choose>
                                                         <c:if test="${ci%8==0}"></tr>
@@ -150,7 +150,7 @@
                                         </c:when>
                                         <c:otherwise>
                                             <table class="nodes" cellspacing="0">
-                                                <tr><t:stroj stroj="${zdr.stroj}"/></tr>
+                                                <tr><t:perunMachine perunMachine="${zdr.perunMachine}"/></tr>
                                             </table>
                                         </c:otherwise>
                                     </c:choose>
