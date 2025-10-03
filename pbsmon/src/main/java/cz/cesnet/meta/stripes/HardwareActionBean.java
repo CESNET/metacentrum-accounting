@@ -30,7 +30,7 @@ public class HardwareActionBean extends BaseActionBean {
         return new ForwardResolution("/nodes/hardware.jsp");
     }
 
-    public PhysicalMachines getFyzickeStroje() {
+    public PhysicalMachines getPhysicalMachines() {
         return physicalMachines;
     }
 }

@@ -38,7 +38,7 @@ public class PerunMachine {
         this.state = state;
     }
 
-    public PerunComputingResource getVypocetniZdroj() {
+    public PerunComputingResource getPerunComputingResource() {
         return perunComputingResource;
     }
 

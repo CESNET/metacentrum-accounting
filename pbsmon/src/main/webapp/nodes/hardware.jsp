@@ -13,13 +13,13 @@
     <s:layout-component name="telo">
 
         <ul>
-        <c:forEach items="${actionBean.physicalMachines.centra}" var="ownerOrganisation">
-            <li> <strong><f:message key="${ownerOrganisation.nazevKey}"/></strong> (${actionBean.physicalMachines.cpuMap[ownerOrganisation.id]} CPU)
+        <c:forEach items="${actionBean.physicalMachines.ownerOrganisations}" var="ownerOrganisation">
+            <li> <strong><f:message key="${ownerOrganisation.nameKey}"/></strong> (${actionBean.physicalMachines.cpuMap[ownerOrganisation.id]} CPU)
                 <ul>
-            <c:forEach var="zdr" items="${ownerOrganisation.zdroje}" varStatus="s">
-                <li><a href="#<c:out value='${zdr.id}'/>"><c:out value="${zdr.nazev}"/></a>
+            <c:forEach var="zdr" items="${ownerOrganisation.perunComputingResources}" varStatus="s">
+                <li><a href="#<c:out value='${zdr.id}'/>"><c:out value="${zdr.name}"/></a>
                     (${actionBean.physicalMachines.cpuMap[zdr.id]} CPU<c:if test="${zdr.cluster}">,
-                         <f:message key="hardware.uzlu"><f:param value="${fn:length(zdr.stroje)}"/></f:message></c:if>)
+                         <f:message key="hardware.uzlu"><f:param value="${fn:length(zdr.perunMachines)}"/></f:message></c:if>)
                 </li>
             </c:forEach>
                 </ul>
@@ -28,15 +28,15 @@
         </ul>
         <hr>
 
-        <c:forEach items="${actionBean.physicalMachines.centra}" var="ownerOrganisation">
+        <c:forEach items="${actionBean.physicalMachines.ownerOrganisations}" var="ownerOrganisation">
 
-            <c:forEach var="zdr" items="${ownerOrganisation.zdroje}" varStatus="s">
+            <c:forEach var="zdr" items="${ownerOrganisation.perunComputingResources}" varStatus="s">
                 <div id="<c:out value='${zdr.id}'/>">
-                <s:link href="/resource/${zdr.id}"><c:out value="${zdr.nazev}"/></s:link>
+                <s:link href="/resource/${zdr.id}"><c:out value="${zdr.name}"/></s:link>
                 <c:if test="${zdr.cluster}">
-                    (${actionBean.physicalMachines.cpuMap[zdr.id]} CPU, <f:message key="hardware.uzlu"><f:param value="${fn:length(zdr.stroje)}"/></f:message> )
+                    (${actionBean.physicalMachines.cpuMap[zdr.id]} CPU, <f:message key="hardware.uzlu"><f:param value="${fn:length(zdr.perunMachines)}"/></f:message> )
                 </c:if>
-                - <f:message key="${zdr.popisKey}"/><br>
+                - <f:message key="${zdr.descriptionKey}"/><br>
                 <table>
                     <tr>
                         <td>

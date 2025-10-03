@@ -79,4 +79,5 @@
     <logger name="cz.cesnet.meta.cloud.CloudPhysicalHost" level="error"/>
     <logger name="cz.cesnet.meta.pbscache.PbsCacheImpl" level="error"/>
     <logger name="cz.cesnet.meta.cloud.CloudImpl" level="info"/>
+<!--    <logger name="cz.cesnet.meta.pbs.PbsConnectorFile" level="debug"/>-->
 </configuration>

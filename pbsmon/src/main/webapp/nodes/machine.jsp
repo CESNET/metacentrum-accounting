@@ -14,15 +14,15 @@
     <s:layout-component name="telo">
 
         <%-- variantní hláška o clusteru nebo SMP stroji --%>
-        <% if (actionBean.getPerunMachine().getVypocetniZdroj().isCluster()) {%>
+        <% if (actionBean.getPerunMachine().getPerunComputingResource().isCluster()) {%>
         <f:message key="machine_jsp_soucast_clusteru1"/>
         <s:link href="/resource/${actionBean.perunMachine.perunComputingResource.id}"><c:out
-                value="${actionBean.perunMachine.perunComputingResource.nazev}"/></s:link>
+                value="${actionBean.perunMachine.perunComputingResource.name}"/></s:link>
         <f:message key="machine_jsp_soucast_clusteru2"/>
         <% } else { %>
         <f:message key="machine_jsp_smp_stroj1"/>
         <s:link href="/resource/${actionBean.perunMachine.perunComputingResource.id}"><c:out
-                value="${actionBean.perunMachine.perunComputingResource.nazev}"/></s:link>
+                value="${actionBean.perunMachine.perunComputingResource.name}"/></s:link>
         <f:message key="machine_jsp_smp_stroj2"/>
         <% } %>
 
