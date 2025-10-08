@@ -269,6 +269,9 @@ public class PBSMessage implements Serializable {
                 ", usedCputime=" + usedCputime +
                 ", usedNcpus=" + usedNcpus +
                 ", usedCpupercent=" + usedCpupercent +
+                ", usedGpupercent=" + usedGpupercent +
+                ", usedGpuMemMaxPercent=" + usedGpuMemMaxPercent +
+                ", usedGpuPowerUsage=" + usedGpuPowerUsage +
                 ", execHosts=" + execHosts +
                 '}';
     }

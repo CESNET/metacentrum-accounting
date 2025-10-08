@@ -85,7 +85,9 @@ public class PbsRecordManagerImpl extends JdbcDaoSupport implements PbsRecordMan
                 .usingColumns("acct_id_string", "date_time", "jobname", "queue",
                         "create_time", "start_time", "end_time", "exit_status", "acct_user_id", "ci_acct_pbs_server_id",
                         "req_ncpus", "req_nodes", "req_nodect", "req_mem", "req_walltime", "soft_walltime",
-                        "used_ncpus", "used_mem", "used_vmem", "used_walltime", "used_cputime", "used_cpupercent", "req_gpus");
+                        "used_ncpus", "used_mem", "used_vmem", "used_walltime", "used_cputime", "used_cpupercent",
+                        "used_gpupercent", "used_gpumemmaxpercent", "used_gpupowerusage",
+                        "req_gpus");
 
         SimpleJdbcInsert insertStartPbsRecord = new SimpleJdbcInsert(dataSource)
                 .withTableName("acct_pbs_record_started")
