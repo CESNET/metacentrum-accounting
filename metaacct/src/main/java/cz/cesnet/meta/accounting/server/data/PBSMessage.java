@@ -34,6 +34,10 @@ public class PBSMessage implements Serializable {
   private int usedCpupercent;
   private long softWalltime;
 
+  private int usedGpupercent;
+  private int usedGpuMemMaxPercent;
+  private float usedGpuPowerUsage;
+
   private List<PBSHost> execHosts;
   private List<NodeSpec> nodesSpecs;
 
@@ -218,7 +222,31 @@ public class PBSMessage implements Serializable {
     this.softWalltime = softWalltime;
   }
 
-  @Override
+    public int getUsedGpupercent() {
+        return usedGpupercent;
+    }
+
+    public void setUsedGpupercent(int usedGpupercent) {
+        this.usedGpupercent = usedGpupercent;
+    }
+
+    public int getUsedGpuMemMaxPercent() {
+        return usedGpuMemMaxPercent;
+    }
+
+    public void setUsedGpuMemMaxPercent(int usedGpuMemMaxPercent) {
+        this.usedGpuMemMaxPercent = usedGpuMemMaxPercent;
+    }
+
+    public float getUsedGpuPowerUsage() {
+        return usedGpuPowerUsage;
+    }
+
+    public void setUsedGpuPowerUsage(float usedGpuPowerUsage) {
+        this.usedGpuPowerUsage = usedGpuPowerUsage;
+    }
+
+    @Override
     public String toString() {
         return "PBSMessage{" +
                 "user='" + user + '\'' +

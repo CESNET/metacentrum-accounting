@@ -8,4 +8,3 @@ test-output
 *~
 config.properties
 dependency-reduced-pom.xml
-deploy.sh

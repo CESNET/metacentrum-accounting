@@ -294,6 +294,9 @@ public class PbsRecordManagerImpl extends JdbcDaoSupport implements PbsRecordMan
             params.put("used_walltime", r.getMessageText().getUsedWalltime());
             params.put("used_cputime", r.getMessageText().getUsedCputime());
             params.put("used_cpupercent", r.getMessageText().getUsedCpupercent());
+            params.put("used_gpupercent", r.getMessageText().getUsedGpupercent());
+            params.put("used_gpumemmaxpercent", r.getMessageText().getUsedGpuMemMaxPercent());
+            params.put("used_gpupowerusage", r.getMessageText().getUsedGpuPowerUsage());
         }
         return params;
     }

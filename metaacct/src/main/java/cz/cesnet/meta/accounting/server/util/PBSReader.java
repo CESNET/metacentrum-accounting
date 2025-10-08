@@ -113,8 +113,17 @@ public class PBSReader {
                     String vmem = s.substring(s.indexOf('=') + 1);
                     pbsMessage.setUsedVmem(StringUtils.parsePbsLogSizeFormat(vmem));
                 } else if (s.startsWith("resources_used.cpupercent=")) {
-                    String ncpus = s.substring(s.indexOf('=') + 1);
-                    pbsMessage.setUsedCpupercent(Integer.parseInt(ncpus));
+                    String cpupercent = s.substring(s.indexOf('=') + 1);
+                    pbsMessage.setUsedCpupercent(Integer.parseInt(cpupercent));
+                } else if (s.startsWith("resources_used.gpupercent=")) {
+                    String gpupercent = s.substring(s.indexOf('=') + 1);
+                    pbsMessage.setUsedGpupercent(Integer.parseInt(gpupercent));
+                } else if (s.startsWith("resources_used.gpumemmaxpercent=")) {
+                    String gpumemmaxpercent = s.substring(s.indexOf('=') + 1);
+                    pbsMessage.setUsedGpuMemMaxPercent(Integer.parseInt(gpumemmaxpercent));
+                } else if (s.startsWith("resources_used.gpupowerusage=")) {
+                    String gpupowerusage = s.substring(s.indexOf('=') + 1);
+                    pbsMessage.setUsedGpuPowerUsage(Float.parseFloat(gpupowerusage));
                 } else if (s.startsWith("Resource_List.walltime=")) {
                     String walltime = s.substring(s.indexOf('=') + 1);
                     pbsMessage.setReqWalltime(StringUtils.parsePbsLogTimeFormat(walltime));
