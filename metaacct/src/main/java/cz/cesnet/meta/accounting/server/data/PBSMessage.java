@@ -14,6 +14,7 @@ public class PBSMessage implements Serializable {
   private String group;
   private String jobname;
   private String queue;
+  private String project;
   private long createTime;  
   private long startTime;
   private long endTime;
@@ -118,7 +119,15 @@ public class PBSMessage implements Serializable {
     this.user = user;
   }
 
-  public long getReqNcpus() {
+    public String getProject() {
+        return project;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
+    }
+
+    public long getReqNcpus() {
     return reqNcpus;
   }
 
@@ -253,6 +262,7 @@ public class PBSMessage implements Serializable {
                 ", group='" + group + '\'' +
                 ", jobname='" + jobname + '\'' +
                 ", queue='" + queue + '\'' +
+                ", project='" + project + '\'' +
                 ", createTime=" + createTime +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +

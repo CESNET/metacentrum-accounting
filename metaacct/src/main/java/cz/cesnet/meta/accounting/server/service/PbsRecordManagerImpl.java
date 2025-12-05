@@ -82,7 +82,7 @@ public class PbsRecordManagerImpl extends JdbcDaoSupport implements PbsRecordMan
         DataSource dataSource = getDataSource();
         SimpleJdbcInsert insertEndPbsRecord = new SimpleJdbcInsert(dataSource)
                 .withTableName("acct_pbs_record")
-                .usingColumns("acct_id_string", "date_time", "jobname", "queue",
+                .usingColumns("acct_id_string", "date_time", "jobname", "queue", "project",
                         "create_time", "start_time", "end_time", "exit_status", "acct_user_id", "ci_acct_pbs_server_id",
                         "req_ncpus", "req_nodes", "req_nodect", "req_mem", "req_walltime", "soft_walltime",
                         "used_ncpus", "used_mem", "used_vmem", "used_walltime", "used_cputime", "used_cpupercent",
@@ -276,6 +276,7 @@ public class PbsRecordManagerImpl extends JdbcDaoSupport implements PbsRecordMan
         params.put("date_time", r.getDateTime());
         params.put("jobname", r.getMessageText().getJobname());
         params.put("queue", r.getMessageText().getQueue());
+        params.put("project", r.getMessageText().getProject());
         params.put("create_time", r.getMessageText().getCreateTime());
         params.put("start_time", r.getMessageText().getStartTime());
         params.put("acct_user_id", allUsers.get(r.getMessageText().getUser()));

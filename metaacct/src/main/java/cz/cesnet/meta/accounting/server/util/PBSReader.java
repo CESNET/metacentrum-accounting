@@ -89,6 +89,8 @@ public class PBSReader {
                     pbsMessage.setJobname(s.substring(s.indexOf('=') + 1));
                 } else if (s.startsWith("queue=")) {
                     pbsMessage.setQueue(s.substring(s.indexOf('=') + 1));
+                } else if (s.startsWith("project=")) {
+                    pbsMessage.setProject(s.substring(s.indexOf('=') + 1));
                 } else if (s.startsWith("ctime=")) {
                     pbsMessage.setCreateTime(Long.parseLong(s.substring(s.indexOf('=') + 1)));
                 } else if (s.startsWith("start=")) {
