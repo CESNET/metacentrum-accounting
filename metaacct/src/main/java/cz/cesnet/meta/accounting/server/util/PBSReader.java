@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PBSReader {
 
@@ -38,6 +40,9 @@ public class PBSReader {
                 continue;
             }
             PBSRecord record = new PBSRecord();
+            /*
+              Formát řádku logu je timestamp;type;job_id;message následující kód tedy parsuje tyto 4 části.
+             */
             String[] entryParts = line.split(";");
 
             switch (entryParts[1]) {
@@ -76,7 +81,11 @@ public class PBSReader {
 
             record.setIdString(entryParts[2]);
 
-            String[] messageParts = entryParts[3].split(" ");
+            /*
+              Formát message je definován jako položky oddělené mezerou, pokud hodnota obsahuje mezeru, je v uvozovkách.
+              Ale prakticky se objevuje i hodnota v apostrofech obsahující JSON včetně uvozovek a mezer.
+             */
+            String[] messageParts = parseMessageParts(entryParts[3]);
             PBSMessage pbsMessage = new PBSMessage();
 
 
@@ -259,5 +268,31 @@ public class PBSReader {
 
     private static String substringAfter(String s,char ch) {
         return s.substring(s.indexOf(ch) + 1);
+    }
+
+    // Vegenerováno Gemini - Regex logika:
+    // 1. ([^=\s]+)      -> Key
+    // 2. '([^']*)'      -> Value v apostrofech (bere vše, včetně " a mezer, vhodné pro JSON)
+    // 3. "([^"]*)"      -> Value v uvozovkách
+    // 4. ([^\s"']+)     -> Value bez oddělovačů (nesmí obsahovat ' ani ")
+    private static final Pattern PATTERN = Pattern.compile("([^=\\s]+)=(?:'([^']*)'|\"([^\"]*)\"|([^\\s\"']+))");
+
+    private static String[] parseMessageParts(String line) {
+        List<String> list = new ArrayList<>();
+        Matcher matcher = PATTERN.matcher(line);
+
+        while (matcher.find()) {
+            String key = matcher.group(1); // Key
+            String value;
+            if (matcher.group(2) != null) {
+                value = matcher.group(2); // Single quoted (JSON)
+            } else if (matcher.group(3) != null) {
+                value = matcher.group(3); // Double quoted
+            } else {
+                value = matcher.group(4); // Unquoted
+            }
+            list.add(key+"="+value);
+        }
+        return list.toArray(new String[0]);
     }
 }
