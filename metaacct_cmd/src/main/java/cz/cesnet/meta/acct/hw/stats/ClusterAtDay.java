@@ -120,7 +120,7 @@ public class ClusterAtDay {
 
     public double getUtilizationRatio() {
         long dostupne = getAllCpuTime() - getMaintenanceCpuTime();
-        long vyuzite = getReservedCpuTime() + getPerunReservedCpuTime() + getJobsTime();
+        long vyuzite = Math.min((getReservedCpuTime() + getPerunReservedCpuTime() + getJobsTime()), dostupne);
         double vyuziti;
 
         if (dostupne == 0) {
